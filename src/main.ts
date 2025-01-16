@@ -6,7 +6,7 @@ import App from './App.vue'
 import * as ElIcon from '@element-plus/icons-vue'
 import store from './store'
 
-// 你好你好
+// 你好
 // @ts-ignore
 import locale from 'element-plus/dist/locale/zh-cn.mjs'
 import router from '@/router'
