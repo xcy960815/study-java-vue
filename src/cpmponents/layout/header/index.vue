@@ -14,14 +14,22 @@
         />
       </svg>
     </div>
+
     <el-dropdown
       trigger="contextmenu"
       @command="handleChooseItem"
       size="default"
     >
-      <span class="user-name">
-        {{ userInfo.nickName }}
-      </span>
+      <div class="user-info">
+        <el-avatar
+          class="user-avatar"
+          shape="square"
+          :src="userInfo.avatar"
+        />
+        <span class="user-name">
+          {{ userInfo.nickName }}
+        </span>
+      </div>
       <template #dropdown>
         <el-dropdown-menu>
           <el-dropdown-item command="user-info"
@@ -38,10 +46,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, onMounted } from 'vue'
-import { useUserInfoStore } from '@store'
-import { useSystemInfoStore } from '@store'
-
+import { computed, onMounted } from 'vue'
+import {
+  useUserInfoStore,
+  useSystemInfoStore
+} from '@store'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
 const systemInfoStore = useSystemInfoStore()
@@ -56,8 +67,7 @@ const toggleClick = () => {
 const handleChooseItem = (command: string) => {
   switch (command) {
     case 'user-info':
-      console.log('个人中心')
-
+      router.push('/user/info')
       break
     case 'login-out':
       console.log('退出登录')
@@ -85,6 +95,15 @@ onMounted(() => {
 
   .hamburger.is-active {
     transform: rotate(180deg);
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+
+    .user-avatar {
+      margin-right: 10px;
+    }
   }
 }
 </style>

@@ -6,11 +6,15 @@ import {
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
-const routes: RouteRecordRaw[] = [
+
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
-    redirect: '/login'
+    redirect: '/login',
+    meta: {
+      hidden: true
+    }
   },
   {
     path: '/login',
@@ -34,12 +38,23 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       {
+        path: '/user/info',
+        name: 'info',
+        component: defineAsyncComponent(
+          () => import(`../views/user/info.vue`)
+        ),
+        meta: {
+          title: '用户中心'
+        }
+      },
+      {
         path: '/user/list',
         name: 'list',
         component: defineAsyncComponent(
           () => import(`../views/user/list.vue`)
         ),
         meta: {
+          hidden: true,
           title: '用户列表'
         }
       }

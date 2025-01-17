@@ -95,6 +95,12 @@ export default defineConfig(({ mode }) => {
         ),
         '@store': fileURLToPath(
           new URL('./src/store', import.meta.url)
+        ),
+        '@components': fileURLToPath(
+          new URL('./src/components', import.meta.url)
+        ),
+        '@router': fileURLToPath(
+          new URL('./src/router', import.meta.url)
         )
       }
     }

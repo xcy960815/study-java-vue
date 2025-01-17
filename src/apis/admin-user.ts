@@ -8,7 +8,7 @@ interface RequestParams extends baseListParams {}
  * @returns {Promise<ResponseResult<T>>}
  */
 export function getAdminUserList<
-  T = Array<AdminUserOption>
+  T = Array<AdminUserInfoOption>
 >(
   queryFormData: RequestParams
 ): Promise<ResponseResult<T>> {

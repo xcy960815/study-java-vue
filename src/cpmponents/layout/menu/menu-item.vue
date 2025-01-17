@@ -1,24 +1,38 @@
 <template>
-  <el-sub-menu v-if="hasSubMenu(props.menuItem)" index="1">
-    <template #title>
-      <el-icon>
-        <location />
-      </el-icon>
-      <span>Navigator One</span>
-    </template>
-  </el-sub-menu>
+  <template v-for="menuItem in menuData">
+    <el-sub-menu
+      v-if="hasSubMenu(menuItem)"
+      :index="menuItem.path"
+    >
+      <template #title>
+        <el-icon>
+          <location />
+        </el-icon>
+        <span>{{ menuItem.meta?.title }}</span>
+      </template>
+      <menu-item :menu-data="menuItem.children"></menu-item>
+    </el-sub-menu>
+    <el-menu-item v-else :index="menuItem.path">
+      <el-icon><icon-menu /></el-icon>
+      <span>{{ menuItem.meta?.title }}</span>
+    </el-menu-item>
+  </template>
 </template>
 
 <script lang="ts" setup>
-import type { PropType } from 'vue'
+import { computed, type PropType } from 'vue'
 import { type RouteRecordRaw } from 'vue-router'
 const props = defineProps({
-  menuItem: {
-    type: Object as PropType<RouteRecordRaw>,
+  menuData: {
+    type: Object as PropType<Array<RouteRecordRaw>>,
     default: () => {
-      return {}
+      return []
     }
   }
+})
+
+const menuData = computed(() => {
+  return props.menuData
 })
 const hasSubMenu = (menuItem: RouteRecordRaw) => {
   return menuItem.children && menuItem.children.length

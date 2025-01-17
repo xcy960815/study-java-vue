@@ -1,31 +1,20 @@
 <template>
   <h4 class="layout-header-title">{{ viteAppTitle }}</h4>
   <el-menu
+    :collapse="isCollapse"
     active-text-color="#fff"
-    background-color="#293135"
+    background-color="rgb(2, 93, 126)"
     router
     :default-active="defaultActive"
     text-color="#fff"
   >
-    <template v-for="menuItem in menuData">
-      <menu-item :menu-item="menuItem"></menu-item>
-    </template>
-    <!-- <el-menu-item index="/user/list">
-      <el-icon>
-        <menu />
-      </el-icon>
-      <span>用户</span>
-    </el-menu-item>
-    <el-menu-item index="/admin-user/list">
-      <el-icon>
-        <document />
-      </el-icon>
-      <span>超级用户</span>
-    </el-menu-item> -->
+    <menu-item :menu-data="menuData"></menu-item>
   </el-menu>
 </template>
 
 <script lang="ts" setup>
+// import { routes } from "@/router"
+import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted } from 'vue'
 import {
@@ -37,28 +26,44 @@ const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
 const defaultActive = computed(() => route.path)
-
+const systemInfoStore = useSystemInfoStore()
+const isCollapse = computed(() => {
+  return !systemInfoStore.openMenuFlag
+})
 const menuData = computed(() => {
-  const allRoutes = router.getRoutes()
-  const filterRoutes = (routes: RouteRecordRaw[]) => {
-    return routes.filter((menuItem) => {
-      if (menuItem.children?.length) {
-        menuItem.children = filterRoutes(menuItem.children)
-      }
-      return menuItem?.meta?.hidden !== true
-    })
+  const routes = router.options.routes
+  function filterRoutes(
+    data: ReadonlyArray<RouteRecordRaw>
+  ) {
+    return data
+      .map((node) => {
+        const newNode = { ...node }
+        if (
+          newNode.children &&
+          newNode.children.length > 0
+        ) {
+          newNode.children = filterRoutes(newNode.children)
+        }
+        return newNode
+      })
+      .filter(
+        (node) =>
+          node.meta &&
+          node.meta?.title &&
+          !node.meta?.hidden
+      )
   }
-  return filterRoutes(allRoutes)
+  return filterRoutes(routes)
 })
 onMounted(() => {
-  console.log(menuData.value)
+  // console.log(router);
 })
 </script>
 <style lang="less" scoped>
 .layout-header-title {
   height: 50px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   font-family: Avenir, Helvetica Neue, Arial, Helvetica,
     sans-serif;
   text-align: center;

@@ -1,4 +1,4 @@
-declare interface AdminUserOption {
+declare interface AdminUserInfoOption {
   adminUserId: number
   locked: number
   loginPassword: string

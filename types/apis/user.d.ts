@@ -1,8 +1,8 @@
-declare interface UserOption {
+declare interface UserInfoOption {
   /**
    * 用户主键id
    */
-  id: number
+  userId: number | null
 
   /**
    * 用户昵称
@@ -38,9 +38,14 @@ declare interface UserOption {
    * 注册时间
    */
   createTime: string
+
+  /**
+   * 头像 （base64）
+   */
+  avatar: string
 }
 
 declare interface UserListResult {
-  data: UserOption[]
+  data: UserInfoOption[]
   total: number
 }

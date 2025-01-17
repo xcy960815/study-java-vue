@@ -4,9 +4,9 @@ interface GetUserListParams extends baseListParams {}
 
 /**
  * 获取当前登录用户信息
- * @returns {ResponseResult<UserOption>}
+ * @returns {ResponseResult<UserInfoOption>}
  */
-export const getUserInfo = <T extends UserOption>() => {
+export const getUserInfo = <T extends UserInfoOption>() => {
   const url = `/user/getUserInfo`
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
@@ -34,32 +34,57 @@ export const getUserList = <T = any>(
 /**
  * 更新用户请求参数类型
  * @param params
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export const updateUserInfo = <T extends boolean>(
+  params: Partial<UserInfoOption>
+): Promise<ResponseResult<T>> => {
+  const url = `/user/updateUserInfo`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(
+    url,
+    params
+  )
+}
+
+/**
+ * 上传用户头像
+ * @param params {FormData}
+ * @returns {Promise<ResponseResult<string>>}
+ */
+export const updateUserAvatar = <T extends string>(
+  params: FormData
+) => {
+  const url = `/user/updateUserAvatar`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(
+    url,
+    params
+  )
+}
+
+/**
+ * 创建用户信息
+ * @param params {Partial<UserInfoOption>}
  * @returns {Promise<ResponseResult<T>>}
  */
-export const updateUser = <T = any>(
-  params: Partial<UserOption>
+export const insertUserInfo = <T extends boolean>(
+  params: Partial<UserInfoOption>
 ): Promise<ResponseResult<T>> => {
-  const url = `/user/updateUser`
+  const url = `/user/insertUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(
     url,
     params
   )
 }
 
-export const insertUser = <T = any>(
-  params: Partial<UserOption>
+/**
+ * 删除用户信息
+ * @param params {Partial<UserInfoOption>}
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export const deleteUserInfo = <T extends boolean>(
+  params: Partial<UserInfoOption>
 ): Promise<ResponseResult<T>> => {
-  const url = `/user/insertUser`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    params
-  )
-}
-
-export const deleteUser = <T = any>(
-  params: Partial<UserOption>
-): Promise<ResponseResult<T>> => {
-  const url = `/user/deleteUser`
+  const url = `/user/deleteUserInfoInfo`
   return request.delete<
     ResponseResult<T>,
     ResponseResult<T>

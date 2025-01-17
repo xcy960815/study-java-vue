@@ -1,5 +1,10 @@
 <template>
-  <el-form :model="queryFormData" label-width="auto" inline>
+  <el-form
+    :model="queryFormData"
+    label-width="auto"
+    inline
+    v-show="showSearch"
+  >
     <el-form-item label="用户昵称">
       <el-input
         v-model="queryFormData.nickName"
@@ -29,9 +34,15 @@
       />
     </el-form-item>
   </el-form>
-  <el-button type="success" @click="handleClickAddUser"
-    >新增用户</el-button
+  <Handle-ToolBar
+    v-model:showSearch="showSearch"
+    @queryTableData="getUserList"
   >
+    <el-button type="primary" @click="handleClickAddUser">
+      新增用户
+    </el-button>
+  </Handle-ToolBar>
+
   <el-table
     border
     :data="userListInfo.tableData"
@@ -139,8 +150,9 @@ import { userModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import HandleToolBar from '@/cpmponents/handle-toolbar/index.vue'
 interface UserListInfo {
-  tableData: UserOption[]
+  tableData: UserInfoOption[]
   total: number | undefined
   pageSize: number
   pageNum: number
@@ -157,6 +169,7 @@ const queryFormData = reactive({
   address: ''
 })
 const addOrEditUserDialogTitle = ref('')
+
 const addOrEditUserDialogVisible = ref(false)
 
 const userListInfo = reactive<UserListInfo>({
@@ -193,13 +206,14 @@ const getUserList = async () => {
 const addOrEditUserFormRef = ref<FormInstance>()
 
 const addOrEditUserFormData = reactive<
-  Omit<UserOption, 'id' | 'age' | 'createTime'>
+  Omit<UserInfoOption, 'userId' | 'age' | 'createTime'>
 >({
   nickName: '',
   loginName: '',
   introduceSign: '',
   address: '',
-  passwordMd5: 'e10adc3949ba59abbe56e057f20f883e'
+  passwordMd5: 'e10adc3949ba59abbe56e057f20f883e',
+  avatar: ''
 })
 
 const addOrEditUserFormRules: FormRules<
@@ -243,7 +257,7 @@ const handleClickAddUser = () => {
   })
 }
 
-const handleClickEditUser = (row: UserOption) => {
+const handleClickEditUser = (row: UserInfoOption) => {
   addOrEditUserDialogTitle.value = '编辑用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
@@ -261,11 +275,11 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditUserDialogTitle.value === '新增用户') {
-    result = await userModule.insertUser<boolean>(
+    result = await userModule.insertUserInfo(
       addOrEditUserFormData
     )
   } else {
-    result = await userModule.updateUser<boolean>(
+    result = await userModule.updateUserInfo<boolean>(
       addOrEditUserFormData
     )
   }
@@ -276,16 +290,17 @@ const handleClickAddOrEditConfirm = async () => {
   }
 }
 
-const handleClickDeleteUser = (row: UserOption) => {
+const handleClickDeleteUser = (row: UserInfoOption) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning'
   })
     .then(async () => {
-      const result = await userModule.deleteUser<boolean>({
-        id: row.id
-      })
+      const result =
+        await userModule.deleteUserInfo<boolean>({
+          userId: row.userId
+        })
       if (result.code !== 200) return
       getUserList()
       ElMessage({
@@ -301,6 +316,7 @@ const handleClickDeleteUser = (row: UserOption) => {
     })
 }
 
+const showSearch = ref(true)
 onMounted(() => {
   getUserList()
 })

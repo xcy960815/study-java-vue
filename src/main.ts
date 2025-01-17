@@ -5,8 +5,6 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import * as ElIcon from '@element-plus/icons-vue'
 import store from './store'
-
-// 你好你还哦啊12121212
 // @ts-ignore
 import locale from 'element-plus/dist/locale/zh-cn.mjs'
 import router from '@/router'
@@ -14,7 +12,7 @@ import router from '@/router'
 const app = createApp(App)
 app.use(ElementPlus, {
   locale,
-  size: 'small',
+  // size: 'small',
   zIndex: 3000
 })
 Object.keys(ElIcon).forEach((key) => {

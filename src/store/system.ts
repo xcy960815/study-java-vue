@@ -4,7 +4,7 @@ import { Names } from './store-name'
 export const systemInfoStore = defineStore(Names.SYSTEM, {
   state: () => {
     return {
-      openMenu: false
+      openMenu: true
     }
   },
   getters: {
@@ -19,6 +19,6 @@ export const systemInfoStore = defineStore(Names.SYSTEM, {
     setOpenMenuFlag(flag: boolean) {
       this.openMenu = flag
     }
-  }
-  // persist: true
+  },
+  persist: true
 })

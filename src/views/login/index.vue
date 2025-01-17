@@ -70,6 +70,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useRouter } from 'vue-router'
 import { useUserInfoStore } from '@/store'
 import type { FormRules, FormInstance } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
