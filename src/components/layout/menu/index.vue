@@ -56,7 +56,7 @@ const menuData = computed(() => {
   return filterRoutes(routes)
 })
 onMounted(() => {
-  // console.log(router);
+  console.log(menuData.value)
 })
 </script>
 <style lang="less" scoped>

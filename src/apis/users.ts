@@ -1,24 +1,28 @@
 import { request } from '@utils/request'
 
-interface GetUserListParams extends baseListParams {}
-
 /**
  * 获取当前登录用户信息
- * @returns {ResponseResult<UserInfoOption>}
+ * @returns {ResponseResult<UserInfoDto>}
  */
-export const getUserInfo = <T extends UserInfoOption>() => {
+export const getUserInfo = <T extends UserInfoDto>() => {
   const url = `/user/getUserInfo`
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
   )
 }
+
+interface UserListRequestParams
+  extends baseListParams,
+    UserInfoVo {}
 /**
  * 获取用户列表请求参数类型
  * @param queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getUserList = <T = any>(
-  queryFormData: GetUserListParams
+export const getUserList = <
+  T extends ListResonse<UserInfoDto>
+>(
+  queryFormData: UserListRequestParams
 ): Promise<ResponseResult<T>> => {
   const { pageSize, pageNum, ...otherQueryFormData } =
     queryFormData
@@ -33,11 +37,11 @@ export const getUserList = <T = any>(
 
 /**
  * 更新用户请求参数类型
- * @param params
+ * @param {UserInfoVo} params
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export const updateUserInfo = <T extends boolean>(
-  params: Partial<UserInfoOption>
+  params: UserInfoVo
 ): Promise<ResponseResult<T>> => {
   const url = `/user/updateUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(
@@ -63,11 +67,11 @@ export const updateUserAvatar = <T extends string>(
 
 /**
  * 创建用户信息
- * @param params {Partial<UserInfoOption>}
+ * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<T>>}
  */
 export const insertUserInfo = <T extends boolean>(
-  params: Partial<UserInfoOption>
+  params: Partial<UserInfoDto>
 ): Promise<ResponseResult<T>> => {
   const url = `/user/insertUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(
@@ -78,11 +82,11 @@ export const insertUserInfo = <T extends boolean>(
 
 /**
  * 删除用户信息
- * @param params {Partial<UserInfoOption>}
+ * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export const deleteUserInfo = <T extends boolean>(
-  params: Partial<UserInfoOption>
+  params: UserInfoVo
 ): Promise<ResponseResult<T>> => {
   const url = `/user/deleteUserInfoInfo`
   return request.delete<

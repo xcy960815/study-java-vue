@@ -1,0 +1,23 @@
+// element-plus 样式中的变量引出来重新赋值
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  $colors: (
+    'primary': (
+      'base': pink
+    ),
+    'success': (
+      'base': red
+    ),
+    'warning': (
+      'base': #ff771c
+    ),
+    'danger': (
+      'base': #ff3030
+    ),
+    'error': (
+      'base': #ff3030
+    ),
+    'info': (
+      'base': #9e9e9e
+    )
+  )
+);

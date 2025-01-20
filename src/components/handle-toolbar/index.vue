@@ -42,6 +42,9 @@
 import { Search, Refresh } from '@element-plus/icons-vue'
 import { useSlots, type Slots } from 'vue'
 
+defineOptions({
+  name: 'handle-toolbar'
+})
 const showSearch = defineModel('showSearch', {
   default: true
 })
@@ -68,6 +71,7 @@ const defaultSlotContents = slots.default
 .handle-toolbar {
   position: relative;
   margin-bottom: 10px;
+  height: 32px;
 
   .right-panel {
     display: flex;

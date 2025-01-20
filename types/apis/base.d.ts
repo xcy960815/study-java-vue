@@ -8,3 +8,8 @@ declare type ResponseResult<T = any> = {
   data: T
   message: string
 }
+
+declare interface ListResonse<D extends Object> {
+  data: D[]
+  total: number
+}

@@ -29,7 +29,7 @@ export const userInfoStore = defineStore(Names.User, {
         })
         const { token } = result.data
         await setToken(token)
-        eventEmitter.emit('login-success')
+        eventEmitter.emit('login')
       }
     },
     /**
@@ -43,7 +43,7 @@ export const userInfoStore = defineStore(Names.User, {
           type: 'success'
         })
         await removeToken()
-        eventEmitter.emit('login-out')
+        eventEmitter.emit('logout')
       }
     },
     /**

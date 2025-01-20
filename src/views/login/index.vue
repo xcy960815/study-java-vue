@@ -1,5 +1,6 @@
 <template>
   <div class="login-page">
+    <canvas class="login-backage" id="cvs"></canvas>
     <el-form
       ref="loginFormRef"
       :model="loginFormData"
@@ -70,18 +71,19 @@
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
 import { useUserInfoStore } from '@/store'
 import type { FormRules, FormInstance } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View } from '@element-plus/icons-vue'
 import MD5 from 'MD5'
+import { initBackground } from './background'
 interface LoginFormData {
   username: string
   password: string
   rememberMe: boolean
 }
 
+initBackground()
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 
 const userInfoStore = useUserInfoStore()
@@ -150,7 +152,7 @@ onMounted(() => {})
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url('@/assets/images/login.jpg');
+  // background-image: url('@/assets/images/login.jpg');
   background-size: cover;
   background-position: center;
   width: 100%;
@@ -165,18 +167,27 @@ onMounted(() => {})
     .el-input__icon_view {
       cursor: pointer;
     }
+
+    .login-title {
+      margin: 0px auto 30px auto;
+      text-align: center;
+      color: #707070;
+    }
+
+    :deep(.el-form-item__label) {
+      color: white;
+      font-size: 16px;
+      font-style: italic;
+    }
   }
 
-  .login-title {
-    margin: 0px auto 30px auto;
-    text-align: center;
-    color: #707070;
-  }
-
-  :deep(.el-form-item__label) {
-    color: white;
-    font-size: 16px;
-    font-style: italic;
+  .login-backage {
+    z-index: -1;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 }
 </style>

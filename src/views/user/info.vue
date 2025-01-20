@@ -21,12 +21,12 @@
         placeholder="请输入用户账号"
       />
     </el-form-item>
-    <el-form-item label="密码" prop="passwordMd5">
+    <!-- <el-form-item label="密码" prop="passwordMd5">
       <el-input
         v-model="userInfoFormData.passwordMd5"
         placeholder="请输入用户密码"
       />
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="个性签名" prop="introduceSign">
       <el-input
         v-model="userInfoFormData.introduceSign"
@@ -81,7 +81,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons'
 
 const userInfoFormRef = ref<FormInstance>()
-const userInfoFormData = reactive<UserInfoOption>({
+const userInfoFormData = reactive<UserInfoDto>({
   /**
    * 用户主键id
    */
@@ -121,7 +121,7 @@ const userInfoFormData = reactive<UserInfoOption>({
 })
 
 const userInfoFormRules = reactive<
-  FormRules<Partial<UserInfoOption>>
+  FormRules<Partial<UserInfoDto>>
 >({})
 
 /**

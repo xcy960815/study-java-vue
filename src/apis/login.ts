@@ -1,28 +1,12 @@
 import { request } from '@utils/request'
 
-export interface LoginRequestParams {
-  username: string
-  password: string
-  rememberMe: boolean
-}
-
-interface LoginResponse {
-  address: string
-  createTime: string
-  id: number
-  introduceSign: string
-  loginName: string
-  nickName: string
-  token: string
-}
-
 /**
  * 登入接口
- * @param {LoginRequestParams} requestParams
+ * @param {LoginRequestVo} requestParams
  * @returns {Promise<ResponseResult<T>>}
  */
-export function login<T extends LoginResponse>(
-  requestParams: LoginRequestParams
+export function login<T extends LoginResponseDto>(
+  requestParams: LoginRequestVo
 ) {
   const url = `/login`
   return request.post<ResponseResult<T>, ResponseResult<T>>(

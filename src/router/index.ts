@@ -31,40 +31,73 @@ export const routes: RouteRecordRaw[] = [
     path: '/user',
     name: 'user',
     component: defineAsyncComponent(
-      () => import(`../cpmponents/layout/index.vue`)
+      () => import(`../components/layout/index.vue`)
     ),
     meta: {
       title: '用户'
     },
     children: [
       {
-        path: '/user/info',
-        name: 'info',
-        component: defineAsyncComponent(
-          () => import(`../views/user/info.vue`)
-        ),
-        meta: {
-          title: '用户中心'
-        }
-      },
-      {
         path: '/user/list',
-        name: 'list',
+        name: 'userList',
         component: defineAsyncComponent(
           () => import(`../views/user/list.vue`)
         ),
         meta: {
-          hidden: true,
           title: '用户列表'
         }
+      },
+      {
+        path: '/user/info',
+        name: 'userInfo',
+        component: defineAsyncComponent(
+          () => import(`../views/user/info.vue`)
+        ),
+        meta: {
+          hidden: true,
+          title: '用户中心'
+        }
       }
+    ]
+  },
+  {
+    path: '/goods-category',
+    name: 'goods-category',
+    component: defineAsyncComponent(
+      () => import(`../components/layout/index.vue`)
+    ),
+    meta: {
+      title: '商品'
+    },
+    children: [
+      {
+        path: '/goodsCategory/list',
+        name: 'goodsCategoryList',
+        component: defineAsyncComponent(
+          () => import(`../views/goods-category/list.vue`)
+        ),
+        meta: {
+          title: '商品列表'
+        }
+      }
+      // {
+      //   path: '/user/info',
+      //   name: 'info',
+      //   component: defineAsyncComponent(
+      //     () => import(`../views/user/info.vue`)
+      //   ),
+      //   meta: {
+      //     hidden: true,
+      //     title: '用户中心'
+      //   }
+      // },
     ]
   },
   {
     path: '/admin-user',
     name: 'admin-user',
     component: defineAsyncComponent(
-      () => import(`../cpmponents/layout/index.vue`)
+      () => import(`../components/layout/index.vue`)
     ),
     meta: {
       title: '超级管理员'
@@ -115,14 +148,12 @@ eventEmitter.on('token-invalid', () => {
 /**
  * 登录成功
  */
-eventEmitter.on('login-success', () => {
-  // console.log('router 登录成功')
+eventEmitter.on('login', () => {
   router.push('/user/list')
 })
 
-eventEmitter.on('login-out', () => {
-  // console.log('router 登录失效')
-  router.push('/login')
+eventEmitter.on('logout', () => {
+  router.replace('/login')
 })
 
 // 全局路由守卫

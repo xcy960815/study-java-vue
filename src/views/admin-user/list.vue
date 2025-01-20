@@ -6,7 +6,7 @@
 import { onMounted, ref } from 'vue'
 import { adminUserModule } from '@apis'
 
-const adminUserList = ref<Array<AdminUserInfoOption>>([])
+const adminUserList = ref<Array<AdminUserInfoDto>>([])
 
 /**
  * @description 获取用户列表

@@ -1,70 +1,70 @@
 <template>
+  <!-- 商品列表 -->
   <el-form
     :model="queryFormData"
     label-width="auto"
     inline
     v-show="showSearch"
   >
-    <el-form-item label="用户昵称">
+    <el-form-item label="商品id">
       <el-input
-        v-model="queryFormData.nickName"
-        placeholder="用户昵称"
-        @change="getUserList"
+        v-model="queryFormData.categoryId"
+        placeholder="商品id"
+        @change="getGoodsCategoryList"
       />
     </el-form-item>
-    <el-form-item label="登陆名称">
+    <el-form-item label="商品名称">
       <el-input
-        v-model="queryFormData.loginName"
-        placeholder="登陆名称"
-        @change="getUserList"
+        v-model="queryFormData.categoryName"
+        placeholder="商品名称"
+        @change="getGoodsCategoryList"
       />
     </el-form-item>
-    <el-form-item label="个性签名">
-      <el-input
-        v-model="queryFormData.introduceSign"
-        placeholder="个性签名"
-        @change="getUserList"
-      />
-    </el-form-item>
-    <el-form-item label="收货地址">
-      <el-input
-        v-model="queryFormData.address"
-        placeholder="收货地址"
-        @change="getUserList"
-      />
+    <el-form-item label="商品等级">
+      <el-select
+        v-model="queryFormData.categoryLevel"
+        style="width: 200px"
+        placeholder="商品等级"
+        @change="getGoodsCategoryList"
+      >
+        <el-option label="一级分类" :value="1" />
+        <el-option label="二级分类" :value="2" />
+        <el-option label="三级分类" :value="3" />
+      </el-select>
     </el-form-item>
   </el-form>
   <Handle-ToolBar
     v-model:showSearch="showSearch"
-    @queryTableData="getUserList"
+    @queryTableData="getGoodsCategoryList"
   >
     <el-button type="primary" @click="handleClickAddUser">
-      新增用户
+      新增商品
     </el-button>
   </Handle-ToolBar>
 
   <el-table
     border
-    :data="userListInfo.tableData"
+    :data="goodsCategoryList.tableData"
     style="width: 100%"
   >
     <el-table-column
-      prop="nickName"
-      label="用户昵称"
+      prop="categoryId"
+      label="商品id"
       width="100"
     />
     <el-table-column
-      prop="age"
-      label="用户年龄"
-      width="100"
+      prop="categoryName"
+      label="商品名称"
+      width="150"
     />
-    <el-table-column prop="loginName" label="登陆名称" />
     <el-table-column
-      prop="introduceSign"
-      label="个性签名"
+      prop="categoryLevel"
+      label="商品等级"
     />
-    <el-table-column prop="address" label="收货地址" />
-    <el-table-column prop="createTime" label="注册时间" />
+    <!-- <el-table-column prop="introduceSign" label="个性签名" />
+    <el-table-column prop="address" label="收货地址" /> -->
+    <el-table-column prop="createTime" label="创建时间" />
+    <el-table-column prop="updateTime" label="更新时间" />
     <el-table-column fixed="right" label="操作" width="120">
       <template #default="{ row }">
         <el-button
@@ -85,13 +85,13 @@
     </el-table-column>
   </el-table>
   <el-pagination
-    v-model:current-page="userListInfo.pageNum"
-    v-model:page-size="userListInfo.pageSize"
+    v-model:current-page="goodsCategoryList.pageNum"
+    v-model:page-size="goodsCategoryList.pageSize"
     :page-sizes="[10, 20, 30, 40]"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="userListInfo.total"
-    @size-change="userListInfo.handlePageSizeChange"
-    @current-change="userListInfo.handlePageNumChange"
+    :total="goodsCategoryList.total"
+    @size-change="goodsCategoryList.handlePageSizeChange"
+    @current-change="goodsCategoryList.handlePageNumChange"
   />
   <el-dialog
     v-model="addOrEditUserDialogVisible"
@@ -146,13 +146,18 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { userModule } from '@apis'
+import { goodsCategoryModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  type FormInstance,
+  type FormRules,
+  ElMessage,
+  ElMessageBox
+} from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-interface UserListInfo {
-  tableData: UserInfoDto[]
+
+interface GoodsCategoryInfo {
+  tableData: GoodsCategoryDto[]
   total: number | undefined
   pageSize: number
   pageNum: number
@@ -162,43 +167,44 @@ interface UserListInfo {
 /**
  * @description 查询条件
  */
-const queryFormData = reactive({
-  nickName: '',
-  loginName: '',
-  introduceSign: '',
-  address: ''
+const queryFormData = reactive<GoodsCategoryVo>({
+  categoryId: null,
+  categoryLevel: null
 })
 const addOrEditUserDialogTitle = ref('')
 
 const addOrEditUserDialogVisible = ref(false)
 
-const userListInfo = reactive<UserListInfo>({
+const goodsCategoryList = reactive<GoodsCategoryInfo>({
   tableData: [],
   total: 0,
   pageSize: 10,
   pageNum: 1,
   handlePageSizeChange(pageSize: number) {
-    userListInfo.pageSize = pageSize
-    getUserList()
+    goodsCategoryList.pageSize = pageSize
+    getGoodsCategoryList()
   },
   handlePageNumChange(pageNum: number) {
-    userListInfo.pageNum = pageNum
-    getUserList()
+    goodsCategoryList.pageNum = pageNum
+    getGoodsCategoryList()
   }
 })
 
-const getUserList = async () => {
-  const pageSize = userListInfo.pageSize
-  const pageNum = userListInfo.pageNum
-  const result = await userModule.getUserList({
-    pageSize,
-    pageNum,
-    ...queryFormData
-  })
+/**
+ * @description 获取商品列表
+ */
+const getGoodsCategoryList = async () => {
+  const pageSize = goodsCategoryList.pageSize
+  const pageNum = goodsCategoryList.pageNum
+  const result =
+    await goodsCategoryModule.getGoodsCategoryList({
+      pageSize,
+      pageNum,
+      ...queryFormData
+    })
   if (result.code === 200) {
-    userListInfo.tableData = result.data.data
-    userListInfo.total = result.data.total
-    // userListInfo.total = undefined
+    goodsCategoryList.tableData = result.data.data
+    goodsCategoryList.total = result.data.total
   }
 }
 
@@ -211,7 +217,6 @@ const addOrEditUserFormData = reactive<
   loginName: '',
   introduceSign: '',
   address: '',
-  // passwordMd5: 'e10adc3949ba59abbe56e057f20f883e',
   avatar: ''
 })
 
@@ -274,22 +279,22 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditUserDialogTitle.value === '新增用户') {
-    result = await userModule.insertUserInfo(
-      addOrEditUserFormData
-    )
+    // result = await goodsCategoryModule.insertUserInfo(
+    //   addOrEditUserFormData
+    // )
   } else {
-    result = await userModule.updateUserInfo<boolean>(
-      addOrEditUserFormData
-    )
+    // result = await goodsCategoryModule.updateUserInfo<boolean>(
+    //   addOrEditUserFormData
+    // )
   }
 
-  if (result.code === 200) {
-    getUserList()
-    addOrEditUserDialogVisible.value = false
-  }
+  // if (result.code === 200) {
+  //   getGoodsCategoryList()
+  //   addOrEditUserDialogVisible.value = false
+  // }
 }
 
-const handleClickDeleteUser = (row: UserInfoDto) => {
+const handleClickDeleteUser = (row: GoodsCategoryDto) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -297,11 +302,11 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
   })
     .then(async () => {
       const result =
-        await userModule.deleteUserInfo<boolean>({
-          userId: row.userId
-        })
-      if (result.code !== 200) return
-      getUserList()
+        //   await goodsCategoryModule.deleteUserInfo<boolean>({
+        //     userId: row.userId
+        //   })
+        // if (result.code !== 200) return
+        getGoodsCategoryList()
       ElMessage({
         type: 'success',
         message: '操作成功'
@@ -317,6 +322,6 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
 
 const showSearch = ref(true)
 onMounted(() => {
-  getUserList()
+  getGoodsCategoryList()
 })
 </script>

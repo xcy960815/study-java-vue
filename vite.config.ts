@@ -3,6 +3,12 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
+// 你也可以使用 unplugin-vue-components
+// import Components from 'unplugin-vue-components/vite'
+// import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
+// 或者使用 unplugin-element-plus
+import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
 // https://vitejs.dev/config/
@@ -68,6 +74,14 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler', // or 'modern'  禁止控制台输出警告
+          additionalData: `@use "@assets/style/element/theme.scss" as *;`
+        }
+      }
+    },
     plugins: [
       vue(),
       vueDevTools(),
@@ -77,7 +91,13 @@ export default defineConfig(({ mode }) => {
             VITE_APP_TITLE
           }
         }
+      }),
+      ElementPlus({
+        useSource: true
       })
+      // Components({
+      //   resolvers: [ElementPlusResolver()]
+      // })
     ],
     resolve: {
       alias: {

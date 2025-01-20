@@ -1,4 +1,4 @@
-declare interface UserInfoOption {
+declare interface UserInfoDto {
   /**
    * 用户主键id
    */
@@ -10,19 +10,9 @@ declare interface UserInfoOption {
   nickName: string
 
   /**
-   * 年龄
-   */
-  age: number
-
-  /**
    * 登陆名称(默认为手机号)
    */
   loginName: string
-
-  /**
-   * MD5加密后的密码
-   */
-  passwordMd5: string
 
   /**
    * 个性签名
@@ -45,7 +35,6 @@ declare interface UserInfoOption {
   avatar: string
 }
 
-declare interface UserListResult {
-  data: UserInfoOption[]
-  total: number
-}
+declare type UserInfoVo = Partial<
+  Omit<UserInfoDto, 'avatar' | 'createTime'>
+>
