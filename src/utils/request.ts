@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
 import { getToken } from './token'
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
-const router = useRouter()
+
 axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
@@ -30,15 +30,21 @@ request.interceptors.response.use(
   (response) => {
     const responseData = response.data
     if (responseData.code == 401) {
-      console.log('request 登录失效')
-
       eventEmitter.emit('token-invalid')
+      return Promise.reject(responseData)
+    } else if (responseData.code == 500) {
+      ElMessage({
+        type: 'error',
+        message: responseData.message
+      })
       return Promise.reject(responseData)
     }
 
     return responseData
   },
   (error) => {
+    console.log('error-error', error)
+
     return Promise.reject(error)
   }
 )

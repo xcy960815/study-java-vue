@@ -1,19 +1,20 @@
 <template>
-  <h4 class="layout-header-title">{{ viteAppTitle }}</h4>
-  <el-menu
-    :collapse="isCollapse"
-    active-text-color="#fff"
-    background-color="rgb(2, 93, 126)"
-    router
-    :default-active="defaultActive"
-    text-color="#fff"
-  >
-    <menu-item :menu-data="menuData"></menu-item>
-  </el-menu>
+  <div class="layout-menu-container">
+    <h4 class="layout-header-title">{{ viteAppTitle }}</h4>
+    <el-menu
+      :collapse="isCollapse"
+      active-text-color="#fff"
+      background-color="rgb(2, 93, 126)"
+      router
+      :default-active="defaultActive"
+      text-color="#fff"
+    >
+      <menu-item :menu-data="menuData"></menu-item>
+    </el-menu>
+  </div>
 </template>
 
 <script lang="ts" setup>
-// import { routes } from "@/router"
 import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted } from 'vue'
@@ -55,23 +56,25 @@ const menuData = computed(() => {
   }
   return filterRoutes(routes)
 })
-onMounted(() => {
-  console.log(menuData.value)
-})
+onMounted(() => {})
 </script>
 <style lang="less" scoped>
-.layout-header-title {
-  height: 50px;
-  font-weight: 600;
-  font-size: 16px;
-  font-family: Avenir, Helvetica Neue, Arial, Helvetica,
-    sans-serif;
-  text-align: center;
-  line-height: 50px;
-  color: #ffffff;
-}
+.layout-menu-container {
+  width: 100%;
 
-.el-menu {
-  border: 0 !important;
+  .layout-header-title {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    font-family: Avenir, Helvetica Neue, Arial, Helvetica,
+      sans-serif;
+    text-align: center;
+    line-height: 50px;
+    color: #ffffff;
+  }
+
+  .el-menu {
+    border: 0 !important;
+  }
 }
 </style>

@@ -61,8 +61,6 @@
       prop="categoryLevel"
       label="商品等级"
     />
-    <!-- <el-table-column prop="introduceSign" label="个性签名" />
-    <el-table-column prop="address" label="收货地址" /> -->
     <el-table-column prop="createTime" label="创建时间" />
     <el-table-column prop="updateTime" label="更新时间" />
     <el-table-column fixed="right" label="操作" width="120">
