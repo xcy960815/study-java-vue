@@ -18,6 +18,14 @@ interface Result {
   url: string
 }
 
+interface Colors {
+  primary: string
+}
+
+/**
+ * 设置系统主题
+ * @returns
+ */
 export const setSystemTheme = () => {
   /**
    *
@@ -79,6 +87,11 @@ export const setSystemTheme = () => {
     return data
   }
 
+  /**
+   * 获取样式模板
+   * @param data {string}
+   * @returns {string}
+   */
   const getStyleTemplate = (data: string) => {
     const colorMap = {
       '#3a8ee6': 'shade-1',
@@ -128,6 +141,8 @@ export const setSystemTheme = () => {
     originalStyle: string,
     colors: Record<string, string>
   ) => {
+    // console.log("writeNewStyle");
+
     Object.entries(colors).forEach(([key, value]) => {
       originalStyle = originalStyle.replace(
         new RegExp('(:|\\s+)' + key, 'g'),
@@ -147,13 +162,14 @@ export const setSystemTheme = () => {
 
   const themeDialogVisible = ref(false)
 
-  const colors = reactive({
+  const colors = reactive<Colors>({
     primary: '#409eff'
   })
   /**
    * 原本的样式
    */
   const originalStyle = ref('')
+
   /**
    * header 标签中 style标签的数量
    */
@@ -162,10 +178,27 @@ export const setSystemTheme = () => {
       document.styleSheets.length || -1
     return styleSheetsCount
   })
-  const initTheme = () => {
-    getElementOrignalStyle().then((data) => {
-      originalStyle.value = getStyleTemplate(data)
-    })
+
+  /**
+   * 初始化主题
+   */
+  const initTheme = async () => {
+    const data = await getElementOrignalStyle()
+    originalStyle.value = getStyleTemplate(data)
+    const theme: Colors = JSON.parse(
+      localStorage.getItem(SYSTEMTHEME) || '{}'
+    )
+    if (theme) {
+      Object.entries(theme).forEach(([key, value]) => {
+        colors[key as keyof Colors] = value
+      })
+    }
+    generateColors(colors.primary)
+    writeNewStyle(
+      originalStylesheetCount.value,
+      originalStyle.value,
+      colors
+    )
   }
   /**
    * 切换主题
@@ -176,6 +209,11 @@ export const setSystemTheme = () => {
       originalStylesheetCount.value,
       originalStyle.value,
       colors
+    )
+    // 本地保存
+    localStorage.setItem(
+      SYSTEMTHEME,
+      JSON.stringify(colors)
     )
     themeDialogVisible.value = false
   }
