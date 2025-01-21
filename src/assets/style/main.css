@@ -1,0 +1,10 @@
+@import './base.css';
+
+/* @media (min-width: 1024px) { */
+html,
+body,
+#app {
+  height: 100%;
+  width: 100%;
+}
+/* } */

@@ -15,13 +15,7 @@
       </svg>
     </div>
     <div class="right-panel">
-      <el-link
-        class="change-theme-switch"
-        @click="handleClickChangeTheme"
-        :underline="false"
-        type="info"
-        >切换主题</el-link
-      >
+      <theme></theme>
       <el-dropdown
         trigger="contextmenu"
         @command="handleChooseItem"
@@ -53,68 +47,42 @@
       </el-dropdown>
     </div>
   </el-header>
-
-  <!-- 切换主题dialog -->
-  <el-dialog
-    center
-    v-model="themeDialogVisible"
-    title="切换主题"
-    width="400px"
-  >
-    <el-form
-      :model="colors"
-      ref="themeFormRef"
-      class="theme-form"
-      label-width="70px"
-    >
-      <el-form-item label="主题色" prop="primary">
-        <el-color-picker
-          v-model="colors.primary"
-        ></el-color-picker>
-      </el-form-item>
-      <el-form-item class="color-buttons">
-        <el-button
-          type="primary"
-          @click="handleConfirmTheme"
-          >切换</el-button
-        >
-        <el-button @click="resetTheme">重置</el-button>
-      </el-form-item>
-    </el-form>
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { type FormInstance } from 'element-plus'
-import {
-  computed,
-  onMounted,
-  reactive,
-  ref,
-  nextTick
-} from 'vue'
+import { computed, onMounted } from 'vue'
 import {
   useUserInfoStore,
   useSystemInfoStore
 } from '@store'
 import { useRouter } from 'vue-router'
 import {
-  generateColors,
-  writeNewStyle,
   setVarStyle,
-  getIndexStyle,
-  getStyleTemplate
-} from '@utils/theme'
+  LAYOUTSIDECONTAINERWIDTHKEY
+} from '@/utils/style'
+import Theme from './themen.vue'
 const router = useRouter()
 const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
 const systemInfoStore = useSystemInfoStore()
+
 const openMenuFlag = computed(
   () => systemInfoStore.openMenuFlag
 )
 
+/**
+ * 点击展开收起小图标
+ */
 const toggleClick = () => {
   systemInfoStore.reversalOpenMenuFlag()
+  if (openMenuFlag.value) {
+    const history_width =
+      localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) ||
+      '300px'
+    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
+  } else {
+    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
+  }
 }
 
 const handleChooseItem = (command: string) => {
@@ -122,7 +90,6 @@ const handleChooseItem = (command: string) => {
     case 'user-info':
       router.push('/user/info')
       break
-
     case 'change-password':
       router.push('/user/password')
       break
@@ -131,46 +98,6 @@ const handleChooseItem = (command: string) => {
       userInfoStore.logout()
       break
   }
-}
-const themeFormRef = ref<FormInstance>()
-const themeDialogVisible = ref(false)
-const colors = reactive({
-  primary: '#409eff'
-})
-const handleClickChangeTheme = () => {
-  themeDialogVisible.value = true
-  nextTick(() => {
-    themeFormRef.value?.resetFields()
-  })
-}
-/**
- *
- */
-const originalStylesheetCount = computed(() => {
-  return document.styleSheets.length || -1
-})
-const originalStyle = ref('')
-getIndexStyle().then((data) => {
-  originalStyle.value = getStyleTemplate(data)
-})
-
-/**
- * 切换主题
- */
-const handleConfirmTheme = () => {
-  // generateColors(colors.primary)
-  // console.log("colors",originalStylesheetCount.value, originalStyle.value, colors);
-  // writeNewStyle(originalStylesheetCount.value, originalStyle.value, colors)
-  themeDialogVisible.value = false
-  setVarStyle('--el-color-primary', colors.primary)
-  setVarStyle('--el-color-primary-light-9', colors.primary)
-  setVarStyle('--el-color-primary-light-3', colors.primary)
-}
-/**
- * 重置主题
- */
-const resetTheme = () => {
-  themeFormRef.value?.resetFields()
 }
 
 onMounted(() => {
@@ -202,11 +129,6 @@ onMounted(() => {
   .right-panel {
     display: flex;
     align-items: center;
-
-    .change-theme-switch {
-      position: inherit;
-      margin-right: 10px;
-    }
 
     .user-info {
       display: flex;

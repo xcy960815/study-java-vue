@@ -6,6 +6,8 @@ import {
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
+import * as ElIcon from '@element-plus/icons-vue'
+import { getToken } from '@utils/token'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -34,7 +36,8 @@ export const routes: RouteRecordRaw[] = [
       () => import(`../components/layout/index.vue`)
     ),
     meta: {
-      title: '用户'
+      title: '用户',
+      icon: 'User'
     },
     children: [
       {
@@ -44,6 +47,7 @@ export const routes: RouteRecordRaw[] = [
           () => import(`../views/user/list.vue`)
         ),
         meta: {
+          icon: 'Notebook',
           title: '用户列表'
         }
       },
@@ -67,7 +71,8 @@ export const routes: RouteRecordRaw[] = [
       () => import(`../components/layout/index.vue`)
     ),
     meta: {
-      title: '商品'
+      title: '商品',
+      icon: 'SetUp'
     },
     children: [
       {
@@ -77,7 +82,8 @@ export const routes: RouteRecordRaw[] = [
           () => import(`../views/goods-category/list.vue`)
         ),
         meta: {
-          title: '商品列表'
+          title: '商品列表',
+          icon: 'List'
         }
       }
       // {
@@ -129,6 +135,7 @@ declare module 'vue-router' {
     permission?: string | Array<string>
     link?: string
     hidden?: boolean
+    icon?: keyof typeof ElIcon
   }
 }
 
@@ -157,11 +164,17 @@ eventEmitter.on('logout', () => {
 })
 
 // 全局路由守卫
-router.beforeEach((to, from, next) => {
-  if (to.meta.title) {
-    // document.title = `${to.meta.title}`
+router.beforeEach(async (to, from, next) => {
+  if (to.path === '/login') {
+    next()
+    // return
+  } else {
+    const token = await getToken()
+    if (!token) {
+      next('/login')
+    }
+    next()
   }
-  next()
 })
 
 router.afterEach((to, from) => {

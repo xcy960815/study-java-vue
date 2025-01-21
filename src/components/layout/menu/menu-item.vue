@@ -5,15 +5,30 @@
       :index="menuItem.path"
     >
       <template #title>
-        <el-icon>
-          <location />
-        </el-icon>
+        <component
+          v-if="menuItem.meta?.icon"
+          style="width: 1em; height: 1em; margin-right: 1em"
+          :is="menuItem.meta?.icon"
+        ></component>
+        <span
+          v-else
+          style="width: 1em; height: 1em; margin-right: 1em"
+        ></span>
         <span>{{ menuItem.meta?.title }}</span>
       </template>
       <menu-item :menu-data="menuItem.children"></menu-item>
     </el-sub-menu>
     <el-menu-item v-else :index="menuItem.path">
-      <el-icon><icon-menu /></el-icon>
+      <component
+        v-if="menuItem.meta?.icon"
+        style="width: 1em; height: 1em; margin-right: 1em"
+        :is="menuItem.meta?.icon"
+      >
+      </component>
+      <span
+        v-else
+        style="width: 1em; height: 1em; margin-right: 1em"
+      ></span>
       <span>{{ menuItem.meta?.title }}</span>
     </el-menu-item>
   </template>

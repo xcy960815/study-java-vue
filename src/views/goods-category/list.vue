@@ -37,7 +37,10 @@
     v-model:showSearch="showSearch"
     @queryTableData="getGoodsCategoryList"
   >
-    <el-button type="primary" @click="handleClickAddUser">
+    <el-button
+      type="primary"
+      @click="handleClickAddGoodCategory"
+    >
       新增商品
     </el-button>
   </Handle-ToolBar>
@@ -69,14 +72,14 @@
           link
           type="primary"
           size="small"
-          @click="handleClickEditUser(row)"
+          @click="handleClickEditGoodCategory(row)"
           >编辑</el-button
         >
         <el-button
           link
           type="primary"
           size="small"
-          @click="handleClickDeleteUser(row)"
+          @click="handleClickDeleteGoodsCategory(row)"
           >删除</el-button
         >
       </template>
@@ -92,37 +95,39 @@
     @current-change="goodsCategoryList.handlePageNumChange"
   />
   <el-dialog
-    v-model="addOrEditUserDialogVisible"
-    :title="addOrEditUserDialogTitle"
+    v-model="addOrEditGoodsCategoryDialogVisible"
+    :title="addOrEditGoodsCategoryDialogTitle"
   >
     <el-form
-      ref="addOrEditUserFormRef"
-      :model="addOrEditUserFormData"
-      :rules="addOrEditUserFormRules"
+      ref="addOrEditGoodsCategoryFormRef"
+      :model="addOrEditGoodsCategoryFormData"
+      :rules="addOrEditGoodsCategoryFormRules"
       label-width="auto"
       status-icon
     >
       <el-form-item label="用户昵称" prop="nickName">
         <el-input
-          v-model="addOrEditUserFormData.nickName"
+          v-model="addOrEditGoodsCategoryFormData.nickName"
           placeholder="请输入用户昵称"
         />
       </el-form-item>
       <el-form-item label="登陆名称" prop="loginName">
         <el-input
-          v-model="addOrEditUserFormData.loginName"
+          v-model="addOrEditGoodsCategoryFormData.loginName"
           placeholder="请输入登陆名称"
         />
       </el-form-item>
       <el-form-item label="个性签名" prop="introduceSign">
         <el-input
-          v-model="addOrEditUserFormData.introduceSign"
+          v-model="
+            addOrEditGoodsCategoryFormData.introduceSign
+          "
           placeholder="请输入个性签名"
         />
       </el-form-item>
       <el-form-item label="收货地址" prop="address">
         <el-input
-          v-model="addOrEditUserFormData.address"
+          v-model="addOrEditGoodsCategoryFormData.address"
           placeholder="请输入收货地址"
         />
       </el-form-item>
@@ -130,7 +135,9 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button
-          @click="addOrEditUserDialogVisible = false"
+          @click="
+            addOrEditGoodsCategoryDialogVisible = false
+          "
           >取消</el-button
         >
         <el-button
@@ -169,9 +176,9 @@ const queryFormData = reactive<GoodsCategoryVo>({
   categoryId: null,
   categoryLevel: null
 })
-const addOrEditUserDialogTitle = ref('')
+const addOrEditGoodsCategoryDialogTitle = ref('')
 
-const addOrEditUserDialogVisible = ref(false)
+const addOrEditGoodsCategoryDialogVisible = ref(false)
 
 const goodsCategoryList = reactive<GoodsCategoryInfo>({
   tableData: [],
@@ -206,9 +213,9 @@ const getGoodsCategoryList = async () => {
   }
 }
 
-const addOrEditUserFormRef = ref<FormInstance>()
+const addOrEditGoodsCategoryFormRef = ref<FormInstance>()
 
-const addOrEditUserFormData = reactive<
+const addOrEditGoodsCategoryFormData = reactive<
   Omit<UserInfoDto, 'userId' | 'age' | 'createTime'>
 >({
   nickName: '',
@@ -218,8 +225,8 @@ const addOrEditUserFormData = reactive<
   avatar: ''
 })
 
-const addOrEditUserFormRules: FormRules<
-  typeof addOrEditUserFormData
+const addOrEditGoodsCategoryFormRules: FormRules<
+  typeof addOrEditGoodsCategoryFormData
 > = {
   nickName: [
     {
@@ -251,48 +258,52 @@ const addOrEditUserFormRules: FormRules<
   ]
 }
 
-const handleClickAddUser = () => {
-  addOrEditUserDialogTitle.value = '新增用户'
-  addOrEditUserDialogVisible.value = true
+const handleClickAddGoodCategory = () => {
+  addOrEditGoodsCategoryDialogTitle.value = '新增商品'
+  addOrEditGoodsCategoryDialogVisible.value = true
   nextTick(() => {
-    addOrEditUserFormRef.value?.resetFields()
+    addOrEditGoodsCategoryFormRef.value?.resetFields()
   })
 }
 
-const handleClickEditUser = (row: UserInfoDto) => {
-  addOrEditUserDialogTitle.value = '编辑用户'
-  addOrEditUserDialogVisible.value = true
+const handleClickEditGoodCategory = (row: UserInfoDto) => {
+  addOrEditGoodsCategoryDialogTitle.value = '编辑商品'
+  addOrEditGoodsCategoryDialogVisible.value = true
   nextTick(() => {
-    addOrEditUserFormRef.value?.resetFields()
-    Object.assign(addOrEditUserFormData, row)
+    addOrEditGoodsCategoryFormRef.value?.resetFields()
+    Object.assign(addOrEditGoodsCategoryFormData, row)
   })
 }
 
 const handleClickAddOrEditConfirm = async () => {
-  const valid = await addOrEditUserFormRef.value
+  const valid = await addOrEditGoodsCategoryFormRef.value
     ?.validate()
     .then(() => true)
     .catch(() => false)
 
   if (!valid) return
   let result
-  if (addOrEditUserDialogTitle.value === '新增用户') {
+  if (
+    addOrEditGoodsCategoryDialogTitle.value === '新增商品'
+  ) {
     // result = await goodsCategoryModule.insertUserInfo(
-    //   addOrEditUserFormData
+    //   addOrEditGoodsCategoryFormData
     // )
   } else {
     // result = await goodsCategoryModule.updateUserInfo<boolean>(
-    //   addOrEditUserFormData
+    //   addOrEditGoodsCategoryFormData
     // )
   }
 
   // if (result.code === 200) {
   //   getGoodsCategoryList()
-  //   addOrEditUserDialogVisible.value = false
+  //   addOrEditGoodsCategoryDialogVisible.value = false
   // }
 }
 
-const handleClickDeleteUser = (row: GoodsCategoryDto) => {
+const handleClickDeleteGoodsCategory = (
+  row: GoodsCategoryDto
+) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -319,6 +330,7 @@ const handleClickDeleteUser = (row: GoodsCategoryDto) => {
 }
 
 const showSearch = ref(true)
+
 onMounted(() => {
   getGoodsCategoryList()
 })
