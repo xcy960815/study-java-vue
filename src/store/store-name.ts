@@ -1,4 +1,5 @@
 export const enum Names {
-  User = 'USER',
-  SYSTEM = 'SYSTEM'
+  USER = 'USER',
+  SYSTEM = 'SYSTEM',
+  LOGIN = 'LOGIN'
 }

@@ -1,9 +1,15 @@
+/**
+ * 登录接口参数
+ */
 declare interface LoginRequestVo {
   username: string
   password: string
   rememberMe: boolean
 }
 
+/**
+ * 登录接口返回值
+ */
 declare interface LoginResponseDto {
   address: string
   createTime: string

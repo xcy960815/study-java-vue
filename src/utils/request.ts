@@ -8,7 +8,6 @@ axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
   timeout: 1000
-  // withCredentials: false
 })
 
 request.interceptors.request.use(
@@ -21,7 +20,10 @@ request.interceptors.request.use(
 
     return config
   },
-  (error) => {}
+  (error) => {
+    const { message } = error
+    ElMessage.error(message)
+  }
 )
 /**
  * 响应拦截器
@@ -38,14 +40,16 @@ request.interceptors.response.use(
         message: responseData.message
       })
       return Promise.reject(responseData)
+    } else {
+      return Promise.resolve(responseData)
     }
-
-    return responseData
   },
   (error) => {
-    console.log('error-error', error)
+    const { message } = error
 
+    ElMessage.error(message)
     return Promise.reject(error)
   }
 )
+
 export { request }

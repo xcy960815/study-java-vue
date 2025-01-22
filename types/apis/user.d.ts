@@ -37,4 +37,8 @@ declare interface UserInfoDto {
 
 declare type UserInfoVo = Partial<
   Omit<UserInfoDto, 'avatar' | 'createTime'>
->
+> & {
+  passwordMd5?: string
+  newPasswordMd5?: string
+  confirmNewPassword?: string
+}

@@ -96,3 +96,16 @@ export const deleteUserInfo = <T extends boolean>(
     data: params
   })
 }
+
+/**
+ * 修改用户密码
+ */
+export const updateUserPassword = async <T extends boolean>(
+  requestParams: UserInfoVo
+) => {
+  const url = `/user/updateUserPassword`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(
+    url,
+    requestParams
+  )
+}

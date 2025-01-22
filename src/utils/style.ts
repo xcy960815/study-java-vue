@@ -1,3 +1,4 @@
+/** 该文件作用是修改系统主题颜色 */
 import color from 'css-color-function'
 import { type FormInstance } from 'element-plus'
 import {
@@ -7,7 +8,7 @@ import {
   nextTick,
   onMounted
 } from 'vue'
-
+import { type RouteLocationNormalizedGeneric } from 'vue-router'
 export const LAYOUTSIDECONTAINERWIDTHKEY =
   '--layout-side-container-width'
 
@@ -141,8 +142,6 @@ export const setSystemTheme = () => {
     originalStyle: string,
     colors: Record<string, string>
   ) => {
-    // console.log("writeNewStyle");
-
     Object.entries(colors).forEach(([key, value]) => {
       originalStyle = originalStyle.replace(
         new RegExp('(:|\\s+)' + key, 'g'),
@@ -271,11 +270,12 @@ export const setVarStyle = (
 export const changeTabTile = (title: string) => {
   document.title = title
 }
+
 /**
  * 修改浏览器tab的icon
  * @param iconPath {string}
  */
-export const changeTabIcon = (iconPath: string) => {
+export const setTabIco = (iconPath: string) => {
   const linkElement =
     document.querySelector<HTMLLinkElement>(
       "link[rel*='icon']"
@@ -284,4 +284,34 @@ export const changeTabIcon = (iconPath: string) => {
   linkElement.rel = 'shortcut icon'
   linkElement.href = iconPath
   document.head.appendChild(linkElement)
+}
+
+const icos = import.meta.glob<{ default: string }>(
+  '../assets/icos/*.ico',
+  { eager: true }
+)
+
+/**
+ * 修改页面tab的ico
+ * @param to {RouteLocationNormalizedGeneric}
+ */
+export const changeTabIco = (
+  to: RouteLocationNormalizedGeneric
+) => {
+  const [parentModule] = to.matched
+  const parentModuleName = parentModule.name as string
+  const processedIcos = Object.fromEntries(
+    Object.entries(icos).map(([key, value]) => {
+      // 去掉前缀和后缀
+      const newKey = key
+        .replace('../assets/icos/', '')
+        .replace('.ico', '')
+      return [newKey, value]
+    })
+  )
+  const targetIco = processedIcos[parentModuleName]
+  if (targetIco) {
+    setTabIco(targetIco.default)
+  } else
+    setTabIco('/study-java-web/src/assets/icos/favicon.ico')
 }

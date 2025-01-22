@@ -88,7 +88,8 @@ export default defineConfig(({ mode }) => {
       createHtmlPlugin({
         inject: {
           data: {
-            VITE_APP_TITLE
+            VITE_APP_TITLE,
+            VITE_BASE_URL
           }
         }
       }),

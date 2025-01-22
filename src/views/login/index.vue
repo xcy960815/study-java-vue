@@ -71,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useUserInfoStore } from '@/store'
+import { useLoginStore } from '@/store'
 import type { FormRules, FormInstance } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View } from '@element-plus/icons-vue'
@@ -86,7 +86,6 @@ interface LoginFormData {
 initBackground()
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 
-const userInfoStore = useUserInfoStore()
 const logining = ref(false)
 
 const loginFormData = reactive({
@@ -128,10 +127,13 @@ const loginFormRules: FormRules<LoginFormData> = {
     }
   ]
 }
+
+const loginStore = useLoginStore()
 /**
  * 登入
  */
 const handleLogin = async () => {
+  logining.value = true
   const valid = await loginFormRef.value
     ?.validate()
     .catch(() => false)
@@ -139,7 +141,15 @@ const handleLogin = async () => {
   const loginData = { ...loginFormData }
 
   loginData.password = MD5(loginFormData.password)
-  userInfoStore.login(loginData)
+
+  loginStore
+    .login(loginData)
+    .then(() => {
+      console.log('then')
+    })
+    .catch(() => {
+      logining.value = false
+    })
 }
 
 onMounted(() => {})

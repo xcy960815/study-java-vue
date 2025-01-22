@@ -1,6 +1,5 @@
 import {
   createRouter,
-  // createWebHistory,
   createWebHashHistory
 } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
@@ -8,7 +7,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import * as ElIcon from '@element-plus/icons-vue'
 import { getToken } from '@utils/token'
-
+import { changeTabIco } from '@utils/style'
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -145,29 +144,33 @@ const router = createRouter({
   routes
 })
 
+/*************** 统一管理通用路由跳转 *****************/
+
 /**
  * token过期
  */
 eventEmitter.on('token-invalid', () => {
-  // console.log('router 登录失效')
   router.push('/login')
 })
 /**
  * 登录成功
  */
 eventEmitter.on('login', () => {
-  router.push('/user/list')
+  router.replace('/user/list')
 })
 
 eventEmitter.on('logout', () => {
   router.replace('/login')
 })
 
+/*************** 统一管理通用路由跳转 *****************/
+
 // 全局路由守卫
 router.beforeEach(async (to, from, next) => {
+  changeTabIco(to)
+
   if (to.path === '/login') {
     next()
-    // return
   } else {
     const token = await getToken()
     if (!token) {

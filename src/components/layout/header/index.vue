@@ -47,13 +47,19 @@
       </el-dropdown>
     </div>
   </el-header>
+  <!-- 修改密码dialog -->
+  <change-password-dialog
+    ref="changePasswordDialogRef"
+  ></change-password-dialog>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
+import ChangePasswordDialog from './change-password-dialog.vue'
+import { computed, onMounted, ref } from 'vue'
 import {
   useUserInfoStore,
-  useSystemInfoStore
+  useSystemInfoStore,
+  useLoginStore
 } from '@store'
 import { useRouter } from 'vue-router'
 import {
@@ -62,13 +68,18 @@ import {
 } from '@/utils/style'
 import Theme from './themen.vue'
 const router = useRouter()
+
 const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
-const systemInfoStore = useSystemInfoStore()
 
+const systemInfoStore = useSystemInfoStore()
 const openMenuFlag = computed(
   () => systemInfoStore.openMenuFlag
 )
+
+const changePasswordDialogRef = ref<InstanceType<
+  typeof ChangePasswordDialog
+> | null>(null)
 
 /**
  * 点击展开收起小图标
@@ -85,17 +96,20 @@ const toggleClick = () => {
   }
 }
 
+const loginStore = useLoginStore()
+
 const handleChooseItem = (command: string) => {
   switch (command) {
     case 'user-info':
       router.push('/user/info')
       break
     case 'change-password':
-      router.push('/user/password')
+      // router.push('/user/password')
+      changePasswordDialogRef.value?.openDialog()
       break
     case 'login-out':
       console.log('退出登录')
-      userInfoStore.logout()
+      loginStore.logout()
       break
   }
 }
