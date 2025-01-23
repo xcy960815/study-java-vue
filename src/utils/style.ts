@@ -9,9 +9,16 @@ import {
   onMounted
 } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
+
+/**
+ * 侧边栏宽度key
+ */
 export const LAYOUTSIDECONTAINERWIDTHKEY =
   '--layout-side-container-width'
 
+/**
+ * 系统主题key
+ */
 const SYSTEMTHEME = 'system-theme'
 
 interface Result {
@@ -235,11 +242,8 @@ export const setSystemTheme = () => {
     themeFormRef.value?.resetFields()
   }
 
-  onMounted(() => {
-    initTheme()
-  })
-
   return {
+    initTheme,
     handleConfirmTheme,
     handleClickChangeTheme,
     themeDialogVisible,
@@ -287,7 +291,7 @@ export const setTabIco = (iconPath: string) => {
 }
 
 const icos = import.meta.glob<{ default: string }>(
-  '../assets/icos/*.ico',
+  '../assets/svg-icons/*.svg',
   { eager: true }
 )
 
@@ -300,18 +304,25 @@ export const changeTabIco = (
 ) => {
   const [parentModule] = to.matched
   const parentModuleName = parentModule.name as string
+  console.log('parentModuleName', parentModuleName)
+
   const processedIcos = Object.fromEntries(
     Object.entries(icos).map(([key, value]) => {
       // 去掉前缀和后缀
       const newKey = key
-        .replace('../assets/icos/', '')
-        .replace('.ico', '')
+        .replace('../assets/svg-icons/', '')
+        .replace('.svg', '')
       return [newKey, value]
     })
   )
+  console.log('processedIcos-processedIcos', processedIcos)
+
   const targetIco = processedIcos[parentModuleName]
+
   if (targetIco) {
     setTabIco(targetIco.default)
   } else
-    setTabIco('/study-java-web/src/assets/icos/favicon.ico')
+    setTabIco(
+      '/study-java-web/src/assets/svg-icons/other.svg'
+    )
 }

@@ -5,30 +5,25 @@
       :index="menuItem.path"
     >
       <template #title>
-        <component
+        <svg-icon
           v-if="menuItem.meta?.icon"
-          style="width: 1em; height: 1em; margin-right: 1em"
-          :is="menuItem.meta?.icon"
-        ></component>
-        <span
-          v-else
-          style="width: 1em; height: 1em; margin-right: 1em"
-        ></span>
+          :name="menuItem.meta?.icon"
+          class="icon"
+        ></svg-icon>
+        <!-- 占位符 -->
+        <span class="icon" v-else></span>
         <span>{{ menuItem.meta?.title }}</span>
       </template>
       <menu-item :menu-data="menuItem.children"></menu-item>
     </el-sub-menu>
     <el-menu-item v-else :index="menuItem.path">
-      <component
+      <svg-icon
         v-if="menuItem.meta?.icon"
-        style="width: 1em; height: 1em; margin-right: 1em"
-        :is="menuItem.meta?.icon"
-      >
-      </component>
-      <span
-        v-else
-        style="width: 1em; height: 1em; margin-right: 1em"
-      ></span>
+        :name="menuItem.meta?.icon"
+        class="icon"
+      ></svg-icon>
+      <!-- 占位符 -->
+      <span class="icon" v-else></span>
       <span>{{ menuItem.meta?.title }}</span>
     </el-menu-item>
   </template>
@@ -57,4 +52,11 @@ defineOptions({
   name: 'MenuItem'
 })
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.el-menu-item,
+.el-sub-menu__title {
+  .icon {
+    margin-right: 0.5em;
+  }
+}
+</style>

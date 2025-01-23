@@ -1,6 +1,10 @@
-import { ref, readonly, watchEffect } from 'vue'
-
-import type { Ref, DeepReadonly } from 'vue'
+import {
+  ref,
+  readonly,
+  watchEffect,
+  type Ref,
+  type DeepReadonly
+} from 'vue'
 
 export type AsyncComputedOnCancel = (
   cancelCallback: () => void

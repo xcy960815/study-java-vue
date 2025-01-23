@@ -5,9 +5,9 @@ import {
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
-import * as ElIcon from '@element-plus/icons-vue'
 import { getToken } from '@utils/token'
 import { changeTabIco } from '@utils/style'
+
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -29,6 +29,22 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/password',
+    name: 'password',
+    component: defineAsyncComponent(
+      () => import(`../components/layout/index.vue`)
+    ),
+    meta: {
+      title: '密码',
+      hidden: true
+    },
+    props: {
+      content: defineAsyncComponent(
+        () => import(`../views/password/index.vue`) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
+      )
+    }
+  },
+  {
     path: '/user',
     name: 'user',
     component: defineAsyncComponent(
@@ -36,17 +52,17 @@ export const routes: RouteRecordRaw[] = [
     ),
     meta: {
       title: '用户',
-      icon: 'User'
+      icon: 'user'
     },
     children: [
       {
         path: '/user/list',
-        name: 'userList',
+        name: 'user-list',
         component: defineAsyncComponent(
           () => import(`../views/user/list.vue`)
         ),
         meta: {
-          icon: 'Notebook',
+          icon: 'user-list',
           title: '用户列表'
         }
       },
@@ -71,18 +87,18 @@ export const routes: RouteRecordRaw[] = [
     ),
     meta: {
       title: '商品',
-      icon: 'SetUp'
+      icon: 'goods-category'
     },
     children: [
       {
         path: '/goodsCategory/list',
-        name: 'goodsCategoryList',
+        name: 'goods-category-list',
         component: defineAsyncComponent(
           () => import(`../views/goods-category/list.vue`)
         ),
         meta: {
           title: '商品列表',
-          icon: 'List'
+          icon: 'goods-category-list'
         }
       }
       // {
@@ -115,7 +131,8 @@ export const routes: RouteRecordRaw[] = [
           () => import(`../views/admin-user/list.vue`)
         ),
         meta: {
-          title: '超级管理员列表'
+          title: '超级管理员列表',
+          icon: 'admin-user'
         }
       }
     ]
@@ -125,18 +142,6 @@ export const routes: RouteRecordRaw[] = [
     redirect: '/'
   }
 ]
-
-import 'vue-router'
-
-declare module 'vue-router' {
-  interface RouteMeta {
-    title?: string
-    permission?: string | Array<string>
-    link?: string
-    hidden?: boolean
-    icon?: keyof typeof ElIcon
-  }
-}
 
 const router = createRouter({
   history: createWebHashHistory(), // hash 模式
@@ -168,11 +173,14 @@ eventEmitter.on('logout', () => {
 // 全局路由守卫
 router.beforeEach(async (to, from, next) => {
   changeTabIco(to)
-
+  const token = await getToken()
   if (to.path === '/login') {
-    next()
+    if (token) {
+      next('/user/list')
+    } else {
+      next()
+    }
   } else {
-    const token = await getToken()
     if (!token) {
       next('/login')
     }

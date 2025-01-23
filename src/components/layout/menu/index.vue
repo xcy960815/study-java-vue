@@ -136,8 +136,7 @@ onMounted(() => {
 <style lang="less" scoped>
 .layout-side-container {
   transition: width 0.3s;
-  // width: v-bind(`${LAYOUTSIDECONTAINERWIDTHKEY}`);
-  width: var(--layout-side-container-width); //TODO
+  width: var(--layout-side-container-width); // TODO
 
   .layout-side-title {
     background-color: rgb(2, 93, 126);
@@ -160,7 +159,7 @@ onMounted(() => {
     width: 100%;
 
     .drap-meuline {
-      width: 8px;
+      width: 4px;
       height: 100%;
       background-color: rgb(2, 93, 126);
       cursor: e-resize;
@@ -168,14 +167,18 @@ onMounted(() => {
       right: 0;
       z-index: 99;
     }
-    .drap-meuline:hover {
-      background-color: rgb(154, 45, 160);
+
+    // .drap-meuline:hover {
+    //   background-color: rgb(154, 45, 160);
+    // }
+
+    .el-menu--horizontal {
+      --el-menu-horizontal-height: 100px;
     }
 
     .layout-menu-view {
       width: 100%;
       border: 0 !important;
-      // flex: 1;
     }
   }
 }

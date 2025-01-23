@@ -2,39 +2,48 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
-
-// 你也可以使用 unplugin-vue-components
-// import Components from 'unplugin-vue-components/vite'
-// import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
-// 或者使用 unplugin-element-plus
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+import path from 'path'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
-// https://vitejs.dev/config/
-/** @type {import('vite').UserConfig} */
+/**
+ * @type {import('vite').UserConfig}
+ * @link https://vitejs.dev/config/
+ */
 export default defineConfig(({ mode }) => {
+  /** 端口号 */
   const VITE_PORT = parseInt(
     loadEnv(mode, './env/').VITE_PORT
   )
+
+  /** 后端接口 */
   const VITE_API_DOMAIN = loadEnv(
     mode,
     './env/'
   ).VITE_API_DOMAIN //'http://localhost:8081'
 
+  /** 后端接口前缀 */
   const VITE_API_DOMAIN_PREFIX = loadEnv(
     mode,
     './env/'
   ).VITE_API_DOMAIN_PREFIX // '/dev_api'
 
+  /** 后端接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(
     `^${VITE_API_DOMAIN_PREFIX}`
   )
+
+  /** 静态资源地址 */
   const VITE_BASE_URL = loadEnv(
     mode,
     './env/'
   ).VITE_BASE_URL
 
+  /** Html tab title */
   const VITE_APP_TITLE = loadEnv(
     mode,
     './env/'
@@ -95,10 +104,25 @@ export default defineConfig(({ mode }) => {
       }),
       ElementPlus({
         useSource: true
+      }),
+      // 注册所有的svg文件生成svg雪碧图
+      createSvgIconsPlugin({
+        iconDirs: [
+          path.resolve(
+            process.cwd(),
+            'src/assets/svg-icons'
+          )
+        ], // icon存放的目录
+        symbolId: 'icon-[name]', // symbol的id
+        inject: 'body-last', // 插入的位置
+        customDomId: '__svg__icons__dom__' // svg的id
+      }),
+      AutoImport({
+        resolvers: [ElementPlusResolver()]
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()]
       })
-      // Components({
-      //   resolvers: [ElementPlusResolver()]
-      // })
     ],
     resolve: {
       alias: {

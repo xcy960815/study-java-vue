@@ -15,6 +15,7 @@
       </svg>
     </div>
     <div class="right-panel">
+      <!-- 主题配置 -->
       <theme></theme>
       <el-dropdown
         trigger="contextmenu"
@@ -47,14 +48,10 @@
       </el-dropdown>
     </div>
   </el-header>
-  <!-- 修改密码dialog -->
-  <change-password-dialog
-    ref="changePasswordDialogRef"
-  ></change-password-dialog>
 </template>
 
 <script lang="ts" setup>
-import ChangePasswordDialog from './change-password-dialog.vue'
+// import ChangePasswordDialog from './change-password-dialog.vue'
 import { computed, onMounted, ref } from 'vue'
 import {
   useUserInfoStore,
@@ -76,10 +73,6 @@ const systemInfoStore = useSystemInfoStore()
 const openMenuFlag = computed(
   () => systemInfoStore.openMenuFlag
 )
-
-const changePasswordDialogRef = ref<InstanceType<
-  typeof ChangePasswordDialog
-> | null>(null)
 
 /**
  * 点击展开收起小图标
@@ -104,8 +97,7 @@ const handleChooseItem = (command: string) => {
       router.push('/user/info')
       break
     case 'change-password':
-      // router.push('/user/password')
-      changePasswordDialogRef.value?.openDialog()
+      router.push('/password')
       break
     case 'login-out':
       console.log('退出登录')
