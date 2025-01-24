@@ -13,7 +13,7 @@
 import { computed } from 'vue'
 import * as ElIcon from '@element-plus/icons-vue'
 defineOptions({
-  name: 'SvgIcon'
+  name: 'svg-icon'
 })
 
 const props = defineProps({

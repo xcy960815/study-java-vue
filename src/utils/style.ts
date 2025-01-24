@@ -1,13 +1,7 @@
 /** 该文件作用是修改系统主题颜色 */
 import color from 'css-color-function'
 import { type FormInstance } from 'element-plus'
-import {
-  computed,
-  reactive,
-  ref,
-  nextTick,
-  onMounted
-} from 'vue'
+import { computed, reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
 
 /**
@@ -304,8 +298,6 @@ export const changeTabIco = (
 ) => {
   const [parentModule] = to.matched
   const parentModuleName = parentModule.name as string
-  console.log('parentModuleName', parentModuleName)
-
   const processedIcos = Object.fromEntries(
     Object.entries(icos).map(([key, value]) => {
       // 去掉前缀和后缀
@@ -315,8 +307,6 @@ export const changeTabIco = (
       return [newKey, value]
     })
   )
-  console.log('processedIcos-processedIcos', processedIcos)
-
   const targetIco = processedIcos[parentModuleName]
 
   if (targetIco) {

@@ -1,23 +1,28 @@
 import { defineStore } from 'pinia'
 import { Names } from './store-name'
 
-export const systemInfoStore = defineStore(Names.SYSTEM, {
+export const systemInfoStore = defineStore<
+  Names.SYSTEM,
+  BaseStore.State<SystemStore.State>,
+  BaseStore.Getters<SystemStore.State, SystemStore.Getters>,
+  BaseStore.Actions<SystemStore.State, SystemStore.Actions>
+>(Names.SYSTEM, {
   state: () => {
     return {
-      openMenu: true
+      openMenuFlag: true
     }
   },
   getters: {
-    openMenuFlag(state) {
-      return state.openMenu
+    getOpenMenuFlag(state) {
+      return state.openMenuFlag
     }
   },
   actions: {
     reversalOpenMenuFlag() {
-      this.openMenu = !this.openMenu
+      this.openMenuFlag = !this.openMenuFlag
     },
-    setOpenMenuFlag(flag: boolean) {
-      this.openMenu = flag
+    setOpenMenuFlag(flag) {
+      this.openMenuFlag = flag
     }
   },
   persist: true
