@@ -91,7 +91,7 @@ export const routes: RouteRecordRaw[] = [
     },
     children: [
       {
-        path: '/goodsCategory/list',
+        path: '/goods-category/list',
         name: 'goods-category-list',
         component: defineAsyncComponent(
           () => import(`../views/goods-category/list.vue`)
@@ -100,18 +100,18 @@ export const routes: RouteRecordRaw[] = [
           title: '商品列表',
           icon: 'goods-category-list'
         }
+      },
+      {
+        path: '/goods-category/info',
+        name: 'info',
+        component: defineAsyncComponent(
+          () => import(`../views/goods-category/info.vue`)
+        ),
+        meta: {
+          hidden: true,
+          title: '商品详情'
+        }
       }
-      // {
-      //   path: '/user/info',
-      //   name: 'info',
-      //   component: defineAsyncComponent(
-      //     () => import(`../views/user/info.vue`)
-      //   ),
-      //   meta: {
-      //     hidden: true,
-      //     title: '用户中心'
-      //   }
-      // },
     ]
   },
   {

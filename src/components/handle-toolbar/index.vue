@@ -15,7 +15,7 @@
         placement="top"
       >
         <el-button
-          size="mini"
+          size="small"
           circle
           :icon="Search"
           @click="toggleSearch()"
@@ -28,7 +28,7 @@
         placement="top"
       >
         <el-button
-          size="mini"
+          size="small"
           circle
           :icon="Refresh"
           @click="refresh()"

@@ -57,7 +57,7 @@
       <el-form-item style="width: 100%">
         <el-button
           :loading="logining"
-          size="medium"
+          size="default"
           type="primary"
           style="width: 100%"
           @click.native.prevent="handleLogin"
@@ -142,14 +142,9 @@ const handleLogin = async () => {
 
   loginData.password = MD5(loginFormData.password)
 
-  loginStore
-    .login(loginData)
-    .then(() => {
-      console.log('then')
-    })
-    .catch(() => {
-      logining.value = false
-    })
+  loginStore.login(loginData).finally(() => {
+    logining.value = false
+  })
 }
 
 onMounted(() => {})

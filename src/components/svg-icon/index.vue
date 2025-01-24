@@ -10,8 +10,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, type PropType } from 'vue'
 import * as ElIcon from '@element-plus/icons-vue'
+import { svgIcons } from '@assets/svg-icons/index'
+
+type ElIconName = keyof typeof ElIcon
+
+type SvgIconName = (typeof svgIcons)[number]
+
 defineOptions({
   name: 'svg-icon'
 })
@@ -22,7 +28,7 @@ const props = defineProps({
     default: 'icon'
   },
   name: {
-    type: String,
+    type: String as PropType<SvgIconName | ElIconName>,
     required: true
   },
   color: {
@@ -38,8 +44,6 @@ const props = defineProps({
 const isExternalIcon = computed(() => {
   const iconNames = Object.keys(ElIcon)
   const isExternal = !iconNames.includes(props.name)
-  console.log('isExternal--isExternal', isExternal)
-
   return isExternal
 })
 
@@ -50,8 +54,8 @@ const symbolId = computed(
 
 <style lang="less" scoped>
 .svg-icon {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1em;
+  height: 1em;
   vertical-align: middle;
   overflow: hidden;
   fill: currentColor;

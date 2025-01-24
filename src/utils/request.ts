@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
-import { getToken } from './token'
+import { getToken, removeToken } from './token'
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 
 axios.defaults.withCredentials = false
@@ -29,10 +29,16 @@ request.interceptors.request.use(
  * 响应拦截器
  */
 request.interceptors.response.use(
-  (response) => {
+  async (response) => {
     const responseData = response.data
-    if (responseData.code == 401) {
+    if (responseData.code === 401) {
+      await removeToken()
       eventEmitter.emit('token-invalid')
+      ElMessage({
+        type: 'error',
+        message: responseData.message
+      })
+
       return Promise.reject(responseData)
     } else if (responseData.code == 500) {
       ElMessage({

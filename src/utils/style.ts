@@ -40,7 +40,6 @@ export const setSystemTheme = () => {
     isBlob: boolean = false
   ): Promise<Result> => {
     const result = reactive<Result>({
-      // data: isBlob ? new Blob() : "",
       data: '',
       url: ''
     })
@@ -86,6 +85,8 @@ export const setSystemTheme = () => {
     const { data } = await useFetch(
       '//unpkg.com/element-plus/dist/index.css'
     )
+    console.log('data', data)
+
     return data
   }
 
@@ -129,6 +130,8 @@ export const setSystemTheme = () => {
       )
       colors[key] = color.convert(replacedValue)
     })
+    console.log('colors', colors)
+
     return colors
   }
 

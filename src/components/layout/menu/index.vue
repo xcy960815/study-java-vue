@@ -5,13 +5,13 @@
   >
     <h4 class="layout-side-title">{{ viteAppTitle }}</h4>
     <div class="layout-side-view">
+      <!-- background-color="rgb(2, 93, 126)" -->
       <el-menu
         class="layout-menu-view"
         :collapse="isCollapse"
         active-text-color="#fff"
-        background-color="rgb(2, 93, 126)"
         router
-        :default-active="defaultActive"
+        :default-active="currentRoute"
         text-color="#fff"
       >
         <menu-item :menu-data="menuData"></menu-item>
@@ -36,12 +36,13 @@ import {
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
-const defaultActive = computed(() => route.path)
+
+const currentRoute = computed(() => route.path)
 
 const systemInfoStore = useSystemInfoStore()
 
 const isCollapse = computed(() => {
-  const openMenuFlag = !systemInfoStore.openMenuFlag
+  const openMenuFlag = !systemInfoStore.getOpenMenuFlag
   return openMenuFlag
 })
 
@@ -115,7 +116,6 @@ const initDrap = () => {
     document.onmouseup = () => {
       document.onmousemove = null
       document.onmouseup = null
-
       if (sidebarContainer.offsetWidth <= 64) {
         setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, 64 + 'px')
         systemInfoStore.setOpenMenuFlag(false)

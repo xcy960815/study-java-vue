@@ -57,5 +57,5 @@ declare interface GoodsCategoryVo
       | 'updateUser'
     >
   > {
-  categoryLevel?: number | null
+  categoryLevel: number
 }

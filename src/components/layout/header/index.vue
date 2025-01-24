@@ -51,7 +51,6 @@
 </template>
 
 <script lang="ts" setup>
-// import ChangePasswordDialog from './change-password-dialog.vue'
 import { computed, onMounted, ref } from 'vue'
 import {
   useUserInfoStore,
@@ -70,8 +69,9 @@ const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
 
 const systemInfoStore = useSystemInfoStore()
+
 const openMenuFlag = computed(
-  () => systemInfoStore.openMenuFlag
+  () => systemInfoStore.getOpenMenuFlag
 )
 
 /**

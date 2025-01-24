@@ -47,7 +47,7 @@
 
   <el-table
     border
-    :data="goodsCategoryList.tableData"
+    :data="goodsCategoryInfo.tableData"
     style="width: 100%"
   >
     <el-table-column
@@ -66,8 +66,15 @@
     />
     <el-table-column prop="createTime" label="创建时间" />
     <el-table-column prop="updateTime" label="更新时间" />
-    <el-table-column fixed="right" label="操作" width="120">
+    <el-table-column fixed="right" label="操作" width="150">
       <template #default="{ row }">
+        <el-button
+          link
+          type="primary"
+          size="small"
+          @click="handleClickEditGoodCategoryDetail(row)"
+          >详情</el-button
+        >
         <el-button
           link
           type="primary"
@@ -86,13 +93,13 @@
     </el-table-column>
   </el-table>
   <el-pagination
-    v-model:current-page="goodsCategoryList.pageNum"
-    v-model:page-size="goodsCategoryList.pageSize"
+    v-model:current-page="goodsCategoryInfo.pageNum"
+    v-model:page-size="goodsCategoryInfo.pageSize"
     :page-sizes="[10, 20, 30, 40]"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="goodsCategoryList.total"
-    @size-change="goodsCategoryList.handlePageSizeChange"
-    @current-change="goodsCategoryList.handlePageNumChange"
+    :total="goodsCategoryInfo.total"
+    @size-change="goodsCategoryInfo.handlePageSizeChange"
+    @current-change="goodsCategoryInfo.handlePageNumChange"
   />
   <el-dialog
     v-model="addOrEditGoodsCategoryDialogVisible"
@@ -105,32 +112,29 @@
       label-width="auto"
       status-icon
     >
-      <el-form-item label="用户昵称" prop="nickName">
-        <el-input
-          v-model="addOrEditGoodsCategoryFormData.nickName"
-          placeholder="请输入用户昵称"
-        />
-      </el-form-item>
-      <el-form-item label="登陆名称" prop="loginName">
-        <el-input
-          v-model="addOrEditGoodsCategoryFormData.loginName"
-          placeholder="请输入登陆名称"
-        />
-      </el-form-item>
-      <el-form-item label="个性签名" prop="introduceSign">
+      <el-form-item label="商品名称" prop="categoryName">
         <el-input
           v-model="
-            addOrEditGoodsCategoryFormData.introduceSign
+            addOrEditGoodsCategoryFormData.categoryName
           "
-          placeholder="请输入个性签名"
+          placeholder="请输入商品名称"
         />
+      </el-form-item>
+      <el-form-item label="商品等级" prop="categoryLevel">
+        <el-input
+          v-model="
+            addOrEditGoodsCategoryFormData.categoryLevel
+          "
+          placeholder="请输入商品等级"
+        />
+      </el-form-item>
+      <!-- <el-form-item label="个性签名" prop="introduceSign">
+        <el-input v-model="addOrEditGoodsCategoryFormData.introduceSign
+          " placeholder="请输入个性签名" />
       </el-form-item>
       <el-form-item label="收货地址" prop="address">
-        <el-input
-          v-model="addOrEditGoodsCategoryFormData.address"
-          placeholder="请输入收货地址"
-        />
-      </el-form-item>
+        <el-input v-model="addOrEditGoodsCategoryFormData.address" placeholder="请输入收货地址" />
+      </el-form-item> -->
     </el-form>
     <template #footer>
       <div class="dialog-footer">
@@ -159,6 +163,7 @@ import {
   ElMessage,
   ElMessageBox
 } from 'element-plus'
+import { useRouter } from 'vue-router'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 
 interface GoodsCategoryInfo {
@@ -174,23 +179,24 @@ interface GoodsCategoryInfo {
  */
 const queryFormData = reactive<GoodsCategoryVo>({
   categoryId: null,
-  categoryLevel: null
+  categoryLevel: 0
 })
+
 const addOrEditGoodsCategoryDialogTitle = ref('')
 
 const addOrEditGoodsCategoryDialogVisible = ref(false)
 
-const goodsCategoryList = reactive<GoodsCategoryInfo>({
+const goodsCategoryInfo = reactive<GoodsCategoryInfo>({
   tableData: [],
   total: 0,
   pageSize: 10,
   pageNum: 1,
   handlePageSizeChange(pageSize: number) {
-    goodsCategoryList.pageSize = pageSize
+    goodsCategoryInfo.pageSize = pageSize
     getGoodsCategoryList()
   },
   handlePageNumChange(pageNum: number) {
-    goodsCategoryList.pageNum = pageNum
+    goodsCategoryInfo.pageNum = pageNum
     getGoodsCategoryList()
   }
 })
@@ -199,8 +205,8 @@ const goodsCategoryList = reactive<GoodsCategoryInfo>({
  * @description 获取商品列表
  */
 const getGoodsCategoryList = async () => {
-  const pageSize = goodsCategoryList.pageSize
-  const pageNum = goodsCategoryList.pageNum
+  const pageSize = goodsCategoryInfo.pageSize
+  const pageNum = goodsCategoryInfo.pageNum
   const result =
     await goodsCategoryModule.getGoodsCategoryList({
       pageSize,
@@ -208,61 +214,57 @@ const getGoodsCategoryList = async () => {
       ...queryFormData
     })
   if (result.code === 200) {
-    goodsCategoryList.tableData = result.data.data
-    goodsCategoryList.total = result.data.total
+    goodsCategoryInfo.tableData = result.data.data
+    goodsCategoryInfo.total = result.data.total
   }
 }
 
 const addOrEditGoodsCategoryFormRef = ref<FormInstance>()
 
-const addOrEditGoodsCategoryFormData = reactive<
-  Omit<UserInfoDto, 'userId' | 'age' | 'createTime'>
->({
-  nickName: '',
-  loginName: '',
-  introduceSign: '',
-  address: '',
-  avatar: ''
-})
+const addOrEditGoodsCategoryFormData =
+  reactive<GoodsCategoryVo>({
+    categoryId: null,
 
-const addOrEditGoodsCategoryFormRules: FormRules<
-  typeof addOrEditGoodsCategoryFormData
-> = {
-  nickName: [
-    {
-      required: true,
-      message: '请输入用户昵称',
-      trigger: 'blur'
-    }
-  ],
-  loginName: [
-    {
-      required: true,
-      message: '请输入登陆名称',
-      trigger: 'blur'
-    }
-  ],
-  introduceSign: [
-    {
-      required: true,
-      message: '请输入个性签名',
-      trigger: 'blur'
-    }
-  ],
-  address: [
-    {
-      required: true,
-      message: '请输入收货地址',
-      trigger: 'blur'
-    }
-  ]
-}
+    /**
+     * 分类级别(1-一级分类 2-二级分类 3-三级分类)
+     */
+    categoryLevel: 0,
+
+    /**
+     * 父分类id
+     */
+    parentId: 0,
+
+    /**
+     * 分类名称
+     */
+    categoryName: '',
+
+    /**
+     * 排序值(字段越大越靠前)
+     */
+    categoryRank: 0
+  })
+
+const addOrEditGoodsCategoryFormRules: FormRules<GoodsCategoryVo> =
+  {}
 
 const handleClickAddGoodCategory = () => {
   addOrEditGoodsCategoryDialogTitle.value = '新增商品'
   addOrEditGoodsCategoryDialogVisible.value = true
   nextTick(() => {
     addOrEditGoodsCategoryFormRef.value?.resetFields()
+  })
+}
+const router = useRouter()
+const handleClickEditGoodCategoryDetail = (
+  row: GoodsCategoryDto
+) => {
+  router.push({
+    path: `/goods-category/detail`,
+    query: {
+      id: row.categoryId
+    }
   })
 }
 
@@ -310,12 +312,12 @@ const handleClickDeleteGoodsCategory = (
     type: 'warning'
   })
     .then(async () => {
-      const result =
-        //   await goodsCategoryModule.deleteUserInfo<boolean>({
-        //     userId: row.userId
-        //   })
-        // if (result.code !== 200) return
-        getGoodsCategoryList()
+      // const result =
+      //   await goodsCategoryModule.deleteUserInfo<boolean>({
+      //     userId: row.userId
+      //   })
+      // if (result.code !== 200) return
+      getGoodsCategoryList()
       ElMessage({
         type: 'success',
         message: '操作成功'

@@ -9,12 +9,14 @@
   >
     <el-form-item label="原始密码" prop="originalPassword">
       <el-input
+        type="password"
         v-model="changePasswordFormData.originalPassword"
         placeholder="请输入原始密码"
       />
     </el-form-item>
     <el-form-item label="新密码" prop="newPassword">
       <el-input
+        type="password"
         v-model="changePasswordFormData.newPassword"
         placeholder="请输入新密码"
       />
@@ -24,6 +26,7 @@
       prop="confirmNewPasswordMd5"
     >
       <el-input
+        type="password"
         v-model="
           changePasswordFormData.confirmNewPasswordMd5
         "
@@ -43,11 +46,13 @@ import {
   ElMessage
 } from 'element-plus'
 import { ref, reactive, nextTick } from 'vue'
+
 interface ChangePasswordFormData {
   originalPassword: string
   newPassword: string
   confirmNewPasswordMd5: string
 }
+
 const changePasswordFormRef = ref<FormInstance>()
 
 const changePasswordFormData =
@@ -72,6 +77,36 @@ const changePasswordFormRules: FormRules<ChangePasswordFormData> =
         required: true,
         message: '请输入新密码',
         trigger: 'blur'
+      },
+      {
+        // 自定义验证
+        validator: (_rule, value, callback) => {
+          if (changePasswordFormData.originalPassword) {
+            if (
+              value ===
+              changePasswordFormData.originalPassword
+            ) {
+              callback(
+                new Error('新密码不能与原始密码相同')
+              )
+            } else {
+              callback()
+            }
+          } else if (
+            changePasswordFormData.confirmNewPasswordMd5
+          ) {
+            if (
+              value !==
+              changePasswordFormData.confirmNewPasswordMd5
+            ) {
+              callback(new Error('新密码与确认密码不相同'))
+            } else {
+              callback()
+            }
+          } else {
+            callback()
+          }
+        }
       }
     ],
 
@@ -119,5 +154,6 @@ const handleChangePasswordConfirm = async () => {
   width: 600px;
   padding: 25px;
   margin: auto;
+  margin-top: 100px;
 }
 </style>

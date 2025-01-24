@@ -52,9 +52,7 @@ class CustomEventEmitter {
   ): boolean {
     const listeners = this.listeners.get(eventName)
     if (!listeners || listeners.size === 0) return false
-    listeners.forEach((listener) => {
-      listener(...args)
-    })
+    listeners.forEach((listener) => listener(...args))
     return true
   }
 
