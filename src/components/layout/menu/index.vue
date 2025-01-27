@@ -5,14 +5,13 @@
   >
     <h4 class="layout-side-title">{{ viteAppTitle }}</h4>
     <div class="layout-side-view">
-      <!-- background-color="rgb(2, 93, 126)" -->
+      <!-- text-color="#fff" -->
+      <!-- active-text-color="#fff" -->
       <el-menu
         class="layout-menu-view"
         :collapse="isCollapse"
-        active-text-color="#fff"
         router
         :default-active="currentRoute"
-        text-color="#fff"
       >
         <menu-item :menu-data="menuData"></menu-item>
       </el-menu>
@@ -177,6 +176,7 @@ onMounted(() => {
     }
 
     .layout-menu-view {
+      background-color: rgb(2, 93, 126);
       width: 100%;
       border: 0 !important;
     }

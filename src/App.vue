@@ -7,7 +7,7 @@ import { onMounted } from 'vue'
 import { setSystemTheme } from '@/utils/style'
 const { initTheme } = setSystemTheme()
 onMounted(() => {
-  initTheme()
+  // initTheme()
 })
 </script>
 <style lang="less" scoped></style>

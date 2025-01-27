@@ -7,7 +7,7 @@ import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import ElementPlus from 'unplugin-element-plus/vite'
+// import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
 /**
@@ -86,7 +86,7 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler', // or 'modern'  禁止控制台输出警告
+          api: 'modern-compiler',
           additionalData: `@use "@assets/style/element/theme.scss" as *;`
         }
       }
@@ -102,9 +102,23 @@ export default defineConfig(({ mode }) => {
           }
         }
       }),
-      ElementPlus({
-        useSource: true
+      AutoImport({
+        resolvers: [
+          ElementPlusResolver({
+            // importStyle: 'sass'
+          })
+        ]
       }),
+      Components({
+        resolvers: [
+          ElementPlusResolver({
+            // importStyle: 'sass'
+          })
+        ]
+      }),
+      // ElementPlus({
+      //   useSource: true
+      // }),
       // 注册所有的svg文件生成svg雪碧图
       createSvgIconsPlugin({
         iconDirs: [
@@ -116,12 +130,6 @@ export default defineConfig(({ mode }) => {
         symbolId: 'icon-[name]', // symbol的id
         inject: 'body-last', // 插入的位置
         customDomId: '__svg__icons__dom__' // svg的id
-      }),
-      AutoImport({
-        resolvers: [ElementPlusResolver()]
-      }),
-      Components({
-        resolvers: [ElementPlusResolver()]
       })
     ],
     resolve: {
@@ -146,6 +154,9 @@ export default defineConfig(({ mode }) => {
         ),
         '@router': fileURLToPath(
           new URL('./src/router', import.meta.url)
+        ),
+        '@enums': fileURLToPath(
+          new URL('./src/enums', import.meta.url)
         )
       }
     }

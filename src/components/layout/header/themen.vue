@@ -1,12 +1,19 @@
 <template>
   <!-- 切换主题按钮 -->
   <el-link
-    class="change-theme-switch"
-    @click="handleClickChangeTheme"
+    class="change-theme-color-switch"
+    @click="handleClickChangeThemeColor"
     :underline="false"
     type="info"
-    >切换主题</el-link
-  >
+    >切换主题色
+  </el-link>
+  <el-link
+    class="change-theme-switch"
+    @click="() => handleClickChangeTheme()"
+    :underline="false"
+    type="info"
+    >切换主题
+  </el-link>
 
   <!-- 切换主题dialog -->
   <el-dialog
@@ -45,11 +52,17 @@ const {
   resetTheme,
   themeDialogVisible,
   colors,
+  handleClickChangeThemeColor,
   handleClickChangeTheme
 } = setSystemTheme()
 </script>
 
 <style lang="less" scoped>
+.change-theme-color-switch {
+  position: inherit;
+  margin-right: 10px;
+}
+
 .change-theme-switch {
   position: inherit;
   margin-right: 10px;

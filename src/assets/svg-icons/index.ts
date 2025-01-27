@@ -15,7 +15,8 @@ const svgIcons = [
   'admin-user-list',
   'other',
   'password',
-  'user-list'
+  'user-list',
+  'server-send'
 ] as const
 
 export { svgIcons }

@@ -3,6 +3,9 @@ import color from 'css-color-function'
 import { type FormInstance } from 'element-plus'
 import { computed, reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
+import dayjs from 'dayjs'
+
+import { useDark, useToggle } from '@vueuse/core'
 
 /**
  * 侧边栏宽度key
@@ -85,8 +88,6 @@ export const setSystemTheme = () => {
     const { data } = await useFetch(
       '//unpkg.com/element-plus/dist/index.css'
     )
-    console.log('data', data)
-
     return data
   }
 
@@ -155,6 +156,13 @@ export const setSystemTheme = () => {
     if (stylesheetCount === document.styleSheets.length) {
       const style = document.createElement('style')
       style.innerText = originalStyle
+      const currentTime = dayjs().format(
+        'YYYY-MM-DD HH:mm:ss'
+      )
+      style.setAttribute(
+        'data-vite-dev-origin',
+        currentTime
+      )
       document.head.appendChild(style)
     } else {
       const headLastChild = document.head
@@ -223,14 +231,17 @@ export const setSystemTheme = () => {
 
   const themeFormRef = ref<FormInstance>()
   /**
-   * 切换主题
+   * 切换主题色
    */
-  const handleClickChangeTheme = () => {
+  const handleClickChangeThemeColor = () => {
     themeDialogVisible.value = true
     nextTick(() => {
       themeFormRef.value?.resetFields()
     })
   }
+
+  const isDark = useDark() // 检测当前是否为深色模式
+  const handleClickChangeTheme = useToggle(isDark) // 用于切换深色和浅色模式
 
   /**
    * 重置主题
@@ -242,6 +253,7 @@ export const setSystemTheme = () => {
   return {
     initTheme,
     handleConfirmTheme,
+    handleClickChangeThemeColor,
     handleClickChangeTheme,
     themeDialogVisible,
     themeFormRef,

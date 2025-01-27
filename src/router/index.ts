@@ -115,6 +115,31 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/sse',
+    name: 'sse',
+    component: defineAsyncComponent(
+      () => import(`../components/layout/index.vue`)
+    ),
+    meta: {
+      title: '服务端推送',
+      icon: 'server-send'
+    },
+    children: [
+      {
+        path: '/sse/stream',
+        name: 'sse-stream',
+        component: defineAsyncComponent(
+          () =>
+            import(`../views/server-send-event/index.vue`)
+        ),
+        meta: {
+          icon: 'server-send',
+          title: '服务端推送'
+        }
+      }
+    ]
+  },
+  {
     path: '/admin-user',
     name: 'admin-user',
     component: defineAsyncComponent(

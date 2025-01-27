@@ -2,7 +2,11 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
 import { getToken, removeToken } from './token'
+import { loginEnum } from '@enums/login'
+
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
+
+const withoutAuthorizationUrls = ['/login']
 
 axios.defaults.withCredentials = false
 const request = axios.create({
@@ -13,7 +17,11 @@ const request = axios.create({
 request.interceptors.request.use(
   async (config) => {
     const token = await getToken()
-    if (!config.url?.includes('/login')) {
+    const isWithoutAuthorizationUrl =
+      !withoutAuthorizationUrls.some((url) =>
+        config.url?.includes(url)
+      )
+    if (isWithoutAuthorizationUrl) {
       // 添加请求头
       config.headers['Authorization'] = `Bearer ${token}`
     }
@@ -31,7 +39,7 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   async (response) => {
     const responseData = response.data
-    if (responseData.code === 401) {
+    if (responseData.code === loginEnum.InvalidToken) {
       await removeToken()
       eventEmitter.emit('token-invalid')
       ElMessage({
@@ -40,19 +48,18 @@ request.interceptors.response.use(
       })
 
       return Promise.reject(responseData)
-    } else if (responseData.code == 500) {
+    } else if (responseData.code == loginEnum.ERROR) {
       ElMessage({
         type: 'error',
         message: responseData.message
       })
       return Promise.reject(responseData)
-    } else {
+    } else if (responseData.code == loginEnum.SUCCESS) {
       return Promise.resolve(responseData)
     }
   },
   (error) => {
     const { message } = error
-
     ElMessage.error(message)
     return Promise.reject(error)
   }
