@@ -19,6 +19,17 @@ export const LAYOUTSIDECONTAINERWIDTHKEY =
  */
 const SYSTEMTHEMEKEY = 'system-theme'
 
+// 设置css变量
+export function setStyleProperty(
+  propName: string,
+  value: string
+) {
+  document.documentElement.style.setProperty(
+    propName,
+    value
+  )
+}
+
 export type Theme = {
   colors: {
     primary?: string
@@ -56,17 +67,36 @@ export const setSystemTheme = () => {
 
   const themeDialogVisible = ref(false)
 
-  // 设置css变量
-  function setStyleProperty(
-    propName: string,
-    value: string
+  function updateBrandExtendColorsVar(
+    color: string,
+    name: string
   ) {
-    document.documentElement.style.setProperty(
-      propName,
-      value
+    const { DEFAULT, dark, light } = genMixColor(
+      color,
+      isDark.value
     )
+
+    // 每种主题色由浅到深分为五个阶梯以供开发者使用。
+    setStyleProperty(`--${name}-lighter-color`, light[5])
+    setStyleProperty(`--${name}-light-color`, light[3])
+    setStyleProperty(`--${name}-color`, DEFAULT)
+    setStyleProperty(`--${name}-deep-color`, dark[2])
+    setStyleProperty(`--${name}-deeper-color`, dark[4])
+
+    // elementPlus主题色更新
+    setStyleProperty(`--el-color-${name}`, DEFAULT)
+    setStyleProperty(`--el-color-${name}-dark-2`, dark[2])
+    setStyleProperty(`--el-color-${name}-light-3`, light[3])
+    setStyleProperty(`--el-color-${name}-light-5`, light[5])
+    setStyleProperty(`--el-color-${name}-light-7`, light[7])
+    setStyleProperty(`--el-color-${name}-light-8`, light[8])
+    setStyleProperty(`--el-color-${name}-light-9`, light[9])
   }
 
+  /**
+   * 更新主题色变量
+   * @param param0 {Theme}
+   */
   function updateThemeColorVar({ colors }: Theme) {
     // 遍历当前主题色，生成混合色，并更新到css变量（tailwind + elementPlus）
     for (const brand in colors) {
@@ -75,49 +105,12 @@ export const setSystemTheme = () => {
         brand
       )
     }
-
-    function updateBrandExtendColorsVar(
-      color: string,
-      name: string
-    ) {
-      const { DEFAULT, dark, light } = genMixColor(
-        color,
-        isDark.value
-      )
-
-      // 每种主题色由浅到深分为五个阶梯以供开发者使用。
-      setStyleProperty(`--${name}-lighter-color`, light[5])
-      setStyleProperty(`--${name}-light-color`, light[3])
-      setStyleProperty(`--${name}-color`, DEFAULT)
-      setStyleProperty(`--${name}-deep-color`, dark[2])
-      setStyleProperty(`--${name}-deeper-color`, dark[4])
-
-      // elementPlus主题色更新
-      setStyleProperty(`--el-color-${name}`, DEFAULT)
-      setStyleProperty(`--el-color-${name}-dark-2`, dark[2])
-      setStyleProperty(
-        `--el-color-${name}-light-3`,
-        light[3]
-      )
-      setStyleProperty(
-        `--el-color-${name}-light-5`,
-        light[5]
-      )
-      setStyleProperty(
-        `--el-color-${name}-light-7`,
-        light[7]
-      )
-      setStyleProperty(
-        `--el-color-${name}-light-8`,
-        light[8]
-      )
-      setStyleProperty(
-        `--el-color-${name}-light-9`,
-        light[9]
-      )
-    }
   }
 
+  /**
+   * 设置主题
+   * @param data {Theme}
+   */
   const setTheme = (data: Theme = defaultThemeConfig) => {
     const oldTheme = getTheme()
 
@@ -137,8 +130,9 @@ export const setSystemTheme = () => {
   /**
    * 初始化主题
    */
-  const initTheme = async () => {
-    setTheme()
+  const initTheme = () => {
+    const theme = getTheme()
+    setTheme(theme)
   }
   /**
    * 切换主题
@@ -164,8 +158,6 @@ export const setSystemTheme = () => {
     })
   }
 
-  // const isDark = useDark()
-
   const handleClickChangeTheme = () => {
     isDark.value = !isDark.value
   }
@@ -188,20 +180,6 @@ export const setSystemTheme = () => {
     themeFormRef,
     resetTheme
   }
-}
-
-/**
- * 修改style变量
- * @param key {String} 变量名称
- * @param value {Srring} 变量值
- * @param dom {HTMLElement} 变量所在的dom
- */
-export const setVarStyle = (
-  key: string,
-  value: string,
-  dom: HTMLElement = document.documentElement
-) => {
-  dom.style.setProperty(key, value)
 }
 
 /**

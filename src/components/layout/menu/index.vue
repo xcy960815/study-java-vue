@@ -21,7 +21,7 @@
 </template>
 <script lang="ts" setup>
 import {
-  setVarStyle,
+  setStyleProperty,
   LAYOUTSIDECONTAINERWIDTHKEY
 } from '@/utils/system-theme'
 import { useSystemInfoStore } from '@store'
@@ -79,9 +79,12 @@ const initLayoutSideContainerWidth = () => {
     localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) ||
     '300px'
   if (!isCollapse.value) {
-    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
+    setStyleProperty(
+      LAYOUTSIDECONTAINERWIDTHKEY,
+      history_width
+    )
   } else {
-    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
+    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
   }
 }
 const initDrap = () => {
@@ -106,7 +109,7 @@ const initDrap = () => {
       left_width =
         left_width > max_width ? max_width : left_width
       if (!isCollapse.value) {
-        setVarStyle(
+        setStyleProperty(
           LAYOUTSIDECONTAINERWIDTHKEY,
           left_width + 'px'
         )
@@ -116,7 +119,10 @@ const initDrap = () => {
       document.onmousemove = null
       document.onmouseup = null
       if (sidebarContainer.offsetWidth <= 64) {
-        setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, 64 + 'px')
+        setStyleProperty(
+          LAYOUTSIDECONTAINERWIDTHKEY,
+          64 + 'px'
+        )
         systemInfoStore.setOpenMenuFlag(false)
       } else {
         localStorage.setItem(

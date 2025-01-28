@@ -59,7 +59,7 @@ import {
 } from '@store'
 import { useRouter } from 'vue-router'
 import {
-  setVarStyle,
+  setStyleProperty,
   LAYOUTSIDECONTAINERWIDTHKEY
 } from '@/utils/system-theme'
 import Theme from './themen.vue'
@@ -83,9 +83,12 @@ const toggleClick = () => {
     const history_width =
       localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) ||
       '300px'
-    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
+    setStyleProperty(
+      LAYOUTSIDECONTAINERWIDTHKEY,
+      history_width
+    )
   } else {
-    setVarStyle(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
+    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
   }
 }
 
