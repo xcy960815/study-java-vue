@@ -83,14 +83,14 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          api: 'modern-compiler',
-          additionalData: `@use "@assets/style/element/theme.scss" as *;`
-        }
-      }
-    },
+    // css: {
+    //   preprocessorOptions: {
+    //     scss: {
+    //       api: 'modern-compiler',
+    //       additionalData: `@use "@assets/style/element/theme.scss" as *;`
+    //     }
+    //   }
+    // },
     plugins: [
       vue(),
       vueDevTools(),

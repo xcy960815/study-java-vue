@@ -61,7 +61,7 @@ import { useRouter } from 'vue-router'
 import {
   setVarStyle,
   LAYOUTSIDECONTAINERWIDTHKEY
-} from '@/utils/style'
+} from '@/utils/system-theme'
 import Theme from './themen.vue'
 const router = useRouter()
 
@@ -100,7 +100,6 @@ const handleChooseItem = (command: string) => {
       router.push('/password')
       break
     case 'login-out':
-      console.log('退出登录')
       loginStore.logout()
       break
   }

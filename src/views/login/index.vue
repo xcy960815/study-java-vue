@@ -1,5 +1,7 @@
 <template>
-  <div class="login-page">
+  <div
+    class="login-page w-screen h-screen flex items-center justify-center"
+  >
     <canvas class="login-backage" id="cvs"></canvas>
     <el-form
       ref="loginFormRef"
@@ -95,6 +97,7 @@ const loginFormData = reactive({
 })
 
 const passwordInputType = ref('password')
+
 const showHideIcon = computed(
   () => passwordInputType.value === 'text'
 )
@@ -152,16 +155,9 @@ onMounted(() => {})
 <style lang="less" scoped>
 .login-page {
   position: relative;
-  height: inherit;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  // background-image: url('@/assets/images/login.jpg');
-  background-size: cover;
-  background-position: center;
-  width: 100%;
-  height: 100%;
 
   .login-form {
     border-radius: 6px;

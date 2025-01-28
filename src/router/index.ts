@@ -6,7 +6,7 @@ import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import { getToken } from '@utils/token'
-import { changeTabIco } from '@utils/style'
+import { changeTabIco } from '@/utils/system-theme'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -116,13 +116,13 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     path: '/sse',
-    name: 'sse',
+    name: 'server-send-event',
     component: defineAsyncComponent(
       () => import(`../components/layout/index.vue`)
     ),
     meta: {
       title: '服务端推送',
-      icon: 'server-send'
+      icon: 'server-send-event'
     },
     children: [
       {
@@ -133,7 +133,7 @@ export const routes: RouteRecordRaw[] = [
             import(`../views/server-send-event/index.vue`)
         ),
         meta: {
-          icon: 'server-send',
+          icon: 'server-send-event',
           title: '服务端推送'
         }
       }

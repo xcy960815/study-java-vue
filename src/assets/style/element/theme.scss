@@ -1,4 +1,6 @@
 // element-plus 样式中的变量引出来重新赋值
+
+// 暂时不用
 @forward 'element-plus/theme-chalk/src/common/var.scss' with (
   $colors: (
     'primary': (

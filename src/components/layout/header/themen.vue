@@ -9,10 +9,10 @@
   </el-link>
   <el-link
     class="change-theme-switch"
-    @click="() => handleClickChangeTheme()"
+    @click="handleClickChangeTheme"
     :underline="false"
     type="info"
-    >切换主题
+    >{{ isDark ? '浅色主题' : '深色主题' }}
   </el-link>
 
   <!-- 切换主题dialog -->
@@ -23,15 +23,35 @@
     width="400px"
   >
     <el-form
-      :model="colors"
+      :model="themeConfig"
       ref="themeFormRef"
       class="theme-form"
       label-width="70px"
     >
-      <el-form-item label="主题色" prop="primary">
+      <el-form-item label="主色：">
         <el-color-picker
-          v-model="colors.primary"
-        ></el-color-picker>
+          v-model="themeConfig.colors.primary"
+        />
+      </el-form-item>
+      <el-form-item label="消息色">
+        <el-color-picker
+          v-model="themeConfig.colors.info"
+        />
+      </el-form-item>
+      <el-form-item label="成功色">
+        <el-color-picker
+          v-model="themeConfig.colors.success"
+        />
+      </el-form-item>
+      <el-form-item label="警告色">
+        <el-color-picker
+          v-model="themeConfig.colors.warning"
+        />
+      </el-form-item>
+      <el-form-item label="危险色">
+        <el-color-picker
+          v-model="themeConfig.colors.danger"
+        />
       </el-form-item>
       <el-form-item class="color-buttons">
         <el-button
@@ -46,12 +66,13 @@
 </template>
 
 <script lang="ts" setup>
-import { setSystemTheme } from '@/utils/style'
+import { setSystemTheme } from '@/utils/system-theme'
 const {
+  isDark,
   handleConfirmTheme,
   resetTheme,
   themeDialogVisible,
-  colors,
+  themeConfig,
   handleClickChangeThemeColor,
   handleClickChangeTheme
 } = setSystemTheme()

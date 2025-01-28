@@ -1,9 +1,13 @@
 <template>
-  <el-container class="layout-container">
+  <el-container
+    class="layout-container w-screen h-screen flex"
+  >
     <layout-menu></layout-menu>
-    <el-container class="layout-view-container">
+    <el-container
+      class="layout-view-container flex-1 flex flex-col"
+    >
       <layoout-header></layoout-header>
-      <el-main class="layout-main-container">
+      <el-main class="layout-main-container flex-1 p-2.5">
         <!-- https://element-plus.org/zh-CN/guide/i18n.html -->
         <el-config-provider :locale="locale">
           <router-view v-if="!props.content"></router-view>
@@ -30,18 +34,10 @@ const props = defineProps({
 </script>
 <style lang="less" scoped>
 .layout-container {
-  height: 100%;
-  width: 100%;
-  display: flex;
+  position: relative;
 
   .layout-view-container {
-    display: flex;
     flex-direction: column;
-
-    .layout-main-container {
-      flex: 1;
-      padding: 10px;
-    }
   }
 }
 </style>

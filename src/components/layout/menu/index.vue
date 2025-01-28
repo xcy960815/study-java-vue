@@ -23,7 +23,7 @@
 import {
   setVarStyle,
   LAYOUTSIDECONTAINERWIDTHKEY
-} from '@/utils/style'
+} from '@/utils/system-theme'
 import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted, ref } from 'vue'

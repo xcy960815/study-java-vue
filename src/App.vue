@@ -4,10 +4,10 @@
 
 <script lang="ts" setup>
 import { onMounted } from 'vue'
-import { setSystemTheme } from '@/utils/style'
+import { setSystemTheme } from '@/utils/system-theme'
 const { initTheme } = setSystemTheme()
 onMounted(() => {
-  // initTheme()
+  initTheme()
 })
 </script>
 <style lang="less" scoped></style>
