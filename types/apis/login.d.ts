@@ -5,6 +5,7 @@ declare interface LoginRequestVo {
   username: string
   password: string
   rememberMe: boolean
+  captcha: string
 }
 
 /**

@@ -51,9 +51,25 @@
         </el-input>
       </el-form-item>
 
+      <el-form-item prop="captcha">
+        <div class="captcha-container flex"></div>
+        <el-input
+          class="captcha-input flex-1"
+          v-model="loginFormData.captcha"
+          size="large"
+          placeholder="验证码"
+          @keyup.enter.native="handleLogin"
+        >
+        </el-input>
+        <el-image
+          class="captcha-image flex-1 ml-1 rounded"
+          fill="fill"
+          :src="captchaUrl"
+        />
+      </el-form-item>
       <el-checkbox
+        class="remember-checkbox mb-[25px]"
         v-model="loginFormData.rememberMe"
-        style="margin: 0px 0px 25px 0px"
         >记住密码</el-checkbox
       >
       <el-form-item style="width: 100%">
@@ -79,20 +95,17 @@ import { onMounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View } from '@element-plus/icons-vue'
 import MD5 from 'MD5'
 import { initBackground } from './background'
-interface LoginFormData {
-  username: string
-  password: string
-  rememberMe: boolean
-}
-
+import { loginModule } from '@apis'
 initBackground()
+
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 
 const logining = ref(false)
 
-const loginFormData = reactive({
+const loginFormData = reactive<LoginRequestVo>({
   username: '13700002703',
   password: '123456',
+  captcha: '',
   rememberMe: false
 })
 
@@ -114,7 +127,7 @@ const handleClickPasswordIcon = () => {
 
 const loginFormRef = ref<FormInstance>()
 
-const loginFormRules: FormRules<LoginFormData> = {
+const loginFormRules: FormRules<LoginRequestVo> = {
   username: [
     {
       required: true,
@@ -129,6 +142,13 @@ const loginFormRules: FormRules<LoginFormData> = {
       trigger: 'blur'
     }
   ]
+  // captcha: [
+  //   {
+  //     required: true,
+  //     message: '请输入验证码',
+  //     trigger: 'blur'
+  //   }
+  // ]
 }
 
 const loginStore = useLoginStore()
@@ -149,8 +169,17 @@ const handleLogin = async () => {
     logining.value = false
   })
 }
+const captchaUrl = ref('')
+const handleGetCaptcha = async () => {
+  const result = await loginModule.getCaptcha()
+  if (result.code === 200) {
+    captchaUrl.value = result.data
+  }
+}
 
-onMounted(() => {})
+onMounted(() => {
+  handleGetCaptcha()
+})
 </script>
 <style lang="less" scoped>
 .login-page {

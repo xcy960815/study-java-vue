@@ -25,3 +25,13 @@ export function logout<T extends null>() {
     url
   )
 }
+
+/**
+ * 获取验证码
+ */
+export function getCaptcha<T extends string>() {
+  const url = `/captcha`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(
+    url
+  )
+}

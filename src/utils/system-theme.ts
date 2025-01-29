@@ -17,7 +17,7 @@ export const LAYOUTSIDECONTAINERWIDTHKEY =
 /**
  * 系统主题key
  */
-const SYSTEMTHEMEKEY = 'system-theme'
+const SYSTEMTHEMECOLORKEY = 'system-theme-color'
 
 // 设置css变量
 export function setStyleProperty(
@@ -57,7 +57,7 @@ export const setSystemTheme = () => {
   }
 
   const getTheme = (): Theme => {
-    const theme = localStorage.getItem(SYSTEMTHEMEKEY)
+    const theme = localStorage.getItem(SYSTEMTHEMECOLORKEY)
     return theme ? JSON.parse(theme) : defaultThemeConfig
   }
 
@@ -119,7 +119,7 @@ export const setSystemTheme = () => {
 
     // 将缓存到浏览器
     localStorage.setItem(
-      SYSTEMTHEMEKEY,
+      SYSTEMTHEMECOLORKEY,
       JSON.stringify(data)
     )
 
@@ -141,7 +141,7 @@ export const setSystemTheme = () => {
     setTheme(themeConfig)
     // 本地保存
     localStorage.setItem(
-      SYSTEMTHEMEKEY,
+      SYSTEMTHEMECOLORKEY,
       JSON.stringify(themeConfig)
     )
     themeDialogVisible.value = false
