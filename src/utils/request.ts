@@ -8,6 +8,8 @@ const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 
 const withoutAuthorizationUrls = ['/login']
 
+let status = 0
+
 axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
@@ -42,11 +44,14 @@ request.interceptors.response.use(
     if (responseData.code === loginEnum.InvalidToken) {
       await removeToken()
       eventEmitter.emit('token-invalid')
-      ElMessage({
-        type: 'error',
-        message: responseData.message
-      })
-
+      if (status !== loginEnum.InvalidToken) {
+        // 同一种类型错误只提示一次
+        ElMessage({
+          type: 'error',
+          message: responseData.message
+        })
+      }
+      status = loginEnum.InvalidToken
       return Promise.reject(responseData)
     } else if (responseData.code == loginEnum.ERROR) {
       ElMessage({

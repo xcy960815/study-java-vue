@@ -7,7 +7,7 @@ import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-// import ElementPlus from 'unplugin-element-plus/vite'
+import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 
 /**
@@ -83,14 +83,14 @@ export default defineConfig(({ mode }) => {
         }
       }
     },
-    // css: {
-    //   preprocessorOptions: {
-    //     scss: {
-    //       api: 'modern-compiler',
-    //       additionalData: `@use "@assets/style/element/theme.scss" as *;`
-    //     }
-    //   }
-    // },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler'
+          // additionalData: `@use "@assets/style/element/theme.scss" as *;`
+        }
+      }
+    },
     plugins: [
       vue(),
       vueDevTools(),
@@ -116,9 +116,9 @@ export default defineConfig(({ mode }) => {
           })
         ]
       }),
-      // ElementPlus({
-      //   useSource: true
-      // }),
+      ElementPlus({
+        useSource: true
+      }),
       // 注册所有的svg文件生成svg雪碧图
       createSvgIconsPlugin({
         iconDirs: [

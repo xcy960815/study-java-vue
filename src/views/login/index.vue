@@ -128,20 +128,20 @@ const handleClickPasswordIcon = () => {
 const loginFormRef = ref<FormInstance>()
 
 const loginFormRules: FormRules<LoginRequestVo> = {
-  username: [
-    {
-      required: true,
-      message: '请输入用户名',
-      trigger: 'blur'
-    }
-  ],
-  password: [
-    {
-      required: true,
-      message: '请输入密码',
-      trigger: 'blur'
-    }
-  ]
+  // username: [
+  //   {
+  //     required: true,
+  //     message: '请输入用户名',
+  //     trigger: 'blur'
+  //   }
+  // ],
+  // password: [
+  //   {
+  //     required: true,
+  //     message: '请输入密码',
+  //     trigger: 'blur'
+  //   }
+  // ]
   // captcha: [
   //   {
   //     required: true,
@@ -161,9 +161,12 @@ const handleLogin = async () => {
     ?.validate()
     .catch(() => false)
   if (!valid) return
+
   const loginData = { ...loginFormData }
 
-  loginData.password = MD5(loginFormData.password)
+  loginData.password = loginData.password
+    ? MD5(loginFormData.password)
+    : loginData.password
 
   loginStore.login(loginData).finally(() => {
     logining.value = false
