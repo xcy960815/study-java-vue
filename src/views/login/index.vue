@@ -62,10 +62,14 @@
         </el-input>
         <el-image
           @click="handleGetCaptcha"
-          class="captcha-image flex-1 ml-1 rounded"
+          class="captcha-image cursor-pointer h-10 flex-1 ml-1"
           fill="fill"
           :src="captchaUrl"
-        />
+        >
+          <template #error>
+            <span>图片加载失败</span>
+          </template>
+        </el-image>
       </el-form-item>
       <el-checkbox
         class="remember-checkbox mb-[25px]"
@@ -173,9 +177,14 @@ const handleLogin = async () => {
 }
 
 const captchaUrl = ref('')
-
+const captchaLoading = ref(false)
 const handleGetCaptcha = async () => {
-  const result = await loginModule.getCaptcha()
+  captchaLoading.value = true
+  const result = await loginModule
+    .getCaptcha()
+    .finally(() => {
+      captchaLoading.value = false
+    })
   if (result.code === 200) {
     captchaUrl.value = result.data
   }
@@ -197,6 +206,10 @@ onMounted(() => {
     background: #ffffff;
     width: 400px;
     padding: 25px 25px 5px 25px;
+
+    .captcha-image {
+      border-radius: 2px;
+    }
 
     .el-input__icon_view {
       cursor: pointer;

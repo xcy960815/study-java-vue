@@ -48,4 +48,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
     Themen: typeof import('./src/components/layout/header/themen.vue')['default']
   }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
+  }
 }
