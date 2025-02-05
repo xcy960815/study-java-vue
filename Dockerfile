@@ -18,6 +18,7 @@ COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html
 
 # 运行
 CMD ["nginx", "-g", "daemon off;"]
-
+# 构建镜像
 # docker build -t xcy960815/study-java-web:1.0 .
+# 构建容器
 # docker run --name study-java-web-container -dp 1234:80 xcy960815/study-java-web:1.0

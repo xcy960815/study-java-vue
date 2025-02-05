@@ -52,7 +52,6 @@
       </el-form-item>
 
       <el-form-item prop="captcha">
-        <div class="captcha-container flex"></div>
         <el-input
           class="captcha-input flex-1"
           v-model="loginFormData.captcha"
@@ -62,6 +61,7 @@
         >
         </el-input>
         <el-image
+          @click="handleGetCaptcha"
           class="captcha-image flex-1 ml-1 rounded"
           fill="fill"
           :src="captchaUrl"
@@ -128,27 +128,27 @@ const handleClickPasswordIcon = () => {
 const loginFormRef = ref<FormInstance>()
 
 const loginFormRules: FormRules<LoginRequestVo> = {
-  // username: [
-  //   {
-  //     required: true,
-  //     message: '请输入用户名',
-  //     trigger: 'blur'
-  //   }
-  // ],
-  // password: [
-  //   {
-  //     required: true,
-  //     message: '请输入密码',
-  //     trigger: 'blur'
-  //   }
-  // ]
-  // captcha: [
-  //   {
-  //     required: true,
-  //     message: '请输入验证码',
-  //     trigger: 'blur'
-  //   }
-  // ]
+  username: [
+    {
+      required: true,
+      message: '请输入用户名',
+      trigger: 'blur'
+    }
+  ],
+  password: [
+    {
+      required: true,
+      message: '请输入密码',
+      trigger: 'blur'
+    }
+  ],
+  captcha: [
+    {
+      required: true,
+      message: '请输入验证码',
+      trigger: 'blur'
+    }
+  ]
 }
 
 const loginStore = useLoginStore()
@@ -156,12 +156,11 @@ const loginStore = useLoginStore()
  * 登入
  */
 const handleLogin = async () => {
-  logining.value = true
   const valid = await loginFormRef.value
     ?.validate()
     .catch(() => false)
   if (!valid) return
-
+  logining.value = true
   const loginData = { ...loginFormData }
 
   loginData.password = loginData.password
@@ -172,7 +171,9 @@ const handleLogin = async () => {
     logining.value = false
   })
 }
+
 const captchaUrl = ref('')
+
 const handleGetCaptcha = async () => {
   const result = await loginModule.getCaptcha()
   if (result.code === 200) {
