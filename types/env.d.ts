@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   /** 项目base */
   readonly VITE_BASE_URL: string
+  /** 后端接口前缀 */
+  readonly VITE_API_SERVER_DOMAIN_PREFIX: string
 }
 interface ImportMeta {
   readonly env: ImportMetaEnv

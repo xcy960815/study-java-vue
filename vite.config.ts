@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
+import { type PreRenderedAsset } from 'rollup'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -24,15 +25,26 @@ export default defineConfig(({ mode }) => {
   const VITE_API_DOMAIN = loadEnv(
     mode,
     './env/'
-  ).VITE_API_DOMAIN //'http://localhost:8081'
+  ).VITE_API_DOMAIN
 
-  /** 后端接口前缀 */
+  /** 前端代理接口前缀 */
   const VITE_API_DOMAIN_PREFIX = loadEnv(
     mode,
     './env/'
-  ).VITE_API_DOMAIN_PREFIX // '/dev_api'
+  ).VITE_API_DOMAIN_PREFIX
 
-  /** 后端接口前缀正则 */
+  /** 后端接口前缀 */
+  const VITE_API_SERVER_DOMAIN_PREFIX = loadEnv(
+    mode,
+    './env/'
+  ).VITE_API_SERVER_DOMAIN_PREFIX
+
+  console.log(
+    'VITE_API_SERVER_DOMAIN_PREFIX',
+    VITE_API_SERVER_DOMAIN_PREFIX
+  )
+
+  /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(
     `^${VITE_API_DOMAIN_PREFIX}`
   )
@@ -55,8 +67,42 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['vue', 'element-plus']
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('lodash')) return 'lodash' // lodash 单独打包
+              if (id.includes('element-plus'))
+                return 'element-plus' // element-plus 单独打包
+              if (id.includes('vue')) return 'vue' // vue 单独打包
+              return 'vendor' // 其他库放在 vendor.js 里
+            }
+          },
+          // 入口文件输出配置
+          entryFileNames: `assets/js/[name]-[hash].js`,
+          // 代码分割后的文件输出配置
+          chunkFileNames: `assets/js/[name]-[hash].js`,
+          // 静态资源输出配置
+          assetFileNames(assetInfo: PreRenderedAsset) {
+            // css文件单独输出到css文件夹
+            if (assetInfo.name?.endsWith('.css')) {
+              return `assets/css/[name]-[hash].css`
+            }
+            // 图片文件单独输出到img文件夹
+            else if (
+              [
+                '.png',
+                '.jpg',
+                '.jpeg',
+                '.gif',
+                '.svg',
+                '.webp'
+              ].some((ext) => assetInfo.name?.endsWith(ext))
+            ) {
+              return `assets/img/[name]-[hash].[ext]`
+            }
+            // 其他资源输出到assets文件夹
+            else {
+              return `assets/[name]-[hash].[ext]`
+            }
           }
         }
       }
@@ -79,7 +125,10 @@ export default defineConfig(({ mode }) => {
             res.setHeader('x-req-proxyURL', proxyURL) // 将真实请求地址设置到响应头中
           },
           rewrite: (path) =>
-            path.replace(VITE_API_DOMAIN_PREFIX_REG, '/api')
+            path.replace(
+              VITE_API_DOMAIN_PREFIX_REG,
+              VITE_API_SERVER_DOMAIN_PREFIX
+            )
         }
       }
     },
