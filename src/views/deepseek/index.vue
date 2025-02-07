@@ -14,6 +14,7 @@ const handleGetOllamaModels = async () => {
 
 onMounted(() => {
   handleGetOllamaModels()
+  ollamaModule.getGenerate()
 })
 </script>
 <style lang="less" scoped>

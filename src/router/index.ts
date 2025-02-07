@@ -179,17 +179,33 @@ const router = createRouter({
  * token过期
  */
 eventEmitter.on('token-invalid', () => {
-  router.push('/login')
+  const currentUrl = window.location.href
+  router.replace({
+    path: '/login',
+    query: {
+      redirect: currentUrl
+    }
+  })
 })
 /**
  * 登录成功
  */
 eventEmitter.on('login', () => {
-  router.replace('/user/list')
+  const redirect = router.currentRoute.value.query
+    .redirect as string
+  router.replace({
+    path: redirect || '/user/list'
+  })
 })
 
 eventEmitter.on('logout', () => {
-  router.replace('/login')
+  const currentUrl = window.location.href
+  router.replace({
+    path: '/login',
+    query: {
+      redirect: currentUrl
+    }
+  })
 })
 
 /*************** 统一管理通用路由跳转 *****************/

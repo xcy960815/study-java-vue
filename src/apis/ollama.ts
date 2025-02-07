@@ -10,3 +10,21 @@ export const getModels = <T extends string>() => {
     url
   )
 }
+
+/**
+ *
+ * @returns
+ */
+export const getModelDetail = <T extends string>() => {
+  const url = '/ollama/getModelDetail'
+  return request.get<ResponseResult<T>, ResponseResult<T>>(
+    url
+  )
+}
+
+export const getGenerate = <T extends string>() => {
+  const url = '/ollama/generate'
+  return request.get<ResponseResult<T>, ResponseResult<T>>(
+    url
+  )
+}
