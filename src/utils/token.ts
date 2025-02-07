@@ -1,21 +1,22 @@
 const TOKENNAME = 'BearToken'
+
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL
 /**
  * 获取请求头的token
- * @returns {Promise<string | null>}
+ * @returns {Promise<string>}
  */
 export const getToken = async () => {
   const tokenOption = await cookieStore.get(TOKENNAME)
-  return tokenOption?.value
+  return tokenOption?.value || ''
 }
 
 /**
  * 设置请求头的token
  * @param token {String}
- * @returns
+ * @returns {Promise<void>}
  */
-export const setToken = (token: string) => {
-  return cookieStore.set({
+export const setToken = async (token: string) => {
+  return await cookieStore.set({
     name: TOKENNAME,
     value: token,
     path: VITE_BASE_URL

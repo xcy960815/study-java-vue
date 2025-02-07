@@ -4,13 +4,16 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { serverSendEventModule } from '@apis'
+import { ollamaModule } from '@apis'
+import { GptModel } from '@utils/deepseek'
 
-const serverSendEventRef = ref<HTMLDivElement>()
+const handleGetOllamaModels = async () => {
+  const result = await ollamaModule.getModels()
+  console.log('result', result)
+}
+
 onMounted(() => {
-  serverSendEventModule.serverSendEvent(
-    serverSendEventRef.value
-  )
+  handleGetOllamaModels()
 })
 </script>
 <style lang="less" scoped>

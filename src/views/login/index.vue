@@ -97,6 +97,7 @@ import { useLoginStore } from '@/store'
 import type { FormRules, FormInstance } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View } from '@element-plus/icons-vue'
+import { encryptByRsa } from '@utils/encryption'
 import MD5 from 'MD5'
 import { initBackground } from './background'
 import { loginModule } from '@apis'
@@ -136,21 +137,21 @@ const loginFormRules: FormRules<LoginRequestVo> = {
     {
       required: true,
       message: '请输入用户名',
-      trigger: 'blur'
+      trigger: ['blur', 'change']
     }
   ],
   password: [
     {
       required: true,
       message: '请输入密码',
-      trigger: 'blur'
+      trigger: ['blur', 'change']
     }
   ],
   captcha: [
     {
       required: true,
       message: '请输入验证码',
-      trigger: 'blur'
+      trigger: ['blur', 'change']
     }
   ]
 }
@@ -166,6 +167,8 @@ const handleLogin = async () => {
   if (!valid) return
   logining.value = true
   const loginData = { ...loginFormData }
+
+  // loginData.password = encryptByRsa(loginFormData.password) || loginData.password
 
   loginData.password = loginData.password
     ? MD5(loginFormData.password)

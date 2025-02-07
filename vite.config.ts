@@ -10,7 +10,7 @@ import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
-
+import { visualizer } from 'rollup-plugin-visualizer'
 /**
  * @type {import('vite').UserConfig}
  * @link https://vitejs.dev/config/
@@ -69,12 +69,29 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('lodash')) return 'lodash' // lodash 单独打包
-              if (id.includes('element-plus'))
-                return 'element-plus' // element-plus 单独打包
-              if (id.includes('vue')) return 'vue' // vue 单独打包
+              if (id.includes('lodash')) {
+                // lodash 单独打包
+                return 'lodash'
+              }
+              if (id.includes('@element-plus/icons-vue')) {
+                // 单独拆分 icons
+                return 'icons-vue'
+              }
+              if (id.includes('element-plus')) {
+                // element-plus 单独打包
+                return 'element-plus'
+              }
+              if (id.includes('vue')) {
+                // vue 单独打包
+                return 'vue'
+              }
               return 'vendor' // 其他库放在 vendor.js 里
             }
+            // else {
+            //   if (id.includes('/src/components/')) {
+            //     return id.split('/src/components/')[1].split('.')[0]; // 以组件名作为 chunk 名称
+            //   }
+            // }
           },
           // 入口文件输出配置
           entryFileNames: `assets/js/[name]-[hash].js`,
@@ -109,6 +126,7 @@ export default defineConfig(({ mode }) => {
     },
     logLevel: 'info',
     server: {
+      host: '0.0.0.0', // 确保服务监听所有网络接口
       port: VITE_PORT,
       proxy: {
         [VITE_API_DOMAIN_PREFIX]: {
@@ -179,6 +197,11 @@ export default defineConfig(({ mode }) => {
         symbolId: 'icon-[name]', // symbol的id
         inject: 'body-last', // 插入的位置
         customDomId: '__svg__icons__dom__' // svg的id
+      }),
+      // 打包体积分析
+      visualizer({
+        open: true,
+        filename: 'visualizer.html' //分析图生成的文件名
       })
     ],
     resolve: {

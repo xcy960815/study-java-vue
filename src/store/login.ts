@@ -13,8 +13,6 @@ export const loginStore = defineStore(Names.LOGIN, {
   actions: {
     async login(loginData: LoginRequestVo) {
       const result = await loginModule.login(loginData)
-      console.log('result', result)
-
       if (result.code === 200) {
         ElMessage({
           message: '登入成功',

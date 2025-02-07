@@ -129,8 +129,7 @@ export const routes: RouteRecordRaw[] = [
         path: '/sse/stream',
         name: 'sse-stream',
         component: defineAsyncComponent(
-          () =>
-            import(`../views/server-send-event/index.vue`)
+          () => import(`../views/deepseek/index.vue`)
         ),
         meta: {
           icon: 'server-send-event',
