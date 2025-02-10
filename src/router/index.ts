@@ -1,6 +1,7 @@
 import {
   createRouter,
-  createWebHashHistory
+  createWebHashHistory,
+  useRoute
 } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
@@ -179,11 +180,12 @@ const router = createRouter({
  * token过期
  */
 eventEmitter.on('token-invalid', () => {
-  const currentUrl = window.location.href
+  const route = router.currentRoute.value
+  const redirect = route.fullPath
   router.replace({
     path: '/login',
     query: {
-      redirect: currentUrl
+      redirect
     }
   })
 })
@@ -199,11 +201,12 @@ eventEmitter.on('login', () => {
 })
 
 eventEmitter.on('logout', () => {
-  const currentUrl = window.location.href
+  const route = router.currentRoute.value
+  const redirect = route.fullPath
   router.replace({
     path: '/login',
     query: {
-      redirect: currentUrl
+      redirect
     }
   })
 })
