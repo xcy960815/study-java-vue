@@ -102,7 +102,6 @@ export default defineConfig(({ mode }) => {
           },
           // 静态资源输出配置
           assetFileNames(assetInfo: PreRenderedAsset) {
-            // console.log("assetInfo",assetInfo);
             const name = assetInfo.name
             const originalFileName =
               assetInfo.originalFileName
@@ -114,19 +113,52 @@ export default defineConfig(({ mode }) => {
               '.svg',
               '.webp'
             ]
-            // css文件单独输出到css文件夹
-            if (name?.endsWith('.css')) {
-              return `assets/css/[name]-[hash].css`
-            }
-            // 图片文件单独输出到img文件夹
-            else if (
-              imgSuffixs.some((ext) => name?.endsWith(ext))
-            ) {
-              return `assets/img/[name}]-[hash].[ext]`
-            }
-            // 其他资源输出到assets文件夹
-            else {
-              return `assets/[name]-[hash].[ext]`
+            if (originalFileName) {
+              const originalFileNames =
+                originalFileName.split('/')
+              const parentname =
+                originalFileNames[
+                  originalFileNames.length - 2
+                ]
+              // css文件单独输出到css文件夹
+              if (name?.endsWith('.css')) {
+                return `assets/css/${
+                  parentname ? parentname + '-' : ''
+                }[name]-[hash].css`
+              }
+              // 图片文件单独输出到img文件夹
+              else if (
+                imgSuffixs.some((ext) =>
+                  name?.endsWith(ext)
+                )
+              ) {
+                return `assets/img/${
+                  parentname ? parentname + '-' : ''
+                }[name}]-[hash].[ext]`
+              }
+              // 其他资源输出到assets文件夹
+              else {
+                return `assets/${
+                  parentname ? parentname + '-' : ''
+                }[name]-[hash].[ext]`
+              }
+            } else {
+              // css文件单独输出到css文件夹
+              if (name?.endsWith('.css')) {
+                return `assets/css/[name]-[hash].css`
+              }
+              // 图片文件单独输出到img文件夹
+              else if (
+                imgSuffixs.some((ext) =>
+                  name?.endsWith(ext)
+                )
+              ) {
+                return `assets/img/[name}]-[hash].[ext]`
+              }
+              // 其他资源输出到assets文件夹
+              else {
+                return `assets/[name]-[hash].[ext]`
+              }
             }
           }
         }

@@ -30,3 +30,5 @@ coverage
 *.tsbuildinfo
 
 auto-imports.d.ts
+# 忽略生成的文件
+./visualizer.html
