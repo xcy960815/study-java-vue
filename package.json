@@ -7,7 +7,7 @@
     "dev": "vite --mode dialy",
     "dev-pre": "vite --mode pre",
     "dev-prod": "vite --mode prod",
-    "build": "vite build --mode dev",
+    "build": "vite build --mode dialy",
     "build-pre": "vite build --mode pre",
     "build-prod": "vite build --mode prod",
     "preview": "vite preview",

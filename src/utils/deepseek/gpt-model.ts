@@ -1,5 +1,6 @@
 import { OpenAI } from './index'
 import { Core } from './core'
+
 const MODEL = 'gpt-3.5-turbo'
 
 export default class GptModel extends Core {

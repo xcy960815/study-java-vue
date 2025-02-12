@@ -102,7 +102,7 @@ export class Core {
 
     this._systemMessage =
       systemMessage ??
-      ` 你是ChatGPT,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假`
+      `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假`
 
     this._abortController = new AbortController()
 

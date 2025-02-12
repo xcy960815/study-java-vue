@@ -1,5 +1,8 @@
 import { fileURLToPath, URL } from 'node:url'
-import { type PreRenderedAsset } from 'rollup'
+import {
+  type PreRenderedAsset,
+  type PreRenderedChunk
+} from 'rollup'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -22,16 +25,10 @@ export default defineConfig(({ mode }) => {
   )
 
   /** 后端接口 */
-  const VITE_API_DOMAIN = loadEnv(
+  const VITE_API_SERVER_DOMAIN = loadEnv(
     mode,
     './env/'
-  ).VITE_API_DOMAIN
-
-  /** 前端代理接口前缀 */
-  const VITE_API_DOMAIN_PREFIX = loadEnv(
-    mode,
-    './env/'
-  ).VITE_API_DOMAIN_PREFIX
+  ).VITE_API_SERVER_DOMAIN
 
   /** 后端接口前缀 */
   const VITE_API_SERVER_DOMAIN_PREFIX = loadEnv(
@@ -39,10 +36,11 @@ export default defineConfig(({ mode }) => {
     './env/'
   ).VITE_API_SERVER_DOMAIN_PREFIX
 
-  console.log(
-    'VITE_API_SERVER_DOMAIN_PREFIX',
-    VITE_API_SERVER_DOMAIN_PREFIX
-  )
+  /** 前端代理接口前缀 */
+  const VITE_API_DOMAIN_PREFIX = loadEnv(
+    mode,
+    './env/'
+  ).VITE_API_DOMAIN_PREFIX
 
   /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(
@@ -63,7 +61,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: VITE_BASE_URL,
-    envDir: './env', // 环境变量目录 不设置会在 import.meta.env 中取不到变量
+    envDir: './env', // 环境变量目录 若不设置会在 import.meta.env 中取不到变量
     build: {
       rollupOptions: {
         output: {
@@ -87,34 +85,44 @@ export default defineConfig(({ mode }) => {
               }
               return 'vendor' // 其他库放在 vendor.js 里
             }
-            // else {
-            //   if (id.includes('/src/components/')) {
-            //     return id.split('/src/components/')[1].split('.')[0]; // 以组件名作为 chunk 名称
-            //   }
-            // }
           },
           // 入口文件输出配置
-          entryFileNames: `assets/js/[name]-[hash].js`,
-          // 代码分割后的文件输出配置
-          chunkFileNames: `assets/js/[name]-[hash].js`,
+          entryFileNames: `assets/js/[name]-[format]-[hash].js`,
+          // 代码引入文件输出配置
+          chunkFileNames(chunkInfo: PreRenderedChunk) {
+            const facadeModuleId = chunkInfo.facadeModuleId
+            if (facadeModuleId) {
+              const facadeModuleIds =
+                facadeModuleId.split('/')
+              const parentname =
+                facadeModuleIds[facadeModuleIds.length - 2]
+              return `assets/js/${parentname}-[name]-[hash].js`
+            }
+            return `assets/js/[name]-[hash].js`
+          },
           // 静态资源输出配置
           assetFileNames(assetInfo: PreRenderedAsset) {
+            // console.log("assetInfo",assetInfo);
+            const name = assetInfo.name
+            const originalFileName =
+              assetInfo.originalFileName
+            const imgSuffixs = [
+              '.png',
+              '.jpg',
+              '.jpeg',
+              '.gif',
+              '.svg',
+              '.webp'
+            ]
             // css文件单独输出到css文件夹
-            if (assetInfo.name?.endsWith('.css')) {
+            if (name?.endsWith('.css')) {
               return `assets/css/[name]-[hash].css`
             }
             // 图片文件单独输出到img文件夹
             else if (
-              [
-                '.png',
-                '.jpg',
-                '.jpeg',
-                '.gif',
-                '.svg',
-                '.webp'
-              ].some((ext) => assetInfo.name?.endsWith(ext))
+              imgSuffixs.some((ext) => name?.endsWith(ext))
             ) {
-              return `assets/img/[name]-[hash].[ext]`
+              return `assets/img/[name}]-[hash].[ext]`
             }
             // 其他资源输出到assets文件夹
             else {
@@ -130,7 +138,7 @@ export default defineConfig(({ mode }) => {
       port: VITE_PORT,
       proxy: {
         [VITE_API_DOMAIN_PREFIX]: {
-          target: VITE_API_DOMAIN,
+          target: VITE_API_SERVER_DOMAIN,
           changeOrigin: true,
           ws: true,
           // 该配置会将真是的代理地址显示在 network 自定义请求头中
@@ -200,7 +208,7 @@ export default defineConfig(({ mode }) => {
       }),
       // 打包体积分析
       visualizer({
-        open: true,
+        // open: true,
         filename: 'visualizer.html' //分析图生成的文件名
       })
     ],

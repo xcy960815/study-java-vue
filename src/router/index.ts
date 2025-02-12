@@ -1,7 +1,6 @@
 import {
   createRouter,
-  createWebHashHistory,
-  useRoute
+  createWebHashHistory
 } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
@@ -21,9 +20,7 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: defineAsyncComponent(
-      () => import(`../views/login/index.vue`)
-    ),
+    component: () => import(`../views/login/index.vue`),
     meta: {
       title: '登录',
       hidden: true
@@ -32,25 +29,23 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/password',
     name: 'password',
-    component: defineAsyncComponent(
-      () => import(`../components/layout/index.vue`)
-    ),
+    component: () =>
+      import(`../components/layout/index.vue`),
     meta: {
       title: '密码',
       hidden: true
     },
     props: {
       content: defineAsyncComponent(
-        () => import(`../views/password/index.vue`) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
-      )
+        () => import(`../views/password/index.vue`)
+      ) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
     }
   },
   {
     path: '/user',
     name: 'user',
-    component: defineAsyncComponent(
-      () => import(`../components/layout/index.vue`)
-    ),
+    component: () =>
+      import(`../components/layout/index.vue`),
     meta: {
       title: '用户',
       icon: 'user'
@@ -59,9 +54,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/user/list',
         name: 'user-list',
-        component: defineAsyncComponent(
-          () => import(`../views/user/list.vue`)
-        ),
+        component: () => import(`../views/user/list.vue`),
         meta: {
           icon: 'user-list',
           title: '用户列表'
@@ -70,9 +63,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/user/info',
         name: 'userInfo',
-        component: defineAsyncComponent(
-          () => import(`../views/user/info.vue`)
-        ),
+        component: () => import(`../views/user/info.vue`),
         meta: {
           hidden: true,
           title: '用户中心'
@@ -83,9 +74,8 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/goods-category',
     name: 'goods-category',
-    component: defineAsyncComponent(
-      () => import(`../components/layout/index.vue`)
-    ),
+    component: () =>
+      import(`../components/layout/index.vue`),
     meta: {
       title: '商品',
       icon: 'goods-category'
@@ -94,9 +84,8 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/goods-category/list',
         name: 'goods-category-list',
-        component: defineAsyncComponent(
-          () => import(`../views/goods-category/list.vue`)
-        ),
+        component: () =>
+          import(`../views/goods-category/list.vue`),
         meta: {
           title: '商品列表',
           icon: 'goods-category-list'
@@ -105,9 +94,8 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/goods-category/info',
         name: 'info',
-        component: defineAsyncComponent(
-          () => import(`../views/goods-category/info.vue`)
-        ),
+        component: () =>
+          import(`../views/goods-category/info.vue`),
         meta: {
           hidden: true,
           title: '商品详情'
@@ -116,35 +104,25 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: '/sse',
-    name: 'server-send-event',
-    component: defineAsyncComponent(
-      () => import(`../components/layout/index.vue`)
-    ),
+    path: '/deepseek',
+    name: 'deepseek',
+    component: () =>
+      import(`../components/layout/index.vue`),
     meta: {
-      title: '服务端推送',
-      icon: 'server-send-event'
+      title: 'deepseek',
+      icon: 'deepseek'
     },
-    children: [
-      {
-        path: '/sse/stream',
-        name: 'sse-stream',
-        component: defineAsyncComponent(
-          () => import(`../views/deepseek/index.vue`)
-        ),
-        meta: {
-          icon: 'server-send-event',
-          title: '服务端推送'
-        }
-      }
-    ]
+    props: {
+      content: defineAsyncComponent(
+        () => import(`../views/deepseek/index.vue`)
+      ) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
+    }
   },
   {
     path: '/admin-user',
     name: 'admin-user',
-    component: defineAsyncComponent(
-      () => import(`../components/layout/index.vue`)
-    ),
+    component: () =>
+      import(`../components/layout/index.vue`),
     meta: {
       title: '超级管理员'
     },
@@ -152,9 +130,8 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/admin-user/list',
         name: 'admin-user-list',
-        component: defineAsyncComponent(
-          () => import(`../views/admin-user/list.vue`)
-        ),
+        component: () =>
+          import(`../views/admin-user/list.vue`),
         meta: {
           title: '超级管理员列表',
           icon: 'admin-user'
