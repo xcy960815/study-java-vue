@@ -32,3 +32,5 @@ coverage
 auto-imports.d.ts
 # 忽略生成的文件
 ./visualizer.html
+# 
+./auto-imports.d.ts
