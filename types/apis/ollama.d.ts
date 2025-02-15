@@ -151,7 +151,7 @@ declare namespace OllamaVo {
   /**
    * generate 接口请求参数
    */
-  export interface GrenerateVo {
+  export interface Generate {
     model: string
     prompt: string
     stream?: boolean

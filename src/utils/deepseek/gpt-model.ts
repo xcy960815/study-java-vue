@@ -17,10 +17,10 @@ export default class GptModel extends Core {
     const { requestParams, ...coreOptions } = options
     super(coreOptions)
     this._requestParams = {
-      model: MODEL,
-      temperature: 0.8,
-      top_p: 1,
-      presence_penalty: 1,
+      model: MODEL, // 默认的model
+      temperature: 0.8, // 默认的temperature (随机性)
+      top_p: 1, // 默认的top_p
+      presence_penalty: 1, // 默认的presence_penalty
       ...requestParams
     }
   }

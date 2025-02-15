@@ -32,10 +32,10 @@ export default class TextModle extends Core {
     super(coreOption)
 
     this._requestParams = {
-      model: MODEL,
-      temperature: 0.8,
-      top_p: 1,
-      presence_penalty: 1,
+      model: MODEL, // 默认的 model
+      temperature: 0.8, // 默认的 temperature
+      top_p: 1, // 默认的 top_
+      presence_penalty: 1, // 默认的 presence_penalty
       ...requestParams
     }
 

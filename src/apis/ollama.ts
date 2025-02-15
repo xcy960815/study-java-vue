@@ -6,13 +6,31 @@ const buildRequestUrl = (url: string) => `/ollama${url}`
  * generate 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const generate = <
-  T extends OllamaDto.Generate
->() => {
+export const generate = <T extends OllamaDto.Generate>(
+  generateVo: OllamaVo.Generate
+) => {
   const url = buildRequestUrl('/generate')
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url
+  return request.post<ResponseResult<T>, ResponseResult<T>>(
+    url,
+    generateVo
   )
+}
+
+/**
+ * generateStream 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const generateStream = async <T extends void>(
+  generateStreamVo: OllamaVo.Generate
+) => {
+  const url =
+    'http://localhost:8082/dev-api/ollama/generateStream' //buildRequestUrl('/generateStream')
+  const response = await fetch(url, {
+    method: 'POST',
+    // headers: this.headers,
+    body: JSON.stringify(generateStreamVo)
+  })
+  console.log('response', response)
 }
 
 /**

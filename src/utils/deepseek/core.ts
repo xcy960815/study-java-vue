@@ -5,7 +5,7 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import Gpt3Tokenizer from 'gpt3-tokenizer'
 import { marked } from 'marked'
-import { getToken } from '@utils/token'
+
 marked.setOptions({
   renderer: new marked.Renderer(),
   // highlight: function (code, _lang) {
@@ -105,7 +105,7 @@ export class Core {
    * 获取当前 token 支持的模型的请求地址
    * @returns {string}
    */
-  private get modelUrl(): string {
+  private get modelsUrl(): string {
     return `${this._apiBaseUrl}${'/v1/models'}`
   }
 
@@ -429,7 +429,7 @@ export class Core {
       method: 'GET',
       headers: this.headers
     }
-    return this._fetchSSE(this.modelUrl, requestInit)
+    return this._fetchSSE(this.modelsUrl, requestInit)
   }
 }
 /**

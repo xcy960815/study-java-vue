@@ -13,7 +13,7 @@ let status = 0
 axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
-  timeout: 100000
+  timeout: 60 * 1000 * 10
 })
 
 request.interceptors.request.use(
