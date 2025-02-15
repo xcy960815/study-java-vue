@@ -25,8 +25,6 @@ marked.setOptions({
  * @internal
  */
 export class Core {
-  /** 用于区分是哪个模型的继承 返回不同请求地址 */
-  private _who: string
   /** gpt 对话key */
   protected _apiKey: string
   /** gpt 请求域名 */
@@ -56,7 +54,6 @@ export class Core {
 
   constructor(options: OpenAI.CoreOptions) {
     const {
-      who,
       apiKey,
       apiBaseUrl,
       organization,
@@ -69,7 +66,6 @@ export class Core {
       markdown2Html
     } = options
 
-    this._who = who
     this._apiKey = ''
     ;(async () => {
       this._apiKey = apiKey
@@ -112,19 +108,7 @@ export class Core {
   }
 
   /**
-   * completions请求地址
-   * @returns {string}
-   */
-  protected get completionsUrl(): string {
-    return `${this._apiBaseUrl}${
-      this._who === 'gpt-model'
-        ? '/v1/chat/completions'
-        : '/v1/completions'
-    }`
-  }
-
-  /**
-   * models 请求地址
+   * 获取当前 token 支持的模型的请求地址
    * @returns {string}
    */
   private get modelUrl(): string {

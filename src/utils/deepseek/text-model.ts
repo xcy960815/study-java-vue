@@ -21,7 +21,6 @@ export default class TextModle extends Core {
   // private _sepToken: string;
 
   constructor(options: OpenAI.TextModel.TextCoreOptions) {
-    options.who = 'text-model'
     super(options)
 
     const {
@@ -48,6 +47,7 @@ export default class TextModle extends Core {
     /** 用户前缀 */
     this._userPromptPrefix =
       userPromptPrefix || USER_PROMPT_PREFIX
+
     /** 系统前缀 */
     this._systemPromptPrefix =
       systemPromptPrefix || SYSTEM_PROMPT_PREFIX_DEFAULT
@@ -85,6 +85,13 @@ export default class TextModle extends Core {
       signal: this._abortController.signal
     }
     return requestInit
+  }
+  /**
+   * 当前模型的请求地址
+   * @returns {string}
+   */
+  private get completionsUrl() {
+    return '/v1/completions'
   }
 
   /**

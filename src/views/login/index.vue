@@ -71,6 +71,7 @@
           </template>
         </el-image>
       </el-form-item>
+      <!-- 记住密码 -->
       <el-checkbox
         class="remember-checkbox mb-[25px]"
         v-model="loginFormData.rememberMe"
@@ -78,11 +79,12 @@
       >
       <el-form-item style="width: 100%">
         <el-button
+          :disabled="loginButtonDisabled"
           :loading="logining"
           size="default"
           type="primary"
           style="width: 100%"
-          @click.native.prevent="handleLogin"
+          @click="handleLogin"
         >
           <span v-if="!logining">登 录</span>
           <span v-else>登 录 中...</span>
@@ -122,6 +124,15 @@ const showHideIcon = computed(
 const showVievIcon = computed(
   () => passwordInputType.value === 'password'
 )
+
+const loginButtonDisabled = computed(() => {
+  return (
+    loginFormData.username === '' ||
+    loginFormData.password === '' ||
+    loginFormData.captcha === '' ||
+    loginFormData.captcha.length !== 4
+  )
+})
 
 const handleClickPasswordIcon = () => {
   passwordInputType.value =

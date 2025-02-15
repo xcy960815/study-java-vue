@@ -119,6 +119,21 @@ export const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/ollama',
+    name: 'ollama',
+    component: () =>
+      import(`../components/layout/index.vue`),
+    meta: {
+      title: 'ollama',
+      icon: 'ollama'
+    },
+    props: {
+      content: defineAsyncComponent(
+        () => import(`../views/ollama/index.vue`)
+      ) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
+    }
+  },
+  {
     path: '/admin-user',
     name: 'admin-user',
     component: () =>

@@ -5,7 +5,7 @@ const MODEL = 'gpt-3.5-turbo'
 
 export default class GptModel extends Core {
   /**
-   * @desc 请求参数
+   * 请求参数
    */
   private _requestParams: Partial<
     Omit<
@@ -16,7 +16,6 @@ export default class GptModel extends Core {
 
   constructor(options: OpenAI.GptModel.GptCoreOptions) {
     const { requestParams, ...coreOptions } = options
-    coreOptions.who = 'gpt-model'
     super(coreOptions)
     this._requestParams = {
       model: MODEL,
@@ -61,7 +60,15 @@ export default class GptModel extends Core {
   }
 
   /**
-   * @desc 获取答案
+   * 当前模型的请求地址
+   * @returns {string}
+   */
+  private get completionsUrl() {
+    return '/v1/chat/completions'
+  }
+
+  /**
+   * 获取答案
    * @param {string} question
    * @param {OpenAI.GptModel.GetAnswerOptions} options
    * @returns {Promise<OpenAI.GptModel.AssistantConversation>}
@@ -174,7 +181,7 @@ export default class GptModel extends Core {
   }
 
   /**
-   * @desc 获取会话消息历史
+   * 获取会话消息历史
    * @param {string} text
    * @param {Required<OpenAI.GptModel.SendMessageOptions>} options
    * @returns {Promise<{ messages: OpenAI.GptModel.Message[]; }>}

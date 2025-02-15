@@ -3,11 +3,11 @@ declare namespace SystemStore {
     openMenuFlag: boolean
   }
   /**
-   * @desc getter
+   * getter
    */
   type Getters = {}
   /**
-   * @desc action
+   * action
    */
   type Actions = {
     reversalOpenMenuFlag: () => void

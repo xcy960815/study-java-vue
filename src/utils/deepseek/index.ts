@@ -43,7 +43,6 @@ export namespace OpenAI {
     milliseconds?: number
     /** 是否将markdown语法转换成html */
     markdown2Html?: boolean
-    who: string
   }
 
   /**

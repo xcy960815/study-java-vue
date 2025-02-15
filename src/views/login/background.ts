@@ -1,7 +1,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 /**
- * @desc 防抖函数
+ * 防抖函数
  * @param func {Function} 需要防抖的函数
  * @param delay {number} 延迟时间
  * @returns {Function}
@@ -37,7 +37,7 @@ export function debounce<F extends (...args: any[]) => any>(
 
 export const initBackground = () => {
   /**
-   * @desc 获取随机颜色
+   * 获取随机颜色
    * @returns {string}
    */
   const fontSizeMultiplier = 10
@@ -47,7 +47,7 @@ export const initBackground = () => {
   > | null>(null)
 
   /**
-   * @desc 颜色列表
+   * 颜色列表
    */
   const fontColors = [
     '#33BSE5',
@@ -67,7 +67,7 @@ export const initBackground = () => {
   const charSet = 'study-java-web'
 
   /**
-   * @desc 获取随机颜色
+   * 获取随机颜色
    * @returns {string}
    */
   const getRandomColor = () =>
@@ -75,14 +75,14 @@ export const initBackground = () => {
       Math.floor(Math.random() * fontColors.length)
     ]
   /**
-   * @desc 获取随机字符
+   * 获取随机字符
    * @returns {string}
    */
   const getRandomChar = () =>
     charSet[Math.floor(Math.random() * charSet.length)]
 
   /**
-   * @desc 改变颜色透明度
+   * 改变颜色透明度
    * @param color {string}
    * @param opacity {number}
    * @returns {string}
