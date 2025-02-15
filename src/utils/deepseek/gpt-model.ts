@@ -1,4 +1,3 @@
-import { OpenAI } from './index'
 import { Core } from './core'
 
 const MODEL = 'gpt-3.5-turbo'
@@ -89,7 +88,7 @@ export default class GptModel extends Core {
     )
     // 保存用户对话
     await this.upsertConversation(userMessage)
-    // 构建助手消息
+    // 构建Ai助手消息
     const assistantMessage = this.buildConversation(
       'gpt-assistant',
       '',
@@ -216,7 +215,7 @@ export default class GptModel extends Core {
     let tokenCount = 0
     let prompt = ''
 
-    while (true && this._withContent) {
+    while (this._withContent) {
       // 计算
       messages.forEach((item) => {
         prompt += item.role

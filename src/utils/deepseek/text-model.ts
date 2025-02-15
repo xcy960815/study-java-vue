@@ -1,8 +1,9 @@
-import { OpenAI } from './index'
 import { Core } from './core'
 
 const MODEL = 'text-davinci-003'
+
 const USER_PROMPT_PREFIX = 'User'
+
 const SYSTEM_PROMPT_PREFIX_DEFAULT = 'ChatGPT'
 
 export default class TextModle extends Core {
@@ -21,13 +22,14 @@ export default class TextModle extends Core {
   // private _sepToken: string;
 
   constructor(options: OpenAI.TextModel.TextCoreOptions) {
-    super(options)
-
     const {
       requestParams,
       userPromptPrefix,
-      systemPromptPrefix
+      systemPromptPrefix,
+      ...coreOption
     } = options
+
+    super(coreOption)
 
     this._requestParams = {
       model: MODEL,

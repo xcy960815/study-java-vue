@@ -1,4 +1,3 @@
-import { OpenAI } from './index'
 import {
   createParser,
   type EventSourceParser
@@ -66,12 +65,7 @@ export class Core {
       markdown2Html
     } = options
 
-    this._apiKey = ''
-    ;(async () => {
-      this._apiKey = apiKey
-        ? apiKey
-        : (await getToken()) || ''
-    })()
+    this._apiKey = apiKey
 
     this._apiBaseUrl =
       apiBaseUrl ?? 'https://api.OpenAI.com'
@@ -148,41 +142,67 @@ export class Core {
     return await this._gpt3Tokenizer.encode(_text).bpe
       .length
   }
+  /** 函数热重载 start */
+  protected buildConversation(
+    role: 'user',
+    content: string,
+    option: OpenAI.GetAnswerOptions
+  ): OpenAI.Conversation
+
+  protected buildConversation(
+    role: 'gpt-assistant',
+    content: string,
+    option: OpenAI.GetAnswerOptions
+  ): OpenAI.GptModel.AssistantConversation
+
+  protected buildConversation(
+    role: 'text-assistant',
+    content: string,
+    option: OpenAI.GetAnswerOptions
+  ): OpenAI.TextModel.AssistantConversation
+  /** 函数热重载 end */
 
   /**
    * 构建会话消息
    * @param {"user" | "gpt-assistant" | "text-assistant"} role
    * @param {string} content
-   * @param {OpenAI.SendMessageOptions} option
-   * @returns {OpenAI.Conversation}
+   * @param {OpenAI.GetAnswerOptions} option
+   * @returns {OpenAI.Conversation | OpenAI.GptModel.AssistantConversation | OpenAI.TextModel.AssistantConversation}
    */
-  protected buildConversation<
-    R extends 'user' | 'gpt-assistant' | 'text-assistant'
-  >(
-    role: R,
+  protected buildConversation(
+    role: 'user' | 'gpt-assistant' | 'text-assistant',
     content: string,
     option: OpenAI.GetAnswerOptions
-  ): OpenAI.BuildConversationReturns<R> {
+  ):
+    | OpenAI.Conversation
+    | OpenAI.GptModel.AssistantConversation
+    | OpenAI.TextModel.AssistantConversation {
     if (role === 'user') {
       return {
         role: 'user',
         messageId: option.messageId || this.uuid,
-        parentMessageId: option.parentMessageId,
+        parentMessageId:
+          option.parentMessageId || this.uuid,
         content
-      } as OpenAI.BuildConversationReturns<R>
-    } else if (
-      role === 'gpt-assistant' ||
-      role === 'text-assistant'
-    ) {
+      }
+    } else if (role === 'gpt-assistant') {
       return {
         role: 'assistant',
         messageId: '',
         parentMessageId: option.messageId || this.uuid,
         content,
         detail: null
-      } as OpenAI.BuildConversationReturns<R>
+      }
+    } else if (role === 'text-assistant') {
+      return {
+        role: 'assistant',
+        messageId: '',
+        parentMessageId: option.messageId || this.uuid,
+        content,
+        detail: null
+      }
     } else {
-      return undefined as OpenAI.BuildConversationReturns<R>
+      throw new Error('Invalid role type')
     }
   }
 
