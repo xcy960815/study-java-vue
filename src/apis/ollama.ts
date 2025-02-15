@@ -1,29 +1,59 @@
 import { request } from '@utils/request'
 
+const buildRequestUrl = (url: string) => `/ollama${url}`
+
 /**
- * 获取本地Ollama模型列表
- * @returns ResponseResult
+ * generate 接口
+ * @returns {Promise<ResponseResult<T>>}
  */
-export const getModels = <T extends string>() => {
-  const url = '/ollama/getModels'
+export const generate = <
+  T extends OllamaDto.Generate
+>() => {
+  const url = buildRequestUrl('/generate')
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
   )
 }
 
 /**
- *
- * @returns
+ * version 接口
+ * @returns {Promise<ResponseResult<T>>}
  */
-export const getModelDetail = <T extends string>() => {
-  const url = '/ollama/getModelDetail'
+export const version = <T extends OllamaDto.Version>() => {
+  const url = buildRequestUrl('/version')
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
   )
 }
 
-export const getGenerate = <T extends string>() => {
-  const url = '/ollama/generate'
+/**
+ * models 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const models = <T extends OllamaDto.Models>() => {
+  const url = buildRequestUrl('/models')
+  return request.get<ResponseResult<T>, ResponseResult<T>>(
+    url
+  )
+}
+
+/**
+ * ps 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const ps = <T extends OllamaDto.Ps>() => {
+  const url = buildRequestUrl('/ps')
+  return request.get<ResponseResult<T>, ResponseResult<T>>(
+    url
+  )
+}
+
+/**
+ * tags 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const tags = <T extends OllamaDto.Tags>() => {
+  const url = buildRequestUrl('/tags')
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
   )
