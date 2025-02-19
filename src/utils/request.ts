@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { type AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
 import { getToken, removeToken } from './token'
@@ -30,8 +30,11 @@ request.interceptors.request.use(
 
     return config
   },
-  (error) => {
+  (error: AxiosError) => {
+    console.log('error', error)
+
     const { message } = error
+
     ElMessage.error(message)
   }
 )

@@ -20,17 +20,17 @@ export const generate = <T extends OllamaDto.Generate>(
  * generateStream 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const generateStream = async <T extends void>(
+export const generateStream = async (
   generateStreamVo: OllamaVo.Generate
 ) => {
   const url =
-    'http://localhost:8082/dev-api/ollama/generateStream' //buildRequestUrl('/generateStream')
+    'http://localhost:8082/dev-api/ollama/generateStream'
+
   const response = await fetch(url, {
     method: 'POST',
-    // headers: this.headers,
     body: JSON.stringify(generateStreamVo)
   })
-  console.log('response', response)
+  // console.log('response', response)
 }
 
 /**
