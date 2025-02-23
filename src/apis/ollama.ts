@@ -25,12 +25,10 @@ export const generateStream = async (
 ) => {
   const url =
     'http://localhost:8082/dev-api/ollama/generateStream'
-
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(generateStreamVo)
   })
-  // console.log('response', response)
 }
 
 /**
@@ -75,4 +73,20 @@ export const tags = <T extends OllamaDto.Tags>() => {
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url
   )
+}
+
+/**
+ * delete 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const deleteModel = <T extends boolean>(
+  deleteModelVo: OllamaVo.DeleteModelVo
+) => {
+  const url = buildRequestUrl('/delete')
+  return request.delete<
+    ResponseResult<T>,
+    ResponseResult<T>
+  >(url, {
+    data: deleteModelVo
+  })
 }

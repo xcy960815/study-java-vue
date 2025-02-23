@@ -127,11 +127,29 @@ export const routes: RouteRecordRaw[] = [
       title: 'ollama',
       icon: 'ollama'
     },
-    props: {
-      content: defineAsyncComponent(
-        () => import(`../views/ollama/index.vue`)
-      ) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
-    }
+
+    children: [
+      {
+        path: '/ollama/list',
+        name: 'ollama-list',
+        component: () =>
+          import(`../views/ollama/list/index.vue`),
+        meta: {
+          title: '模型列表',
+          icon: 'ollama'
+        }
+      },
+      {
+        name: 'ollama-chart',
+        path: '/ollama/chart',
+        component: () =>
+          import(`../views/ollama/chart/index.vue`),
+        meta: {
+          title: '会话',
+          icon: 'ollama'
+        }
+      }
+    ]
   },
   {
     path: '/admin-user',

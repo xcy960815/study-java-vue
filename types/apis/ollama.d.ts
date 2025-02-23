@@ -20,7 +20,7 @@ declare namespace OllamaDto {
     eval_duration: number
   }
 
-  interface DataOption {
+  interface ModelOption {
     id: string
     object: string
     created: number
@@ -31,7 +31,7 @@ declare namespace OllamaDto {
    */
   export interface Models {
     object: string
-    data: Array<DataOption>
+    data: Array<ModelOption>
   }
 
   interface Details {
@@ -155,5 +155,9 @@ declare namespace OllamaVo {
     model: string
     prompt: string
     stream?: boolean
+  }
+
+  export interface DeleteModelVo {
+    name: string
   }
 }
