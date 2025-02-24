@@ -21,6 +21,7 @@ export default class GptModel extends Core {
       temperature: 0.8, // 默认的temperature (随机性)
       top_p: 1, // 默认的top_p
       presence_penalty: 1, // 默认的presence_penalty
+      // 用户配置的参数
       ...requestParams
     }
   }
@@ -42,6 +43,7 @@ export default class GptModel extends Core {
     // 获取用户和gpt历史对话记录
     const { messages, maxTokens } =
       await this._getConversationHistory(question, options)
+
     const body = {
       ...this._requestParams,
       ...requestParams,
@@ -49,6 +51,7 @@ export default class GptModel extends Core {
       stream,
       max_tokens: maxTokens
     }
+
     const requestInit: OpenAI.FetchRequestInit = {
       method: 'POST',
       headers: this.headers,

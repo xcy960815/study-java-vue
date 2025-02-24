@@ -1,7 +1,7 @@
 <template>
-  <el-row class="handle-toolbar" :gutter="0">
+  <el-row class="handle-toolbar" :gutter="20">
     <el-col
-      :span="1.5"
+      :span="2"
       v-for="(slotContent, index) in defaultSlotContents"
       :key="index"
     >
@@ -71,7 +71,7 @@ const defaultSlotContents = slots.default
 .handle-toolbar {
   position: relative;
   margin-bottom: 10px;
-  height: 32px;
+  // height: 32px;
 
   .right-panel {
     display: flex;

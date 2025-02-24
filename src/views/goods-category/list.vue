@@ -38,6 +38,7 @@
     @queryTableData="getGoodsCategoryList"
   >
     <el-button
+      size="small"
       type="primary"
       @click="handleClickAddGoodCategory"
     >

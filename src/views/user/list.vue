@@ -38,7 +38,11 @@
     v-model:showSearch="showSearch"
     @queryTableData="getUserList"
   >
-    <el-button type="primary" @click="handleClickAddUser">
+    <el-button
+      size="small"
+      type="primary"
+      @click="handleClickAddUser"
+    >
       新增用户
     </el-button>
   </Handle-ToolBar>
