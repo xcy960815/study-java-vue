@@ -140,10 +140,10 @@ export const routes: RouteRecordRaw[] = [
         }
       },
       {
-        name: 'ollama-chart',
-        path: '/ollama/chart',
+        name: 'ollama-chat',
+        path: '/ollama/chat',
         component: () =>
-          import(`../views/ollama/chart/index.vue`),
+          import(`../views/ollama/chat/index.vue`),
         meta: {
           title: '会话',
           icon: 'ollama'

@@ -1,5 +1,5 @@
 <template>
-  <el-row class="handle-toolbar" :gutter="10">
+  <el-row class="handle-toolbar" :gutter="0">
     <el-col
       :span="1.5"
       v-for="(slotContent, index) in defaultSlotContents"

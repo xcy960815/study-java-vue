@@ -43,9 +43,12 @@ declare namespace OllamaDto {
     quantization_level: string
   }
 
-  interface model {
+  interface PsModelOption {
+    /** 模型名称 */
     name: string
+    /** 模型模型 */
     model: string
+    /** 模型大小 */
     size: number
     digest: string
     details: Details
@@ -56,7 +59,7 @@ declare namespace OllamaDto {
    * ps 接口返回参数
    */
   export interface Ps {
-    models: Array<model>
+    models: Array<PsModelOption>
   }
 
   interface ModleInfo {
