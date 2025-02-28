@@ -1,8 +1,8 @@
-import { Core } from './core'
+import { Core } from '../deepseek/core'
 
-const MODEL = 'deepseek-chat'
+const MODEL = 'gpt-3.5-turbo'
 
-export default class GptModel extends Core {
+export class Ollama extends Core {
   /**
    * 请求参数
    */
@@ -66,7 +66,7 @@ export default class GptModel extends Core {
    * @returns {string}
    */
   private get completionsUrl() {
-    return '/v1/chat/completions'
+    return `/ollama/chat`
   }
 
   /**

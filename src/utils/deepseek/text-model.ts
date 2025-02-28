@@ -119,9 +119,9 @@ export default class TextModle extends Core {
     )
     await this.upsertConversation(userMessage)
 
-    // 构建助手消息
+    /* 构建助手消息 */
     const assistantMessage = this.buildConversation(
-      'text-assistant',
+      'assistant',
       '',
       { ...options, messageId: userMessage.messageId }
     )

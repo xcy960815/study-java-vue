@@ -1,7 +1,6 @@
 <template>
   <div class="chat">
     <div ref="conversationRef"></div>
-    <!-- <el-button @click="generate">generate</el-button> -->
     <el-button @click="generateStream"
       >generateStream
     </el-button>
@@ -11,6 +10,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { GptModel } from '@utils/deepseek'
+import { OllamaModel } from '@utils/ollama'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
@@ -18,13 +18,11 @@ const model = ref<string>(
   (route.query.model as string) || 'deepseek-r1:14b'
 )
 
-const gptModel = new GptModel({
-  apiBaseUrl: 'http://localhost:8082/dev-api',
+const ollamaModel = new OllamaModel({
   apiKey: '',
+  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   requestParams: {
-    model: model.value
-    // prompt: '天为什么是蓝色的？',
-    // stream: true
+    model: 'llama3.1' // model.value
   }
 })
 
@@ -34,39 +32,11 @@ const conversationRef = ref<HTMLDivElement>()
  * 流式会话
  */
 const generateStream = async () => {
-  const generateRequstParamas = {
-    model: model.value,
-    prompt: '天为什么是蓝色的？',
-    stream: true
-  }
-  const url = '/ollama/generateStream'
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(generateRequstParamas)
-  })
-  const reader = response.body?.getReader()
-  const decoder = new TextDecoder()
-  let done = false
-  let chunk = ''
-
-  // 逐块读取流
-  while (!done) {
-    const { value, done: doneReading } =
-      await reader?.read()!
-    done = doneReading
-    // 解码流数据并拼接
-    chunk += decoder.decode(value, { stream: true })
-
-    // 假设每次接收到完整数据时进行处理
-    if (chunk.endsWith('\n')) {
-      // parser.feed(chunk) // 逐段输出
-      chunk = '' // 清空缓存，准备下一段数据
+  ollamaModel.getAnswer('天为什么是蓝色的？', {
+    onProgress(partialResponse) {
+      console.log('partialResponse', partialResponse)
     }
-  }
+  })
 }
 </script>
 <style lang="less" scoped>

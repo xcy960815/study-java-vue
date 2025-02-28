@@ -18,7 +18,8 @@ const svgIcons = [
   'user-list',
   'server-send-event',
   'deepseek',
-  'ollama'
+  'ollama',
+  'chat'
 ] as const
 
 export { svgIcons }

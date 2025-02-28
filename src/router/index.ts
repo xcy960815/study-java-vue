@@ -146,7 +146,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/ollama/chat/index.vue`),
         meta: {
           title: '会话',
-          icon: 'ollama'
+          icon: 'chat'
         }
       }
     ]

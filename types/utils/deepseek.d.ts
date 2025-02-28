@@ -165,7 +165,7 @@ declare namespace OpenAI {
     export interface ResponseChoice
       extends OpenAI.ResponseChoice {
       message?: ResponseMessage
-      delta: ResponseDelta
+      delta?: ResponseDelta
     }
 
     /**
@@ -245,7 +245,7 @@ declare namespace OpenAI {
     export interface ResponseChoice
       extends OpenAI.ResponseChoice {
       text?: string
-      logprobs: ResponseLogprobs | null
+      logprobs?: ResponseLogprobs | null
     }
 
     export interface AssistantConversation

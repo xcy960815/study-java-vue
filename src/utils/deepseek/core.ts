@@ -142,7 +142,7 @@ export class Core {
     return await this._gpt3Tokenizer.encode(_text).bpe
       .length
   }
-  /** 函数热重载 start */
+  /** 函数重载 start */
   protected buildConversation(
     role: 'user',
     content: string,
@@ -150,27 +150,27 @@ export class Core {
   ): OpenAI.Conversation
 
   protected buildConversation(
-    role: 'gpt-assistant',
+    role: 'assistant',
     content: string,
     option: OpenAI.GetAnswerOptions
   ): OpenAI.GptModel.AssistantConversation
 
   protected buildConversation(
-    role: 'text-assistant',
+    role: 'assistant',
     content: string,
     option: OpenAI.GetAnswerOptions
   ): OpenAI.TextModel.AssistantConversation
-  /** 函数热重载 end */
+  /** 函数重载 end */
 
   /**
    * 构建会话消息
-   * @param {"user" | "gpt-assistant" | "text-assistant"} role
+   * @param {"user" | "assistant" | "assistant"} role
    * @param {string} content
    * @param {OpenAI.GetAnswerOptions} option
    * @returns {OpenAI.Conversation | OpenAI.GptModel.AssistantConversation | OpenAI.TextModel.AssistantConversation}
    */
   protected buildConversation(
-    role: 'user' | 'gpt-assistant' | 'text-assistant',
+    role: 'user' | 'assistant' | 'assistant',
     content: string,
     option: OpenAI.GetAnswerOptions
   ):
@@ -185,7 +185,7 @@ export class Core {
           option.parentMessageId || this.uuid,
         content
       }
-    } else if (role === 'gpt-assistant') {
+    } else if (role === 'assistant') {
       return {
         role: 'assistant',
         messageId: '',
@@ -193,7 +193,7 @@ export class Core {
         content,
         detail: null
       }
-    } else if (role === 'text-assistant') {
+    } else if (role === 'assistant') {
       return {
         role: 'assistant',
         messageId: '',
@@ -291,11 +291,10 @@ export class Core {
     requestInit: OpenAI.FetchRequestInit
   ): Promise<OpenAI.AnswerResponse<R> | void> {
     const { onMessage, ...fetchOptions } = requestInit
-    const response = (await fetch(url, {
+    const response = (await fetch(this._apiBaseUrl + url, {
       ...fetchOptions
     })) as OpenAI.AnswerResponse<R>
     if (!response.ok) {
-      // 走到这一步是OpenAI接口错误的时候 如果其他后端应用封装了OpenAI接口即使发生错误也不一定 走到这步
       const errorOption: OpenAI.ChatgptErrorOption = {
         url: response.url,
         status: response.status,
@@ -319,18 +318,6 @@ export class Core {
   }
   /**
    * 创建parser
-   * @param {(p:string)=>void} onMessage
-   * @returns {EventSourceParser}
-   */
-  // private _createParser(onMessage: (p: string) => void): EventSourceParser {
-  //     return createParser((event) => {
-  //         if (event.type === 'event') {
-  //             onMessage?.(event.data);
-  //         }
-  //     })
-  // };
-  /**
-   * 创建parser
    * @param {(p:string) => void} onMessage
    * @returns {EventSourceParser}
    */
@@ -339,12 +326,19 @@ export class Core {
   ): EventSourceParser {
     return createParser({
       onEvent: (event) => {
-        onMessage?.(event.data) // 这里调用传入的 onMessage 回调
+        if (event.data.trim()) {
+          if (
+            event.data.startsWith('data:') &&
+            !event.data.includes('data:: keep-alive')
+          ) {
+            // 兼容deepseek接口
+            onMessage?.(event.data.slice(6))
+          } else {
+            // 兼容chatgpt接口
+            onMessage?.(event.data)
+          }
+        }
       }
-      // 可选：根据需要处理其他回调函数（onRetry, onComment, onError）
-      // onRetry: (retry: number) => { ... },
-      // onComment: (comment: string) => { ... },
-      // onError: (error: ParseError) => { ... }
     })
   }
 
