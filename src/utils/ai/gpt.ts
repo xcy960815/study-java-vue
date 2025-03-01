@@ -3,6 +3,7 @@ import { Core } from './core'
 const MODEL = 'deepseek-chat'
 
 export class Gpt extends Core {
+  private _completionsUrl: string | undefined
   /**
    * 请求参数
    */
@@ -11,8 +12,13 @@ export class Gpt extends Core {
   >
 
   constructor(options: AI.Gpt.GptCoreOptions) {
-    const { requestParams, ...coreOptions } = options
+    const {
+      requestParams,
+      completionsUrl,
+      ...coreOptions
+    } = options
     super(coreOptions)
+    this._completionsUrl = completionsUrl
     this._requestParams = {
       model: MODEL, // 默认的model
       temperature: 0.8, // 默认的temperature (随机性)
@@ -63,7 +69,7 @@ export class Gpt extends Core {
    * @returns {string}
    */
   private get completionsUrl() {
-    return '/v1/chat/completions'
+    return this._completionsUrl ?? '/v1/chat/completions'
   }
 
   /**

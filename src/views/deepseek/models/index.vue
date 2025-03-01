@@ -7,14 +7,10 @@
       <el-button type="primary" @click="handleStartChat()"
         >开始对话</el-button
       >
-      <el-button @click="version"
-        >查看本地ollama版本</el-button
-      >
-      <el-button @click="ps">查看正在运行的模型</el-button>
     </Handle-ToolBar>
     <el-table
       border
-      :data="ollamaModelsListInfo.tableData"
+      :data="deepseekModelsListInfo.tableData"
       style="width: 100%"
     >
       <el-table-column prop="id" label="模型名称" />
@@ -58,9 +54,6 @@
         <el-table-column prop="object" label="类型" />
         <el-table-column prop="owned_by" label="来源" />
         <el-table-column prop="expires_at" label="销毁时间">
-          <!-- <template #default="scope">
-          <span>{{ dayjs(scope.row.expires_at).format("YYYY-MM-DD HH:mm:ss") }}</span>
-        </template> -->
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -97,28 +90,54 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
-
+import HandleToolBar from '@/components/handle-toolbar/index.vue'
+import { ref, reactive, onMounted } from 'vue'
+import { deepseekModule } from '@apis'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 const showSearch = ref(false)
 const psDialogVisible = ref(false)
-const ollamaModelsListInfo = reactive({
-  tableData: []
-})
+
+interface DeepseekModelsListInfo {
+  tableData: DeepSeekDto.ModelOption[]
+}
+const deepseekModelsListInfo =
+  reactive<DeepseekModelsListInfo>({
+    tableData: []
+  })
 const psModelsList = ref([])
 const getOllamaModelsList = () => {
   console.log('getOllamaModelsList')
 }
-const handleStartChat = () => {
+const handleStartChat = (row?: DeepSeekDto.ModelOption) => {
   console.log('handleStartChat')
+  router.push({
+    path: '/deepseek/chat',
+    query: row ? { model: row.id } : {}
+  })
 }
-const handleClickDeleteModel = () => {
+
+const handleClickDeleteModel = (
+  row?: DeepSeekDto.ModelOption
+) => {
   console.log('handleClickDeleteModel')
 }
 const version = () => {
   console.log('version')
 }
-const ps = () => {
-  console.log('ps')
+
+/**
+ * 获取当前key对相应的模型
+ */
+const handleGetModels = async () => {
+  const result = await deepseekModule.models()
+  console.log('result', result)
+  if (result.code === 200) {
+    deepseekModelsListInfo.tableData = result.data.data
+  }
 }
+onMounted(() => {
+  handleGetModels()
+})
 </script>
 <style lang="less" scoped></style>

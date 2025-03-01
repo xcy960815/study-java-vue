@@ -203,6 +203,8 @@ declare namespace AI {
       >
     }
     export interface GptCoreOptions extends CoreOptions {
+      // 自定义请求地址 要求跟chatgpt 返回的数据一样
+      completionsUrl?: string
       requestParams?: Partial<
         Omit<RequestParams, 'messages' | 'n' | 'stream'>
       >

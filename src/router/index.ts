@@ -112,11 +112,28 @@ export const routes: RouteRecordRaw[] = [
       title: 'deepseek',
       icon: 'deepseek'
     },
-    props: {
-      content: defineAsyncComponent(
-        () => import(`../views/deepseek/index.vue`)
-      ) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
-    }
+    children: [
+      {
+        path: '/deepseek/models',
+        name: 'deepseek-models',
+        component: () =>
+          import(`../views/deepseek/models/index.vue`),
+        meta: {
+          title: '模型列表',
+          icon: 'deepseek'
+        }
+      },
+      {
+        path: '/deepseek/chat',
+        name: 'deepseek-chat',
+        component: () =>
+          import(`../views/deepseek/chat/index.vue`),
+        meta: {
+          title: '聊天',
+          icon: 'chat'
+        }
+      }
+    ]
   },
   {
     path: '/ollama',
