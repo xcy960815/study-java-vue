@@ -35,7 +35,7 @@ export class Core {
   /** 是否携带上下文 */
   protected _withContent: boolean
   /** 消息仓库 */
-  protected _messageStore: Map<string, OpenAI.Conversation>
+  protected _messageStore: Map<string, AI.Conversation>
   /** 最大请求token */
   protected _maxModelTokens: number
   /** 最多返回token */
@@ -51,7 +51,7 @@ export class Core {
   /** 是否开启markdown转html */
   protected _markdown2Html: boolean
 
-  constructor(options: OpenAI.CoreOptions) {
+  constructor(options: AI.CoreOptions) {
     const {
       apiKey,
       apiBaseUrl,
@@ -67,8 +67,7 @@ export class Core {
 
     this._apiKey = apiKey
 
-    this._apiBaseUrl =
-      apiBaseUrl ?? 'https://api.OpenAI.com'
+    this._apiBaseUrl = apiBaseUrl ?? 'https://api.AI.com'
 
     this._organization = organization
 
@@ -81,10 +80,7 @@ export class Core {
 
     this._maxResponseTokens = maxResponseTokens ?? 1000
 
-    this._messageStore = new Map<
-      string,
-      OpenAI.Conversation
-    >()
+    this._messageStore = new Map<string, AI.Conversation>()
 
     this._gpt3Tokenizer = new Gpt3Tokenizer({
       type: 'gpt3'
@@ -127,7 +123,7 @@ export class Core {
       Authorization: `Bearer ${this._apiKey}`
     }
     if (this._organization) {
-      headers['OpenAI-Organization'] = this._organization
+      headers['AI-Organization'] = this._organization
     }
     return headers
   }
@@ -146,37 +142,37 @@ export class Core {
   protected buildConversation(
     role: 'user',
     content: string,
-    option: OpenAI.GetAnswerOptions
-  ): OpenAI.Conversation
+    option: AI.GetAnswerOptions
+  ): AI.Conversation
 
   protected buildConversation(
     role: 'assistant',
     content: string,
-    option: OpenAI.GetAnswerOptions
-  ): OpenAI.GptModel.AssistantConversation
+    option: AI.GetAnswerOptions
+  ): AI.Gpt.AssistantConversation
 
   protected buildConversation(
     role: 'assistant',
     content: string,
-    option: OpenAI.GetAnswerOptions
-  ): OpenAI.TextModel.AssistantConversation
+    option: AI.GetAnswerOptions
+  ): AI.Text.AssistantConversation
   /** 函数重载 end */
 
   /**
    * 构建会话消息
    * @param {"user" | "assistant" | "assistant"} role
    * @param {string} content
-   * @param {OpenAI.GetAnswerOptions} option
-   * @returns {OpenAI.Conversation | OpenAI.GptModel.AssistantConversation | OpenAI.TextModel.AssistantConversation}
+   * @param {AI.GetAnswerOptions} option
+   * @returns {AI.Conversation | AI.Gpt.AssistantConversation | AI.Text.AssistantConversation}
    */
   protected buildConversation(
     role: 'user' | 'assistant' | 'assistant',
     content: string,
-    option: OpenAI.GetAnswerOptions
+    option: AI.GetAnswerOptions
   ):
-    | OpenAI.Conversation
-    | OpenAI.GptModel.AssistantConversation
-    | OpenAI.TextModel.AssistantConversation {
+    | AI.Conversation
+    | AI.Gpt.AssistantConversation
+    | AI.Text.AssistantConversation {
     if (role === 'user') {
       return {
         role: 'user',
@@ -209,11 +205,11 @@ export class Core {
   /**
    * 获取对话
    * @param {string} id
-   * @returns {Promise<OpenAI.Conversation | undefined>}
+   * @returns {Promise<AI.Conversation | undefined>}
    */
   protected getConversation(
     id: string
-  ): Promise<OpenAI.Conversation | undefined> {
+  ): Promise<AI.Conversation | undefined> {
     return new Promise((resolve) => {
       const message = this._messageStore.get(id)
       resolve(message)
@@ -221,11 +217,11 @@ export class Core {
   }
   /**
    * 更新对话
-   * @param {OpenAI.Conversation} message
+   * @param {AI.Conversation} message
    * @returns {Promise<void>}
    */
   protected upsertConversation(
-    message: OpenAI.Conversation
+    message: AI.Conversation
   ): Promise<void> {
     return new Promise((resolve) => {
       // 这里做层浅拷贝 因为map存储的值如果是对象的话 会受到指针的影响
@@ -253,7 +249,7 @@ export class Core {
    */
   protected _debugLog(action: string, ...args: any[]) {
     if (this._debug) {
-      console.log(`OpenAI-apis:DEBUG:${action}`, ...args)
+      console.log(`AI-apis:DEBUG:${action}`, ...args)
     }
   }
   /**
@@ -283,25 +279,25 @@ export class Core {
   /**
    * 向OpenAI发送请求
    * @param {string} url
-   * @param {OpenAI.FetchSSEOptions} options
-   * @returns {Promise<OpenAI.GptResponse<R> | void>}
+   * @param {AI.FetchSSEOptions} options
+   * @returns {Promise<AI.GptResponse<R> | void>}
    */
   protected async _fetchSSE<R extends Object>(
     url: string,
-    requestInit: OpenAI.FetchRequestInit
-  ): Promise<OpenAI.AnswerResponse<R> | void> {
+    requestInit: AI.FetchRequestInit
+  ): Promise<AI.AnswerResponse<R> | void> {
     const { onMessage, ...fetchOptions } = requestInit
     const response = (await fetch(this._apiBaseUrl + url, {
       ...fetchOptions
-    })) as OpenAI.AnswerResponse<R>
+    })) as AI.AnswerResponse<R>
     if (!response.ok) {
-      const errorOption: OpenAI.ChatgptErrorOption = {
+      const errorOption: AI.AIErrorOption = {
         url: response.url,
         status: response.status,
         statusText: response.statusText
       }
       const { error } = JSON.parse(await response.text())
-      throw new ChatgptError(error.message, errorOption)
+      throw new AiError(error.message, errorOption)
     }
     // 如果没有 onMessage 回调函数，直接返回 response
     if (!onMessage) {
@@ -359,7 +355,7 @@ export class Core {
    */
   protected clearablePromise<V = any>(
     inputPromise: PromiseLike<V>,
-    options: OpenAI.ClearablePromiseOptions
+    options: AI.ClearablePromiseOptions
   ) {
     const { milliseconds, message } = options
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -378,9 +374,7 @@ export class Core {
               const errorMessage =
                 message ??
                 `Promise timed out after ${milliseconds} milliseconds`
-              const timeoutError = new ChatgptError(
-                errorMessage
-              )
+              const timeoutError = new AiError(errorMessage)
               reject(timeoutError)
             },
             milliseconds
@@ -416,7 +410,7 @@ export class Core {
 
   /**
    *
-   * @returns {Promise<OpenAI.Model[]>}
+   * @returns {Promise<AI.Model[]>}
    */
   public getModels() {
     const requestInit = {
@@ -429,14 +423,11 @@ export class Core {
 /**
  * ChatGPT 错误类
  */
-export class ChatgptError extends Error {
+export class AiError extends Error {
   status?: number
   statusText?: string
   url?: string
-  constructor(
-    message: string,
-    option?: OpenAI.ChatgptErrorOption
-  ) {
+  constructor(message: string, option?: AI.AIErrorOption) {
     super(message)
     if (option) {
       const { status, statusText, url } = option

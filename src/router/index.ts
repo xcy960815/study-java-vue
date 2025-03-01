@@ -130,10 +130,10 @@ export const routes: RouteRecordRaw[] = [
 
     children: [
       {
-        path: '/ollama/list',
-        name: 'ollama-list',
+        path: '/ollama/models',
+        name: 'ollama-models',
         component: () =>
-          import(`../views/ollama/list/index.vue`),
+          import(`../views/ollama/models/index.vue`),
         meta: {
           title: '模型列表',
           icon: 'ollama'

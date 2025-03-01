@@ -1,4 +1,4 @@
-import { Core } from '../deepseek/core'
+import { Core } from '../ai/core'
 
 const MODEL = 'gpt-3.5-turbo'
 
@@ -7,13 +7,10 @@ export class Ollama extends Core {
    * 请求参数
    */
   private _requestParams: Partial<
-    Omit<
-      OpenAI.GptModel.RequestParams,
-      'messages' | 'n' | 'stream'
-    >
+    Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>
   >
 
-  constructor(options: OpenAI.GptModel.GptCoreOptions) {
+  constructor(options: AI.Gpt.GptCoreOptions) {
     const { requestParams, ...coreOptions } = options
     super(coreOptions)
     this._requestParams = {
@@ -28,13 +25,13 @@ export class Ollama extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {OpenAI.GptModel.GetAnswerOptions} options
-   * @returns {Promise<OpenAI.FetchRequestInit>}
+   * @param {AI.Gpt.GetAnswerOptions} options
+   * @returns {Promise<AI.FetchRequestInit>}
    */
   private async _getFetchRequestInit(
     question: string,
-    options: OpenAI.GptModel.GetAnswerOptions
-  ): Promise<OpenAI.FetchRequestInit> {
+    options: AI.Gpt.GetAnswerOptions
+  ): Promise<AI.FetchRequestInit> {
     const {
       onProgress,
       stream = onProgress ? true : false,
@@ -52,7 +49,7 @@ export class Ollama extends Core {
       max_tokens: maxTokens
     }
 
-    const requestInit: OpenAI.FetchRequestInit = {
+    const requestInit: AI.FetchRequestInit = {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
@@ -72,13 +69,13 @@ export class Ollama extends Core {
   /**
    * 获取答案
    * @param {string} question
-   * @param {OpenAI.GptModel.GetAnswerOptions} options
-   * @returns {Promise<OpenAI.GptModel.AssistantConversation>}
+   * @param {AI.Gpt.GetAnswerOptions} options
+   * @returns {Promise<AI.Gpt.AssistantConversation>}
    */
   public async getAnswer(
     question: string,
-    options: OpenAI.GptModel.GetAnswerOptions
-  ): Promise<OpenAI.GptModel.AssistantConversation> {
+    options: AI.Gpt.GetAnswerOptions
+  ): Promise<AI.Gpt.AssistantConversation> {
     const {
       onProgress,
       stream = onProgress ? true : false
@@ -99,7 +96,7 @@ export class Ollama extends Core {
     )
     // 包装成一个promise 发起请求
     const responseP =
-      new Promise<OpenAI.GptModel.AssistantConversation>(
+      new Promise<AI.Gpt.AssistantConversation>(
         async (resolve, reject) => {
           try {
             const requestInit =
@@ -114,7 +111,7 @@ export class Ollama extends Core {
                     assistantMessage.content.trim()
                   return resolve(assistantMessage)
                 }
-                const response: OpenAI.GptModel.Response =
+                const response: AI.Gpt.Response =
                   JSON.parse(data)
                 assistantMessage.messageId = response.id
                 if (response?.choices?.length) {
@@ -137,14 +134,14 @@ export class Ollama extends Core {
                   onProgress?.(assistantMessage)
                 }
               }
-              await this._fetchSSE<OpenAI.GptModel.Response>(
+              await this._fetchSSE<AI.Gpt.Response>(
                 this.completionsUrl,
                 requestInit
               ).catch(reject)
             } else {
               // 发送数据请求
               const response =
-                await this._fetchSSE<OpenAI.GptModel.Response>(
+                await this._fetchSSE<AI.Gpt.Response>(
                   this.completionsUrl,
                   requestInit
                 )
@@ -163,7 +160,7 @@ export class Ollama extends Core {
               resolve(assistantMessage)
             }
           } catch (error) {
-            console.error('OpenAI EventStream error', error)
+            console.error('AI EventStream error', error)
             return reject(error)
           }
         }
@@ -185,14 +182,14 @@ export class Ollama extends Core {
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<OpenAI.GptModel.SendMessageOptions>} options
-   * @returns {Promise<{ messages: OpenAI.GptModel.Message[]; }>}
+   * @param {Required<AI.Gpt.SendMessageOptions>} options
+   * @returns {Promise<{ messages: AI.Gpt.Message[]; }>}
    */
   private async _getConversationHistory(
     text: string,
-    options: OpenAI.GptModel.GetAnswerOptions
+    options: AI.Gpt.GetAnswerOptions
   ): Promise<{
-    messages: Array<OpenAI.GptModel.RequestMessage>
+    messages: Array<AI.Gpt.RequestMessage>
     maxTokens: number
   }> {
     const { systemMessage } = options
@@ -202,18 +199,17 @@ export class Ollama extends Core {
     let parentMessageId = options.parentMessageId
 
     // 当前系统和用户消息
-    const messages: Array<OpenAI.GptModel.RequestMessage> =
-      [
-        {
-          role: 'system',
-          content: systemMessage || this._systemMessage
-        },
-        // 用户当前的问题
-        {
-          role: 'user',
-          content: text
-        }
-      ]
+    const messages: Array<AI.Gpt.RequestMessage> = [
+      {
+        role: 'system',
+        content: systemMessage || this._systemMessage
+      },
+      // 用户当前的问题
+      {
+        role: 'user',
+        content: text
+      }
+    ]
 
     let tokenCount = 0
     let prompt = ''

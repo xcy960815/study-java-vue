@@ -1,10 +1,10 @@
-declare namespace OpenAI {
+declare namespace AI {
   export type ClearablePromiseOptions = {
     milliseconds: number
     message?: string
   }
 
-  export interface ChatgptErrorOption {
+  export interface AIErrorOption {
     status?: number
     statusText?: string
     url?: string
@@ -20,7 +20,7 @@ declare namespace OpenAI {
    */
   export interface CoreOptions {
     apiKey: string
-    /** 请求连接 default https://api.OpenAI.com */
+    /** 请求连接 default https://api.AI.com */
     apiBaseUrl?: string
     /** 组织 */
     organization?: string
@@ -100,10 +100,22 @@ declare namespace OpenAI {
     finish_reason?: string | null
     /** 参数未知 作用未知 */
     content_filter_results?: {
-      hate: { filtered: boolean; severity: string }
-      self_harm: { filtered: boolean; severity: string }
-      sexual: { filtered: boolean; severity: string }
-      violence: { filtered: boolean; severity: string }
+      hate: {
+        filtered: boolean
+        severity: string
+      }
+      self_harm: {
+        filtered: boolean
+        severity: string
+      }
+      sexual: {
+        filtered: boolean
+        severity: string
+      }
+      violence: {
+        filtered: boolean
+        severity: string
+      }
     }
   }
 
@@ -139,10 +151,10 @@ declare namespace OpenAI {
   /**
    * gpt 模型模块
    */
-  export namespace GptModel {
+  export namespace Gpt {
     export interface RequestMessage
       extends Omit<
-        OpenAI.Conversation,
+        AI.Conversation,
         'messageId' | 'parentMessageId'
       > {}
 
@@ -150,7 +162,7 @@ declare namespace OpenAI {
      * 请求参数
      */
     export interface RequestParams
-      extends OpenAI.RequestParams {
+      extends AI.RequestParams {
       messages: Array<RequestMessage>
     }
 
@@ -163,7 +175,7 @@ declare namespace OpenAI {
       extends ResponseMessage {}
 
     export interface ResponseChoice
-      extends OpenAI.ResponseChoice {
+      extends AI.ResponseChoice {
       message?: ResponseMessage
       delta?: ResponseDelta
     }
@@ -171,18 +183,18 @@ declare namespace OpenAI {
     /**
      * 不走steam流接口的输出结果
      */
-    export interface Response extends OpenAI.Response {
+    export interface Response extends AI.Response {
       choices: Array<ResponseChoice>
       // detail?: ResponseDetail;
     }
 
     export interface AssistantConversation
-      extends OpenAI.Conversation {
+      extends AI.Conversation {
       detail?: Response | null
     }
 
     export interface GetAnswerOptions
-      extends OpenAI.GetAnswerOptions {
+      extends AI.GetAnswerOptions {
       onProgress?: (
         partialResponse: AssistantConversation
       ) => void
@@ -197,12 +209,15 @@ declare namespace OpenAI {
     }
   }
 
-  export namespace TextModel {
+  /**
+   * 文本模型
+   */
+  export namespace Text {
     /**
      * 发送的消息选项
      */
     export interface GetAnswerOptions
-      extends OpenAI.GetAnswerOptions {
+      extends AI.GetAnswerOptions {
       systemPromptPrefix?: string
       onProgress?: (
         partialResponse: AssistantConversation
@@ -216,7 +231,7 @@ declare namespace OpenAI {
      * 请求参数
      */
     export interface RequestParams
-      extends OpenAI.RequestParams {
+      extends AI.RequestParams {
       prompt: string
       suffix?: string
       echo?: boolean
@@ -225,12 +240,12 @@ declare namespace OpenAI {
     /**
      * 请求返回
      */
-    export interface Response extends OpenAI.Response {
+    export interface Response extends AI.Response {
       choices: Array<ResponseChoice>
     }
 
     /**
-     * 对数概率？？？？
+     * 对数概率 ？？？？
      */
     export interface ResponseLogprobs {
       tokens?: Array<string>
@@ -243,13 +258,13 @@ declare namespace OpenAI {
      * 作用未知
      */
     export interface ResponseChoice
-      extends OpenAI.ResponseChoice {
+      extends AI.ResponseChoice {
       text?: string
       logprobs?: ResponseLogprobs | null
     }
 
     export interface AssistantConversation
-      extends OpenAI.Conversation {
+      extends AI.Conversation {
       detail?: Response | null
     }
 

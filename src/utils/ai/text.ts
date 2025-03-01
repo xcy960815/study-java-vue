@@ -6,10 +6,10 @@ const USER_PROMPT_PREFIX = 'User'
 
 const SYSTEM_PROMPT_PREFIX_DEFAULT = 'ChatGPT'
 
-export default class TextModle extends Core {
+export class Text extends Core {
   /** 默认请求参数 */
   private _requestParams: Omit<
-    OpenAI.TextModel.RequestParams,
+    AI.Text.RequestParams,
     'prompt'
   >
   /** 用户提示前缀 */
@@ -21,7 +21,7 @@ export default class TextModle extends Core {
 
   // private _sepToken: string;
 
-  constructor(options: OpenAI.TextModel.TextCoreOptions) {
+  constructor(options: AI.Text.TextCoreOptions) {
     const {
       requestParams,
       userPromptPrefix,
@@ -58,13 +58,13 @@ export default class TextModle extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {OpenAI.GptModel.GetAnswerOptions} options
-   * @returns {Promise<OpenAI.FetchRequestInit>}
+   * @param {AI.Gpt.GetAnswerOptions} options
+   * @returns {Promise<AI.FetchRequestInit>}
    */
   private async _getFetchRequestInit(
     question: string,
-    options: OpenAI.TextModel.GetAnswerOptions
-  ): Promise<OpenAI.FetchRequestInit> {
+    options: AI.Text.GetAnswerOptions
+  ): Promise<AI.FetchRequestInit> {
     const {
       onProgress,
       stream = onProgress ? true : false,
@@ -80,7 +80,7 @@ export default class TextModle extends Core {
       stream,
       max_tokens: maxTokens
     }
-    const requestInit: OpenAI.FetchRequestInit = {
+    const requestInit: AI.FetchRequestInit = {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
@@ -99,13 +99,13 @@ export default class TextModle extends Core {
   /**
    * 发送请求到OpenAI
    * @param {string} text
-   * @param {OpenAI.TextModel.GetAnswerOptions} options
-   * @returns {Promise<OpenAI.TextModel.AssistantConversation>}
+   * @param {AI.Text.GetAnswerOptions} options
+   * @returns {Promise<AI.Text.AssistantConversation>}
    */
   public async getAnswer(
     text: string,
-    options: OpenAI.TextModel.GetAnswerOptions
-  ): Promise<OpenAI.TextModel.AssistantConversation> {
+    options: AI.Text.GetAnswerOptions
+  ): Promise<AI.Text.AssistantConversation> {
     const {
       onProgress,
       stream = onProgress ? true : false,
@@ -126,7 +126,7 @@ export default class TextModle extends Core {
       { ...options, messageId: userMessage.messageId }
     )
     const responseP =
-      new Promise<OpenAI.TextModel.AssistantConversation>(
+      new Promise<AI.Text.AssistantConversation>(
         async (resolve, reject) => {
           const requestInit =
             await this._getFetchRequestInit(text, options)
@@ -140,7 +140,7 @@ export default class TextModle extends Core {
                 return
               }
               try {
-                const response: OpenAI.TextModel.Response =
+                const response: AI.Text.Response =
                   JSON.parse(data)
                 if (response.id) {
                   assistantMessage.messageId = response.id
@@ -175,7 +175,7 @@ export default class TextModle extends Core {
           } else {
             try {
               const response =
-                await this._fetchSSE<OpenAI.TextModel.Response>(
+                await this._fetchSSE<AI.Text.Response>(
                   this.completionsUrl,
                   requestInit
                 )
@@ -222,12 +222,12 @@ export default class TextModle extends Core {
   /**
    * 构建 prompt 获取 maxTokens
    * @param {string} message
-   * @param {OpenAI.TextModel.SendMessageOptions} options
+   * @param {AI.Text.SendMessageOptions} options
    * @returns {Promise<{prompt: string, maxTokens: number}>
    */
   private async _getConversationHistory(
     message: string,
-    options: OpenAI.TextModel.GetAnswerOptions
+    options: AI.Text.GetAnswerOptions
   ): Promise<{
     prompt: string
     maxTokens: number

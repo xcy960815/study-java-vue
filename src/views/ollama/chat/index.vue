@@ -9,7 +9,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { GptModel } from '@utils/deepseek'
+import { Gpt } from '@/utils/ai'
 import { OllamaModel } from '@utils/ollama'
 import { useRoute } from 'vue-router'
 const route = useRoute()

@@ -10,11 +10,11 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { ollamaModule } from '@apis'
-import { GptModel } from '@utils/deepseek'
+import { Gpt } from '@/utils/ai'
 const question = ref<string>('天为什么是蓝色的？')
 const model = ref<string>('deepseek-chat')
 const parentMessageId = ref<string>('')
-const gptModel = new GptModel({
+const gptModel = new Gpt({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   markdown2Html: true,
@@ -35,7 +35,6 @@ const generateStream = async () => {
       parentMessageId: parentMessageId.value,
       systemMessage: '你是一个聊天机器人',
       onProgress(partialResponse) {
-        console.log('partialResponse', partialResponse)
         if (deepseekChatRef.value) {
           deepseekChatRef.value.innerHTML =
             partialResponse.content
