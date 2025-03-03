@@ -3,7 +3,6 @@ import { Core } from './core'
 const MODEL = 'deepseek-chat'
 
 export class Gpt extends Core {
-  private _completionsUrl: string | undefined
   /**
    * 请求参数
    */
@@ -12,13 +11,8 @@ export class Gpt extends Core {
   >
 
   constructor(options: AI.Gpt.GptCoreOptions) {
-    const {
-      requestParams,
-      completionsUrl,
-      ...coreOptions
-    } = options
+    const { requestParams, ...coreOptions } = options
     super(coreOptions)
-    this._completionsUrl = completionsUrl
     this._requestParams = {
       model: MODEL, // 默认的model
       temperature: 0.8, // 默认的temperature (随机性)
@@ -28,6 +22,7 @@ export class Gpt extends Core {
       ...requestParams
     }
   }
+
   /**
    * 构建fetch公共请求参数
    * @param {string} question
@@ -43,10 +38,11 @@ export class Gpt extends Core {
       stream = onProgress ? true : false,
       requestParams
     } = options
-    // 获取用户和gpt历史对话记录
+
+    /* 获取用户和gpt历史对话记录 */
     const { messages, maxTokens } =
       await this._getConversationHistory(question, options)
-
+    /* 创建请求体 */
     const body = {
       ...this._requestParams,
       ...requestParams,
@@ -62,14 +58,6 @@ export class Gpt extends Core {
       signal: this._abortController.signal
     }
     return requestInit
-  }
-
-  /**
-   * 当前模型的请求地址
-   * @returns {string}
-   */
-  private get completionsUrl() {
-    return this._completionsUrl ?? '/v1/chat/completions'
   }
 
   /**
@@ -101,7 +89,7 @@ export class Gpt extends Core {
       { ...options, messageId: userMessage.messageId }
     )
     // 包装成一个promise 发起请求
-    const responseP =
+    const responsePromise =
       new Promise<AI.Gpt.AssistantConversation>(
         async (resolve, reject) => {
           try {
@@ -170,16 +158,17 @@ export class Gpt extends Core {
             return reject(error)
           }
         }
-      ).then(async (Conversation) => {
-        return this.upsertConversation(Conversation).then(
+      ).then(async (conversation) => {
+        return this.upsertConversation(conversation).then(
           () => {
-            Conversation.parentMessageId =
-              Conversation.messageId
-            return Conversation
+            conversation.parentMessageId =
+              conversation.messageId
+            return conversation
           }
         )
       })
-    return this.clearablePromise(responseP, {
+
+    return this.clearablePromise(responsePromise, {
       milliseconds: this._milliseconds,
       message: ``
     })

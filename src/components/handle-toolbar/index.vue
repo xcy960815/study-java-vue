@@ -71,6 +71,7 @@ const defaultSlotContents = slots.default
 .handle-toolbar {
   position: relative;
   margin-bottom: 10px;
+  min-height: 26px;
   // height: 32px;
 
   .right-panel {

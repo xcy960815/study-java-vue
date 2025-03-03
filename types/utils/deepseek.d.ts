@@ -38,6 +38,8 @@ declare namespace AI {
     milliseconds?: number
     /** 是否将markdown语法转换成html */
     markdown2Html?: boolean
+    // 自定义请求地址 要求跟chatgpt 返回的数据一样
+    completionsUrl?: string
   }
 
   /**
@@ -185,7 +187,6 @@ declare namespace AI {
      */
     export interface Response extends AI.Response {
       choices: Array<ResponseChoice>
-      // detail?: ResponseDetail;
     }
 
     export interface AssistantConversation
@@ -203,8 +204,6 @@ declare namespace AI {
       >
     }
     export interface GptCoreOptions extends CoreOptions {
-      // 自定义请求地址 要求跟chatgpt 返回的数据一样
-      completionsUrl?: string
       requestParams?: Partial<
         Omit<RequestParams, 'messages' | 'n' | 'stream'>
       >

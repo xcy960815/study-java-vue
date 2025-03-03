@@ -5,6 +5,9 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import Gpt3Tokenizer from 'gpt3-tokenizer'
 import { marked } from 'marked'
+import hljs from 'highlight.js'
+const BEGINWIDTHKEEPALIVE = ' : keep-alive'
+const BEGINWIDTHDATA = 'data:'
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -50,6 +53,8 @@ export class Core {
   protected _milliseconds: number
   /** 是否开启markdown转html */
   protected _markdown2Html: boolean
+  /* 当前模型的请求地址 */
+  private _completionsUrl: string | undefined
 
   constructor(options: AI.CoreOptions) {
     const {
@@ -62,6 +67,7 @@ export class Core {
       maxResponseTokens,
       systemMessage,
       milliseconds,
+      completionsUrl,
       markdown2Html
     } = options
 
@@ -95,6 +101,8 @@ export class Core {
     this._milliseconds = milliseconds ?? 1000 * 60
 
     this._markdown2Html = markdown2Html ?? false
+
+    this._completionsUrl = completionsUrl
   }
 
   /**
@@ -103,6 +111,16 @@ export class Core {
    */
   private get modelsUrl(): string {
     return `${this._apiBaseUrl}${'/v1/models'}`
+  }
+
+  /**
+   * 当前模型的请求地址
+   * @returns {string}
+   */
+  protected get completionsUrl() {
+    return `${this._apiBaseUrl}${
+      this._completionsUrl ?? '/v1/chat/completions'
+    }`
   }
 
   /**
@@ -133,12 +151,12 @@ export class Core {
    * @returns {Promise<number>}
    */
   protected async getTokenCount(
-    _text: string
+    text: string
   ): Promise<number> {
-    return await this._gpt3Tokenizer.encode(_text).bpe
-      .length
+    return await this._gpt3Tokenizer.encode(text).bpe.length
   }
   /** 函数重载 start */
+
   protected buildConversation(
     role: 'user',
     content: string,
@@ -151,28 +169,20 @@ export class Core {
     option: AI.GetAnswerOptions
   ): AI.Gpt.AssistantConversation
 
-  protected buildConversation(
-    role: 'assistant',
-    content: string,
-    option: AI.GetAnswerOptions
-  ): AI.Text.AssistantConversation
   /** 函数重载 end */
 
   /**
    * 构建会话消息
-   * @param {"user" | "assistant" | "assistant"} role
+   * @param { "user" | "assistant" } role
    * @param {string} content
-   * @param {AI.GetAnswerOptions} option
-   * @returns {AI.Conversation | AI.Gpt.AssistantConversation | AI.Text.AssistantConversation}
+   * @param { AI.GetAnswerOptions } option
+   * @returns { AI.Conversation | AI.Gpt.AssistantConversation}
    */
   protected buildConversation(
-    role: 'user' | 'assistant' | 'assistant',
+    role: 'user' | 'assistant',
     content: string,
     option: AI.GetAnswerOptions
-  ):
-    | AI.Conversation
-    | AI.Gpt.AssistantConversation
-    | AI.Text.AssistantConversation {
+  ): AI.Conversation | AI.Gpt.AssistantConversation {
     if (role === 'user') {
       return {
         role: 'user',
@@ -180,14 +190,6 @@ export class Core {
         parentMessageId:
           option.parentMessageId || this.uuid,
         content
-      }
-    } else if (role === 'assistant') {
-      return {
-        role: 'assistant',
-        messageId: '',
-        parentMessageId: option.messageId || this.uuid,
-        content,
-        detail: null
       }
     } else if (role === 'assistant') {
       return {
@@ -216,6 +218,18 @@ export class Core {
     })
   }
   /**
+   * 获取所有的对话
+   * @returns {Promise<AI.Conversation[]>}
+   */
+  public getAllConversations(): Promise<AI.Conversation[]> {
+    return new Promise((resolve) => {
+      const messages = Array.from(
+        this._messageStore.values()
+      )
+      resolve(messages)
+    })
+  }
+  /**
    * 更新对话
    * @param {AI.Conversation} message
    * @returns {Promise<void>}
@@ -235,7 +249,7 @@ export class Core {
    * 清空消息
    * @returns {Promise<void>}
    */
-  protected _clearMessage(): Promise<void> {
+  protected _clearConversation(): Promise<void> {
     return new Promise<void>((resolve) => {
       this._messageStore.clear()
       resolve()
@@ -268,7 +282,7 @@ export class Core {
       while (true) {
         const { done, value } = await reader.read()
         if (done) {
-          return
+          break
         }
         yield value!
       }
@@ -287,7 +301,7 @@ export class Core {
     requestInit: AI.FetchRequestInit
   ): Promise<AI.AnswerResponse<R> | void> {
     const { onMessage, ...fetchOptions } = requestInit
-    const response = (await fetch(this._apiBaseUrl + url, {
+    const response = (await fetch(url, {
       ...fetchOptions
     })) as AI.AnswerResponse<R>
     if (!response.ok) {
@@ -299,7 +313,7 @@ export class Core {
       const { error } = JSON.parse(await response.text())
       throw new AiError(error.message, errorOption)
     }
-    // 如果没有 onMessage 回调函数，直接返回 response
+    /* 如果没有 onMessage 回调函数，直接返回 response */
     if (!onMessage) {
       return response
     }
@@ -322,16 +336,17 @@ export class Core {
   ): EventSourceParser {
     return createParser({
       onEvent: (event) => {
-        if (event.data.trim()) {
+        const data = event.data.trim()
+        if (data) {
           if (
-            event.data.startsWith('data:') &&
-            !event.data.includes('data:: keep-alive')
+            data.startsWith(BEGINWIDTHDATA) &&
+            !data.startsWith(BEGINWIDTHKEEPALIVE)
           ) {
-            // 兼容deepseek接口
-            onMessage?.(event.data.slice(6))
+            // 兼容deepseek接口 deepseek 接口返回的数据是以data:开头的 且 有时候会带有 : keep-alive 这两种情况 JSON.parse 解析不了
+            onMessage?.(data.slice(6))
           } else {
             // 兼容chatgpt接口
-            onMessage?.(event.data)
+            onMessage?.(data)
           }
         }
       }
@@ -353,7 +368,7 @@ export class Core {
   /**
    * 清空promise
    */
-  protected clearablePromise<V = any>(
+  protected clearablePromise<V extends Object>(
     inputPromise: PromiseLike<V>,
     options: AI.ClearablePromiseOptions
   ) {
@@ -361,6 +376,7 @@ export class Core {
     let timer: ReturnType<typeof setTimeout> | undefined
     const wrappedPromise = new Promise<V>(
       (resolve, reject) => {
+        // 清空定时器
         if (milliseconds === Number.POSITIVE_INFINITY) {
           inputPromise.then(resolve, reject)
           return
