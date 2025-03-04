@@ -3,7 +3,7 @@ import { Gpt } from '@/utils/ai'
 
 const gpt = new Gpt({
   completionsUrl: '/deepseek/completions',
-  apiKey: '',
+//   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   markdown2Html: true
 })

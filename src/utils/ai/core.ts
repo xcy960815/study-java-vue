@@ -71,7 +71,7 @@ export class Core {
       markdown2Html
     } = options
 
-    this._apiKey = apiKey
+    this._apiKey = apiKey ?? ""
 
     this._apiBaseUrl = apiBaseUrl ?? 'https://api.AI.com'
 
@@ -118,9 +118,8 @@ export class Core {
    * @returns {string}
    */
   protected get completionsUrl() {
-    return `${this._apiBaseUrl}${
-      this._completionsUrl ?? '/v1/chat/completions'
-    }`
+    return `${this._apiBaseUrl}${this._completionsUrl ?? '/v1/chat/completions'
+      }`
   }
 
   /**
@@ -136,6 +135,9 @@ export class Core {
    * @returns {HeadersInit}
    */
   protected get headers(): HeadersInit {
+    if (!this._apiKey) {
+      throw new AiError('没有设置apiKey')
+    }
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this._apiKey}`
@@ -305,7 +307,7 @@ export class Core {
       ...fetchOptions
     })) as AI.AnswerResponse<R>
     if (!response.ok) {
-      const errorOption: AI.AIErrorOption = {
+      const errorOption: AI.AiErrorOption = {
         url: response.url,
         status: response.status,
         statusText: response.statusText
@@ -440,11 +442,13 @@ export class Core {
  * ChatGPT 错误类
  */
 export class AiError extends Error {
+  name: string
   status?: number
   statusText?: string
   url?: string
-  constructor(message: string, option?: AI.AIErrorOption) {
+  constructor(message: string, option?: AI.AiErrorOption) {
     super(message)
+    this.name = 'AIError';
     if (option) {
       const { status, statusText, url } = option
       this.status = status
@@ -452,4 +456,10 @@ export class AiError extends Error {
       this.url = url
     }
   }
+}
+
+try {
+
+} catch (error: any) {
+  console.log(error)
 }

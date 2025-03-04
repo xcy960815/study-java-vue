@@ -4,7 +4,7 @@ import { type FormInstance } from 'element-plus'
 import { reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
 
-import { merge } from 'lodash-es'
+import { merge } from "lodash"
 import { genMixColor } from './generate-color'
 import { useDark } from '@vueuse/core'
 

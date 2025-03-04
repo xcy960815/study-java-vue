@@ -4,7 +4,7 @@ declare namespace AI {
     message?: string
   }
 
-  export interface AIErrorOption {
+  export interface AiErrorOption {
     status?: number
     statusText?: string
     url?: string
@@ -19,7 +19,7 @@ declare namespace AI {
    * 模型公共参数
    */
   export interface CoreOptions {
-    apiKey: string
+    apiKey?: string
     /** 请求连接 default https://api.AI.com */
     apiBaseUrl?: string
     /** 组织 */
@@ -158,7 +158,7 @@ declare namespace AI {
       extends Omit<
         AI.Conversation,
         'messageId' | 'parentMessageId'
-      > {}
+      > { }
 
     /**
      * 请求参数
@@ -174,7 +174,7 @@ declare namespace AI {
     }
 
     export interface ResponseDelta
-      extends ResponseMessage {}
+      extends ResponseMessage { }
 
     export interface ResponseChoice
       extends AI.ResponseChoice {
