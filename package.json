@@ -24,6 +24,8 @@
     "axios": "^1.7.7",
     "dayjs": "^1.11.13",
     "element-plus": "^2.9.3",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-vue": "^9.32.0",
     "eventsource-parser": "^3.0.0",
     "gpt3-tokenizer": "^1.1.5",
     "highlight.js": "^11.11.1",
@@ -49,6 +51,7 @@
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.21.0",
     "husky": "^9.1.7",
     "jsdom": "^24.1.0",
     "less": "^4.2.0",
@@ -75,7 +78,6 @@
   },
   "lint-staged": {
     "*.{js,jsx,vue,ts,tsx}": [
-      "eslint --fix",
       "prettier --write"
     ],
     "*.{scss,less,css,html,md}": [
