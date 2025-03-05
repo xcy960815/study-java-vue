@@ -9,12 +9,16 @@ export const systemInfoStore = defineStore<
 >(Names.SYSTEM, {
   state: () => {
     return {
-      openMenuFlag: true
+      openMenuFlag: true,
+      keepLiveList: []
     }
   },
   getters: {
     getOpenMenuFlag(state) {
       return state.openMenuFlag
+    },
+    getKeepLiveList(state) {
+      return state.keepLiveList
     }
   },
   actions: {
@@ -23,6 +27,26 @@ export const systemInfoStore = defineStore<
     },
     setOpenMenuFlag(flag) {
       this.openMenuFlag = flag
+    },
+    setKeepLiveList(list) {
+      this.keepLiveList = list
+    },
+    addKeepLiveList(addKeepLiveItem) {
+      if (
+        !!addKeepLiveItem.meta.keepAlive &&
+        !this.keepLiveList.includes(
+          addKeepLiveItem.name as string
+        )
+      ) {
+        this.keepLiveList.push(
+          addKeepLiveItem.name as string
+        )
+      }
+      console.log(
+        'addKeepLiveItem.name',
+        addKeepLiveItem.name
+      )
+      console.log('this.keepLiveList', this.keepLiveList)
     }
   },
   persist: true

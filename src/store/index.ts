@@ -35,7 +35,7 @@ export {
 }
 
 const store = createPinia()
-// 数据持久化
+/* 数据持久化 */
 store.use(piniaPluginPersistedstate)
 
 export default store

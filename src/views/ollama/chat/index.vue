@@ -8,10 +8,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { Gpt } from '@/utils/ai'
+import { ref, onMounted } from 'vue'
 import { OllamaModel } from '@utils/ollama'
 import { useRoute } from 'vue-router'
+
+defineOptions({
+  name: 'ollama-chat'
+})
 const route = useRoute()
 
 const model = ref<string>(
@@ -22,7 +25,7 @@ const ollamaModel = new OllamaModel({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   requestParams: {
-    model: 'llama3.1' // model.value
+    model: model.value
   }
 })
 
@@ -38,6 +41,10 @@ const generateStream = async () => {
     }
   })
 }
+
+onMounted(() => {
+  console.log(1111)
+})
 </script>
 <style lang="less" scoped>
 .chat {

@@ -129,6 +129,7 @@ export const routes: RouteRecordRaw[] = [
         component: () =>
           import(`../views/deepseek/chat/index.vue`),
         meta: {
+          keepAlive: true,
           title: '聊天',
           icon: 'chat'
         }
@@ -162,6 +163,7 @@ export const routes: RouteRecordRaw[] = [
         component: () =>
           import(`../views/ollama/chat/index.vue`),
         meta: {
+          keepAlive: true,
           title: '会话',
           icon: 'chat'
         }

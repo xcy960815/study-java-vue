@@ -1,6 +1,9 @@
+// import { type RouteLocationNormalizedLoadedGeneric } from "vue-router"
+
 declare namespace SystemStore {
   type State = {
     openMenuFlag: boolean
+    keepLiveList: Array<string>
   }
   /**
    * getter
@@ -11,5 +14,8 @@ declare namespace SystemStore {
    */
   type Actions = {
     reversalOpenMenuFlag: () => void
+    addKeepLiveList: (
+      addKeepLiveItem: import('vue-router').RouteLocationNormalizedLoadedGeneric
+    ) => void
   }
 }
