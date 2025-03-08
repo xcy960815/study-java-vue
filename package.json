@@ -78,7 +78,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint --edit $1"
     }
   },
   "lint-staged": {
