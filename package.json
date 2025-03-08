@@ -76,6 +76,11 @@
   "volta": {
     "node": "18.20.4"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
     "*.{js,jsx,vue,ts,tsx}": [
       "prettier --write"

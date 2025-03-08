@@ -5,7 +5,7 @@ export const getGoodsCategoryList = async <
 >(
   requestParams: GoodsCategoryVo
 ) => {
-  const url = `/goodsCategory/getGoodsCategoryList`
+  const url = `/goodsCategory/list`
   return request.get<ResponseResult<T>, ResponseResult<T>>(
     url,
     {
