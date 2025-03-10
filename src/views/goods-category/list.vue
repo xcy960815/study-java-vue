@@ -166,7 +166,9 @@ import {
 } from 'element-plus'
 import { useRouter } from 'vue-router'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-
+defineOptions({
+  name: "goods-category-list"
+})
 interface GoodsCategoryInfo {
   tableData: GoodsCategoryDto[]
   total: number | undefined

@@ -1,148 +1,61 @@
 <template>
-  <el-form
-    :model="queryFormData"
-    label-width="auto"
-    inline
-    v-show="showSearch"
-  >
+  <el-form :model="queryFormData" label-width="auto" inline v-show="showSearch">
     <el-form-item label="用户昵称">
-      <el-input
-        v-model="queryFormData.nickName"
-        placeholder="用户昵称"
-        @change="getUserList"
-      />
+      <el-input v-model="queryFormData.nickName" placeholder="用户昵称" @change="getUserList" />
     </el-form-item>
     <el-form-item label="登陆名称">
-      <el-input
-        v-model="queryFormData.loginName"
-        placeholder="登陆名称"
-        @change="getUserList"
-      />
+      <el-input v-model="queryFormData.loginName" placeholder="登陆名称" @change="getUserList" />
     </el-form-item>
     <el-form-item label="个性签名">
-      <el-input
-        v-model="queryFormData.introduceSign"
-        placeholder="个性签名"
-        @change="getUserList"
-      />
+      <el-input v-model="queryFormData.introduceSign" placeholder="个性签名" @change="getUserList" />
     </el-form-item>
     <el-form-item label="收货地址">
-      <el-input
-        v-model="queryFormData.address"
-        placeholder="收货地址"
-        @change="getUserList"
-      />
+      <el-input v-model="queryFormData.address" placeholder="收货地址" @change="getUserList" />
     </el-form-item>
   </el-form>
-  <Handle-ToolBar
-    v-model:showSearch="showSearch"
-    @queryTableData="getUserList"
-  >
-    <el-button
-      size="small"
-      type="primary"
-      @click="handleClickAddUser"
-    >
+  <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getUserList">
+    <el-button size="small" type="primary" @click="handleClickAddUser">
       新增用户
     </el-button>
   </Handle-ToolBar>
 
-  <el-table
-    border
-    :data="userListInfo.tableData"
-    style="width: 100%"
-  >
-    <el-table-column
-      prop="nickName"
-      label="用户昵称"
-      width="100"
-    />
-    <el-table-column
-      prop="age"
-      label="用户年龄"
-      width="100"
-    />
+  <el-table border :data="userListInfo.tableData" style="width: 100%">
+    <el-table-column prop="nickName" label="用户昵称" width="100" />
+    <el-table-column prop="age" label="用户年龄" width="100" />
     <el-table-column prop="loginName" label="登陆名称" />
-    <el-table-column
-      prop="introduceSign"
-      label="个性签名"
-    />
+    <el-table-column prop="introduceSign" label="个性签名" />
     <el-table-column prop="address" label="收货地址" />
     <el-table-column prop="createTime" label="注册时间" />
     <el-table-column fixed="right" label="操作" width="120">
       <template #default="{ row }">
-        <el-button
-          link
-          type="primary"
-          size="small"
-          @click="handleClickEditUser(row)"
-          >编辑</el-button
-        >
-        <el-button
-          link
-          type="primary"
-          size="small"
-          @click="handleClickDeleteUser(row)"
-          >删除</el-button
-        >
+        <el-button link type="primary" size="small" @click="handleClickEditUser(row)">编辑</el-button>
+        <el-button link type="primary" size="small" @click="handleClickDeleteUser(row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
-  <el-pagination
-    v-model:current-page="userListInfo.pageNum"
-    v-model:page-size="userListInfo.pageSize"
-    :page-sizes="[10, 20, 30, 40]"
-    layout="total, sizes, prev, pager, next, jumper"
-    :total="userListInfo.total"
-    @size-change="userListInfo.handlePageSizeChange"
-    @current-change="userListInfo.handlePageNumChange"
-  />
-  <el-dialog
-    v-model="addOrEditUserDialogVisible"
-    :title="addOrEditUserDialogTitle"
-  >
-    <el-form
-      ref="addOrEditUserFormRef"
-      :model="addOrEditUserFormData"
-      :rules="addOrEditUserFormRules"
-      label-width="auto"
-      status-icon
-    >
+  <el-pagination v-model:current-page="userListInfo.pageNum" v-model:page-size="userListInfo.pageSize"
+    :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="userListInfo.total"
+    @size-change="userListInfo.handlePageSizeChange" @current-change="userListInfo.handlePageNumChange" />
+  <el-dialog v-model="addOrEditUserDialogVisible" :title="addOrEditUserDialogTitle">
+    <el-form ref="addOrEditUserFormRef" :model="addOrEditUserFormData" :rules="addOrEditUserFormRules"
+      label-width="auto" status-icon>
       <el-form-item label="用户昵称" prop="nickName">
-        <el-input
-          v-model="addOrEditUserFormData.nickName"
-          placeholder="请输入用户昵称"
-        />
+        <el-input v-model="addOrEditUserFormData.nickName" placeholder="请输入用户昵称" />
       </el-form-item>
       <el-form-item label="登陆名称" prop="loginName">
-        <el-input
-          v-model="addOrEditUserFormData.loginName"
-          placeholder="请输入登陆名称"
-        />
+        <el-input v-model="addOrEditUserFormData.loginName" placeholder="请输入登陆名称" />
       </el-form-item>
       <el-form-item label="个性签名" prop="introduceSign">
-        <el-input
-          v-model="addOrEditUserFormData.introduceSign"
-          placeholder="请输入个性签名"
-        />
+        <el-input v-model="addOrEditUserFormData.introduceSign" placeholder="请输入个性签名" />
       </el-form-item>
       <el-form-item label="收货地址" prop="address">
-        <el-input
-          v-model="addOrEditUserFormData.address"
-          placeholder="请输入收货地址"
-        />
+        <el-input v-model="addOrEditUserFormData.address" placeholder="请输入收货地址" />
       </el-form-item>
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button
-          @click="addOrEditUserDialogVisible = false"
-          >取消</el-button
-        >
-        <el-button
-          type="primary"
-          @click="handleClickAddOrEditConfirm"
-        >
+        <el-button @click="addOrEditUserDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleClickAddOrEditConfirm">
           确认
         </el-button>
       </div>
@@ -155,6 +68,9 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
+defineOptions({
+  name: "userList"
+})
 interface UserListInfo {
   tableData: UserInfoDto[]
   total: number | undefined

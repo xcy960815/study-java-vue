@@ -53,10 +53,11 @@ export const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '/user/list',
-        name: 'user-list',
+        name: 'userList',
         component: () => import(`../views/user/list.vue`),
         meta: {
           icon: 'user-list',
+          keepAlive: true,
           title: '用户列表'
         }
       },
@@ -88,6 +89,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/goods-category/list.vue`),
         meta: {
           title: '商品列表',
+          keepAlive: true,
           icon: 'goods-category-list'
         }
       },
