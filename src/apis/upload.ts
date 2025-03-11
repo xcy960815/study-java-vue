@@ -1,15 +1,16 @@
 
-
+import { type UploadRawFile } from "element-plus"
 import { type AxiosProgressEvent } from 'axios'
 import { request } from '@utils/request'
 
+type OnUploadProgress = (progressEvent: AxiosProgressEvent) => void
 
 /**
  * 普通文件上传
  * @param {FormData} formData 
  * @returns {Promise<ResponseResult<T>>}
  */
-export const uploadFile = <T extends string>(formData: FormData, onUploadProgress: (progressEvent: AxiosProgressEvent) => void) => {
+export const uploadFile = <T extends string>(formData: FormData, onUploadProgress: OnUploadProgress) => {
     return request.post<ResponseResult<T>, ResponseResult<T>>('/uploadFile', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
@@ -20,14 +21,31 @@ export const uploadFile = <T extends string>(formData: FormData, onUploadProgres
 }
 
 /**
- * 大文件切片上传 todo
- * @param {FormData} formData 
- * @returns 
+ * 大文件切片上传 
+ * @param {File} file
+ * @param {OnUploadProgress} onUploadProgress
+ * @returns {Promise<ResponseResult<T>>}
  */
-export const uploadLargeFile = (formData: FormData) => {
-    return request.post('/upload/large', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    })
+export const uploadLargeFile = async <T extends string>(file: UploadRawFile, onUploadProgress: OnUploadProgress) => {
+    const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB 每片
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+    for (let i = 0; i < totalChunks; i++) {
+        console.log(i);
+        
+        const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+        const formData = new FormData()
+        formData.append("file", chunk)
+        formData.append("fileName", file.name)
+        formData.append("chunkIndex", i.toString())
+        formData.append("totalChunks", totalChunks.toString())
+        return request.post<ResponseResult<T>, ResponseResult<T>>('/uploadLargeFile', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            },
+            // 显示上传进度
+            onUploadProgress
+        })
+    }
+
+
 }

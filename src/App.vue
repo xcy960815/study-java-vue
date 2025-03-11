@@ -1,16 +1,10 @@
 <template>
   <router-view v-slot="{ Component }">
-
     <transition name="fade-transform" mode="out-in">
-      <!-- include="userList" -->
-      <keep-alive>
-
-        <component :is="Component" />
-
+      <keep-alive include="userList">
+        <component :is="Component" :key="routerViewKey"/>
       </keep-alive>
-    </transition>>
-
-
+    </transition>
   </router-view>
 </template>
 
@@ -46,10 +40,10 @@ watch(route, (to) => {
   systemInfoStore.addKeepLiveItem(to)
 })
 
+// const componentKey = ref()
+
 
 onMounted(() => {
-  // console.log("keepLiveList", keepLiveList.value);
-
   initTheme()
 })
 
