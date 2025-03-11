@@ -4,13 +4,13 @@
     v-model:showSearch="showSearch"
     @queryTableData="getOllamaModelsList"
   >
-    <el-button type="primary" @click="handleStartChat()"
+    <el-button type="primary" size="small" @click="handleStartChat()"
       >开始对话</el-button
     >
-    <el-button @click="version"
+    <el-button size="small" @click="version"
       >查看本地ollama版本</el-button
     >
-    <el-button @click="ps">查看正在运行的模型</el-button>
+    <el-button size="small" @click="ps">查看正在运行的模型</el-button>
   </Handle-ToolBar>
   <el-table
     border

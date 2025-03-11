@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { Names } from './store-name'
 import router from "@router"
+
 // import { useRouter, type RouteLocationNormalizedLoadedGeneric } from "vue-router"
 
 export const systemInfoStore = defineStore<
@@ -93,7 +94,6 @@ export const systemInfoStore = defineStore<
       } else if (!!preHistoryItem) {
         router.push(preHistoryItem)
       }
-
     }
   },
   persist: true

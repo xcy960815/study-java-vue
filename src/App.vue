@@ -6,7 +6,7 @@
 
     <transition name="fade">
 
-      <keep-alive :include="keepLiveList">
+      <keep-alive include="userList">
 
         <component :is="Component" />
 
