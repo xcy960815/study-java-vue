@@ -1,18 +1,15 @@
 <template>
-  <!-- <keep-alive :include="keepLiveList">
-    <router-view :key="routerViewKey"></router-view>
-  </keep-alive> -->
   <router-view v-slot="{ Component }">
 
-    <transition name="fade">
-
-      <keep-alive include="userList">
+    <transition name="fade-transform" mode="out-in">
+      <!-- include="userList" -->
+      <keep-alive>
 
         <component :is="Component" />
 
       </keep-alive>
+    </transition>>
 
-    </transition>
 
   </router-view>
 </template>
@@ -36,22 +33,22 @@ const keepLiveList = computed(
 const routerViewKey = ref(route.fullPath)
 
 onBeforeRouteLeave((to) => {
-  console.log("onBeforeRouteLeave--onBeforeRouteLeave");
+  // console.log("onBeforeRouteLeave--onBeforeRouteLeave");
 
   systemInfoStore.addKeepLiveItem(to)
 })
 
 onBeforeRouteUpdate((to) => {
-  console.log("onBeforeRouteUpdate--onBeforeRouteUpdate");
+  // console.log("onBeforeRouteUpdate--onBeforeRouteUpdate");
 })
 
-watch(route, (to, from) => {
+watch(route, (to) => {
   systemInfoStore.addKeepLiveItem(to)
 })
 
 
 onMounted(() => {
-  console.log("keepLiveList", keepLiveList.value);
+  // console.log("keepLiveList", keepLiveList.value);
 
   initTheme()
 })

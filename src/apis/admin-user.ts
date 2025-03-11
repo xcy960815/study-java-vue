@@ -1,5 +1,4 @@
 import { request } from '@utils/request'
-import type { BindingOrAssignmentElementRestIndicator } from 'typescript'
 
 interface RequestParams extends baseListParams {}
 /**

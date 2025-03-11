@@ -194,6 +194,27 @@ export const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/upload',
+    name: 'upload',
+    component: () =>
+      import(`../components/layout/index.vue`),
+    meta: {
+      title: '文件上传'
+    },
+    children: [
+      {
+        path: '/upload/file',
+        name: 'upload-file',
+        component: () =>
+          import(`../views/file-upload/index.vue`),
+        meta: {
+          title: '文件上传',
+          // icon: 'upload'
+        }
+      }
+    ]
+  },
+  {
     path: '/*',
     redirect: '/'
   }

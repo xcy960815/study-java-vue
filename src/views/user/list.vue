@@ -62,15 +62,20 @@
     </template>
   </el-dialog>
 </template>
+<script lang="ts">
+export default {
+  name: "userList"
+}
+</script>
 <script setup lang="ts">
 import { userModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-defineOptions({
-  name: "userList"
-})
+// defineOptions({
+//   name: "userList"
+// })
 interface UserListInfo {
   tableData: UserInfoDto[]
   total: number | undefined
@@ -236,7 +241,9 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
 }
 
 const showSearch = ref(true)
+
 onMounted(() => {
   getUserList()
 })
+
 </script>

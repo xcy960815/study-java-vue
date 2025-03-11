@@ -85,7 +85,7 @@
         >
         <el-button
           link
-          type="primary"
+          type="danger"
           size="small"
           @click="handleClickDeleteGoodsCategory(row)"
           >删除</el-button

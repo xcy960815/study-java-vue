@@ -32,7 +32,7 @@
         >
         <el-button
           link
-          type="primary"
+          type="danger"
           size="small"
           @click="handleClickDeleteModel(row)"
           >删除</el-button
@@ -73,7 +73,7 @@
           >
           <el-button
             link
-            type="primary"
+            type="danger"
             size="small"
             @click="handleClickDeleteModel(row)"
             >删除</el-button
