@@ -6,35 +6,24 @@
             {{ historyItem.meta.title }}
         </el-tag>
     </div>
-
 </template>
 
 <script lang='ts' setup>
 
-import { useRouter, onBeforeRouteLeave, onBeforeRouteUpdate, type RouteLocationNormalizedLoadedGeneric } from "vue-router"
+import { useRouter,useRoute, onBeforeRouteUpdate, type RouteLocationNormalizedLoadedGeneric } from "vue-router"
 import { onMounted, computed } from "vue"
 import { useSystemInfoStore } from "@store"
 
 const router = useRouter()
-
+const route = useRoute()
 const systemInfoStore = useSystemInfoStore()
 
 const historyList = computed(() => systemInfoStore.historyList)
 
-/**
- * 路由守卫
- */
-onBeforeRouteLeave((to, from) => {
-    console.log("onBeforeRouteLeave");
-    // console.log("to--to", to);
-    // console.log("from--from", from);
-    systemInfoStore.addHistoryItem(to)
-})
 
-onBeforeRouteUpdate((to, from) => {
-    // console.log("onBeforeRouteUpdate");
-    // console.log("to--to", to);
-    // console.log("from--from", from);
+onBeforeRouteUpdate((to) => {
+    systemInfoStore.addHistoryItem(to)
+    systemInfoStore.addKeepLiveItem(to)
 })
 
 const allowClosable = (historyItem: RouteLocationNormalizedLoadedGeneric) => {
@@ -68,6 +57,7 @@ const handleCloseTag = (historyItem: RouteLocationNormalizedLoadedGeneric) => {
 
 onMounted(() => {
 
+    systemInfoStore.addHistoryItem(route)
 })
 
 </script>

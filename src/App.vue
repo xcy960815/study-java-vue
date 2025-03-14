@@ -9,16 +9,14 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeRouteLeave, onBeforeRouteUpdate } from "vue-router"
 import { useSystemInfoStore } from '@store'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { setSystemTheme } from '@/utils/system-theme'
+
 const route = useRoute()
 
 const systemInfoStore = useSystemInfoStore()
-
-const { initTheme } = setSystemTheme()
 
 const keepLiveList = computed(
   () => systemInfoStore.getKeepLiveList
@@ -26,23 +24,7 @@ const keepLiveList = computed(
 
 const routerViewKey = ref(route.fullPath)
 
-onBeforeRouteLeave((to) => {
-  // console.log("onBeforeRouteLeave--onBeforeRouteLeave");
-
-  systemInfoStore.addKeepLiveItem(to)
-})
-
-onBeforeRouteUpdate((to) => {
-  // console.log("onBeforeRouteUpdate--onBeforeRouteUpdate");
-})
-
-watch(route, (to) => {
-  systemInfoStore.addKeepLiveItem(to)
-})
-
-// const componentKey = ref()
-
-
+const { initTheme } = setSystemTheme()
 onMounted(() => {
   initTheme()
 })

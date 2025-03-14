@@ -5,8 +5,7 @@ import { request } from '@utils/request'
 
 type OnUploadProgress = (progressEvent: AxiosProgressEvent) => void
 
-const CHUNK_SIZE = 5 * 1024 * 1024 // 5MB 每片
-
+const CHUNK_SIZE = 10 * 1024 * 1024 // 10 MB 每片
 
 /**
  * 普通文件上传

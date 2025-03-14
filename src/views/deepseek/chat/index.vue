@@ -1,7 +1,9 @@
 <template>
   <div class="deepseek-chat">
-    <!-- gpt 回答的答案的动画  -->
-    <div
+    <div class="conversation-list">
+      conversation-list
+    </div>
+    <!-- <div
       id="in-progress"
       v-show="inProgress"
       class="pl-4 pr-4 pt-2 flex items-center justify-between text-xs"
@@ -14,7 +16,6 @@
           <div class="bounce3"></div>
         </div>
       </div>
-      <!-- gpt 停止回答的答案的按钮 -->
       <button
         id="stop-generating-button"
         @click="cancelConversation"
@@ -39,7 +40,6 @@
     </div>
 
     <template v-for="conversation in conversations">
-      <!-- 用户问题 -->
       <div
         class="p-4 self-end question-element relative input-background"
       >
@@ -56,46 +56,12 @@
           {{ conversation.content }}
         </div>
       </div>
-    </template>
-
-    <!-- 问题输入框 -->
-    <div class="flex items-center">
-      <div class="flex-1 question-wrapper">
-        <!-- 问题输入框 -->
-        <el-input
-          v-model="question"
-          :autosize="{ minRows: 2 }"
-          class="w-full h-full text-sm rounded-md"
-          type="textarea"
-          placeholder="任意问题"
-        ></el-input>
-      </div>
-      <!-- 发送问题按钮 -->
-      <div
-        class="right-6 p-0.5 ml-5 flex items-center gap-2"
-      >
-        <el-button
-          @click="completions"
-          title="提交"
-          class="submit-question-button rounded-lg p-0.5"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="w-5 h-5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-            />
-          </svg>
-        </el-button>
-      </div>
-    </div>
+    </template> -->
+    
+    <seed-message
+      @seed-question="completions"
+    ></seed-message>
+    
   </div>
 </template>
 
@@ -103,27 +69,23 @@
 import { onMounted, ref } from 'vue'
 import { deepseekModule } from '@apis'
 import { useRoute } from 'vue-router'
-
+import seedMessage from './seed-message.vue'
 defineOptions({
   name: 'deepseek-chat'
 })
 
 const route = useRoute()
-const question = ref<string>('天为什么是蓝色的？')
+
 const parentMessageId = ref<string>('')
 const conversations = ref<AI.Conversation[]>([])
-const inProgress = ref<boolean>(false)
+
 /**
  * 流式会话
  */
-const completions = async () => {
+const completions = async (question:string) => {
   setTimeout(async () => {
     conversations.value =
       await deepseekModule.getAllConversations()
-    console.log(
-      'conversations.value--conversations.value',
-      conversations.value
-    )
   }, 100)
 
   const model = route.query.model as string
@@ -133,11 +95,14 @@ const completions = async () => {
     requestParams: {
       model
     },
-    onProgress(partialResponse) {}
+    onProgress(partialResponse) {
+      console.log("deepSeekConfig.onProgress", partialResponse);
+      
+    }
   }
 
   const response = await deepseekModule.completions(
-    question.value,
+    question,
     questionOption
   )
   parentMessageId.value = response.parentMessageId
@@ -158,5 +123,10 @@ onMounted(() => {
   position: relative;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  .conversation-list {
+    flex: 1;
+  }
 }
 </style>

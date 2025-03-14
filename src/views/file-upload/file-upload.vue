@@ -1,9 +1,9 @@
 <template>
-    <div class="large-file-upload">
+    <div class="file-upload">
         <!-- 普通文件上传 带上传进度 -->
-        <el-upload class="large-file-uploader" :http-request="handleUploadFile" action="#" :show-file-list="false"
+        <el-upload class="file-uploader" :http-request="handleUploadFile" action="#" :show-file-list="false"
             :before-upload="beforeBeforeUpload">
-            <el-icon class="large-file-uploader-icon">
+            <el-icon class="file-uploader-icon">
                 <Plus />
             </el-icon>
         </el-upload>
@@ -11,12 +11,16 @@
 </template>
 
 <script lang='ts' setup>
-import { h, ref, nextTick } from 'vue'
-import { ElMessage, type UploadProps, type UploadRequestOptions, type IElMessageBox, ElMessageBox, ElProgress } from 'element-plus'
+import { h, ref, nextTick, onMounted } from 'vue'
+import { ElMessage, type UploadRawFile, type UploadRequestOptions, type IElMessageBox, ElMessageBox, ElProgress } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { uploadModule } from "@apis"
 
-const beforeBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
+/**
+ * 上传前的拦截
+ * @param {UploadRawFile} rawFile 上传文件
+ */
+const beforeBeforeUpload = (rawFile: UploadRawFile) => {
     // if (rawFile.size / 1024 / 1024 > 2) {
     //     ElMessage.error('文件大小不能超过 2MB!')
     //     return false
@@ -43,6 +47,7 @@ const handleUploadFile = async ({ file }: UploadRequestOptions) => {
         showCancelButton: false,
         showConfirmButton: false,
         showClose: false,
+        customClass: "file-uploader_messageBox",
         message: () =>
             h(ElProgress, {
                 type: "dashboard",
@@ -50,7 +55,6 @@ const handleUploadFile = async ({ file }: UploadRequestOptions) => {
                 percentage: progress.value,
             }),
     })
-
     const formData = new FormData()
     formData.append("file", file)
     const result = await uploadModule.uploadFile(formData, async (progressEvent) => {
@@ -66,9 +70,23 @@ const handleUploadFile = async ({ file }: UploadRequestOptions) => {
         ElMessage.success("上传成功")
     }
 }
+
+onMounted(() => {
+})
 </script>
+<style lang="less">
+.file-uploader_messageBox {
+    .el-message-box__content {
+        .el-message-box__container {
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+}
+</style>
 <style lang='less' scoped>
-:deep(.large-file-uploader .el-upload) {
+:deep(.file-uploader .el-upload) {
     border: 1px dashed var(--el-border-color);
     border-radius: 6px;
     cursor: pointer;
@@ -77,20 +95,15 @@ const handleUploadFile = async ({ file }: UploadRequestOptions) => {
     transition: var(--el-transition-duration-fast);
 }
 
-:deep(.large-file-uploader .el-upload):hover {
+:deep(.file-uploader .el-upload):hover {
     border-color: var(--el-color-primary);
 }
 
-:deep(.el-icon.large-file-uploader-icon) {
+:deep(.el-icon.file-uploader-icon) {
     font-size: 28px;
     color: #8c939d;
     width: 178px;
     height: 178px;
     text-align: center;
-}
-
-:deep(.el-message-box__message) {
-    display: flex;
-    justify-content: center;
 }
 </style>

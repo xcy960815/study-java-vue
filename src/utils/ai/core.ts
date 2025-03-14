@@ -135,9 +135,9 @@ export class Core {
    * @returns {HeadersInit}
    */
   protected get headers(): HeadersInit {
-    if (!this._apiKey) {
-      throw new AiError('没有设置apiKey')
-    }
+    // if (!this._apiKey) {
+    //   throw new AiError('没有设置apiKey')
+    // }
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this._apiKey}`
