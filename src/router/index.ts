@@ -206,10 +206,20 @@ export const routes: RouteRecordRaw[] = [
         path: '/upload/file',
         name: 'upload-file',
         component: () =>
-          import(`../views/file-upload/index.vue`),
+          import(`../views/file-upload/file-upload.vue`),
         meta: {
           title: '文件上传',
-          // icon: 'upload'
+          icon: 'Files'
+        }
+      },
+      {
+        path: '/upload/large-file',
+        name: 'upload-large-file',
+        component: () =>
+          import(`../views/file-upload/large-file-upload.vue`),
+        meta: {
+          title: '大文件切片上传',
+          icon: 'UploadFilled'
         }
       }
     ]
