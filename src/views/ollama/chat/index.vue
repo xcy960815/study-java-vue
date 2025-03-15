@@ -42,9 +42,6 @@ const generateStream = async () => {
   })
 }
 
-onMounted(() => {
-  console.log(1111)
-})
 </script>
 <style lang="less" scoped>
 .chat {

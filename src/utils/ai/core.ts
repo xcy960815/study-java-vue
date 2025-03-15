@@ -5,23 +5,48 @@ import {
 import { v4 as uuidv4 } from 'uuid'
 import Gpt3Tokenizer from 'gpt3-tokenizer'
 import { marked } from 'marked'
-import hljs from 'highlight.js'
+// import hljs from 'highlight.js'
+import Markdown from "markdown-it";
+import {type Options as MarkdownOptions} from "markdown-it"
+import highlight from "highlight.js";
 const BEGINWIDTHKEEPALIVE = ' : keep-alive'
 const BEGINWIDTHDATA = 'data:'
+const mdOptions: MarkdownOptions = {
+  linkify: true,
+  typographer: true,
+  breaks: true,
+  langPrefix: "language-",
+  // 代码高亮
+  highlight(content, lang) {
+    if (lang && highlight.getLanguage(lang)) {
+      try {
+        return (
+          `<pre class="hljs">
+              <code>
+                ${ highlight.highlight(lang, content, true).value}
+              </code>
+            </pre>`
+        );
+      } catch (__) {}
+    }
+    return "";
+  },
+};
 
-marked.setOptions({
-  renderer: new marked.Renderer(),
-  // highlight: function (code, _lang) {
-  //   return hljs.highlightAuto(code).value;
-  // },
-  // langPrefix: 'hljs language-',
-  pedantic: false,
-  gfm: true,
-  breaks: true
-  // sanitize: false,
-  // smartypants: false,
-  // xhtml: false,
-})
+export const markdown = new Markdown(mdOptions);
+// marked.setOptions({
+//   renderer: new marked.Renderer(),
+//   // highlight: function (code, _lang) {
+//   //   return hljs.highlightAuto(code).value;
+//   // },
+//   // langPrefix: 'hljs language-',
+//   pedantic: false,
+//   gfm: true,
+//   breaks: true
+//   // sanitize: false,
+//   // smartypants: false,
+//   // xhtml: false,
+// })
 /**
  * 基础类 有一些公共方法
  * @internal
@@ -363,7 +388,8 @@ export class Core {
   protected async _markdownToHtml(
     content: string
   ): Promise<string> {
-    const html = await marked.parse(content)
+    // const html = await marked.parse(content)
+    const html = await markdown.render(content)
     return html
   }
 

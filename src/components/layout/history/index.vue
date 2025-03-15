@@ -18,7 +18,10 @@ const router = useRouter()
 const route = useRoute()
 const systemInfoStore = useSystemInfoStore()
 
-const historyList = computed(() => systemInfoStore.historyList)
+const historyList = computed(() => {
+    console.log("historyList", systemInfoStore.historyList);
+    return systemInfoStore.historyList
+})
 
 
 onBeforeRouteUpdate((to) => {
