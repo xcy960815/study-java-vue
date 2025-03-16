@@ -88,6 +88,8 @@ export class Gpt extends Core {
       '',
       { ...options, messageId: userMessage.messageId }
     )
+    // 保存Ai助手消息
+    await this.upsertConversation(assistantMessage)
     // 包装成一个promise 发起请求
     const responsePromise =
       new Promise<AI.Gpt.AssistantConversation>(

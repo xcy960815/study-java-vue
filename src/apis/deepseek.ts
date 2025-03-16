@@ -5,8 +5,9 @@ const gpt = new Gpt({
   completionsUrl: '/deepseek/completions',
 //   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
-  markdown2Html: true
+  // markdown2Html: true
 })
+
 const buildRequestUrl = (url: string) => `/deepseek${url}`
 
 /**

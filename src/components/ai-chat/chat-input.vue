@@ -6,7 +6,7 @@
                 type="textarea" placeholder="任意问题"></el-input>
         </div>
         <div class="right-6 p-0.5 ml-5 flex items-center gap-2">
-            <el-button @click="seedQuestion" title="提交" class="submit-question-button rounded-lg p-0.5">
+            <el-button @click="completions" title="提交" class="submit-question-button rounded-lg p-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-5 h-5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -19,17 +19,15 @@
 
 <script lang='ts' setup>
 import { ref } from "vue"
-// const emits = defineEmits(['seed-question'])
 const emits = defineEmits<{
-  (event: 'seed-question', question: string): void
+    (event: 'completions', question: string): void
 }>()
 const question = ref<string>('天为什么是蓝色的？')
 /**
  * 发送问题
  */
-const seedQuestion = () => {
-    emits('seed-question', question.value)
-    question.value = ''
+const completions = () => {
+    emits('completions', question.value)
 }
 </script>
 <style lang='less' scoped></style>

@@ -15,7 +15,7 @@
       "@apis/*": ["./src/apis/*"],
       "@apis": ["./src/apis"],
       "@store": ["./src/store"],
-      "@components": ["./src/components/*"],
+      "@components/*": ["./src/components/*"],
       "@router": ["./src/router"],
       "@enums/*": ["./src/enums/*"]
     }
