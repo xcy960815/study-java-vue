@@ -14,6 +14,7 @@ declare module 'vue' {
     ChatInput: typeof import('./src/components/ai-chat/chat-input.vue')['default']
     ChatLoading: typeof import('./src/components/ai-chat/chat-loading.vue')['default']
     ChatLoding: typeof import('./src/components/ai-chat/chat-loding.vue')['default']
+    ChatThinking: typeof import('./src/components/ai-chat/chat-thinking.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']

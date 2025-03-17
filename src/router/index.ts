@@ -265,6 +265,9 @@ eventEmitter.on('login', () => {
 eventEmitter.on('logout', () => {
   const route = router.currentRoute.value
   const redirect = route.fullPath
+  // TODO 重定向之后 不会携带路径的参数 
+  console.log("redirect--redirect",router);
+  
   router.replace({
     path: '/login',
     query: {

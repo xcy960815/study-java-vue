@@ -1,5 +1,5 @@
 import { request } from '@utils/request'
-import { Gpt } from '@/utils/ai'
+import { Gpt } from '@utils/ai'
 
 const gpt = new Gpt({
   completionsUrl: '/deepseek/completions',
@@ -8,6 +8,11 @@ const gpt = new Gpt({
   // markdown2Html: true
 })
 
+/**
+ * 构建deepseek 请求地址
+ * @param {string} url 请求地址 
+ * @returns {string}
+ */
 const buildRequestUrl = (url: string) => `/deepseek${url}`
 
 /**

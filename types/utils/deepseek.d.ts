@@ -132,6 +132,9 @@ declare namespace AI {
     role: Role
     content: string
     messageId: string
+    /**
+     * 下次的父id 用于查找会话记录
+     */
     parentMessageId: string
   }
 
@@ -189,8 +192,9 @@ declare namespace AI {
       choices: Array<ResponseChoice>
     }
 
-    export interface AssistantConversation
-      extends AI.Conversation {
+    export interface AssistantConversation extends AI.Conversation {
+      thinking: boolean
+      done: boolean
       detail?: Response | null
     }
 
@@ -204,9 +208,7 @@ declare namespace AI {
       >
     }
     export interface GptCoreOptions extends CoreOptions {
-      requestParams?: Partial<
-        Omit<RequestParams, 'messages' | 'n' | 'stream'>
-      >
+      requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
   }
 

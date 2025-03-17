@@ -17,7 +17,8 @@
       "@store": ["./src/store"],
       "@components/*": ["./src/components/*"],
       "@router": ["./src/router"],
-      "@enums/*": ["./src/enums/*"]
+      "@enums/*": ["./src/enums/*"],
+      "@plugins/*": ["./src/plugins/*"]
     }
   }
 }

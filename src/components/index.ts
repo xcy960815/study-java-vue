@@ -4,6 +4,9 @@
 import HandleTooBar from './handle-toolbar/index.vue'
 import SvgIcon from './svg-icon/index.vue'
 import * as ElIcon from '@element-plus/icons-vue'
+// import * as IconPark  from "@icon-park/vue-next";
+// console.log("IconPark-IconPark",IconPark);
+// console.log("ElIcon--ElIcon",ElIcon);
 
 /**
  * 统一注册全局组件

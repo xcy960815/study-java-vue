@@ -1,6 +1,6 @@
 <template>
   <div class="deepseek-chat">
-    <ai-chat @completions="completions" :conversations="conversations"></ai-chat>
+    <ai-chat @completions="completions" @cancel-conversation="cancelConversation" :conversations="conversations"></ai-chat>
   </div>
 </template>
 
@@ -15,18 +15,17 @@ defineOptions({
 
 
 const route = useRoute()
+const model = route.query.model as string
 
 const parentMessageId = ref<string>('')
 
 const conversations = ref<AI.Conversation[]>([])
 
-const completions = async (question:string) => {
+const completions = async (question: string) => {
   setTimeout(async () => {
     conversations.value = await deepseekModule.getAllConversations()
   })
-
-  const model = route.query.model as string
-
+  
   const questionOption: AI.Gpt.GetAnswerOptions = {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
@@ -61,6 +60,7 @@ const cancelConversation = () => {
   width: 100%;
   display: flex;
   flex-direction: column;
+
   .conversation-list {
     flex: 1;
   }

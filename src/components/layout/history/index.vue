@@ -15,7 +15,9 @@ import { onMounted, computed } from "vue"
 import { useSystemInfoStore } from "@store"
 
 const router = useRouter()
+
 const route = useRoute()
+
 const systemInfoStore = useSystemInfoStore()
 
 const historyList = computed(() => {

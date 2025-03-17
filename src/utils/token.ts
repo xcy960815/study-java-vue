@@ -1,13 +1,20 @@
 const TOKENNAME = 'BearToken'
 
+const hasCookieStore = () => 'cookieStore' in window
+
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL
 /**
  * 获取请求头的token
  * @returns {Promise<string>}
  */
 export const getToken = async () => {
-  const tokenOption = await cookieStore.get(TOKENNAME)
-  return tokenOption?.value || ''
+  if (hasCookieStore()) {
+    const tokenOption = await cookieStore.get(TOKENNAME)
+    return tokenOption?.value || ''
+  } else {
+    return localStorage.getItem(TOKENNAME)
+  }
+
 }
 
 /**
@@ -16,11 +23,16 @@ export const getToken = async () => {
  * @returns {Promise<void>}
  */
 export const setToken = async (token: string) => {
-  return await cookieStore.set({
-    name: TOKENNAME,
-    value: token,
-    path: VITE_BASE_URL
-  })
+  if (hasCookieStore()) {
+    return await cookieStore.set({
+      name: TOKENNAME,
+      value: token,
+      path: VITE_BASE_URL
+    })
+  } else {
+    return localStorage.setItem(TOKENNAME, token)
+  }
+
 }
 
 /**
@@ -28,8 +40,12 @@ export const setToken = async (token: string) => {
  * @returns {Promise<void>}
  */
 export const removeToken = async () => {
-  return await cookieStore.delete({
-    name: TOKENNAME,
-    path: VITE_BASE_URL
-  })
+  if (hasCookieStore()) {
+    return await cookieStore.delete({
+      name: TOKENNAME,
+      path: VITE_BASE_URL
+    })
+  } else {
+    return localStorage.removeItem(TOKENNAME)
+  }
 }

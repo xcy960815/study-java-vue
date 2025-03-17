@@ -7,8 +7,9 @@ import Gpt3Tokenizer from 'gpt3-tokenizer'
 import { marked } from 'marked'
 // import hljs from 'highlight.js'
 import Markdown from "markdown-it";
-import {type Options as MarkdownOptions} from "markdown-it"
+import { type Options as MarkdownOptions } from "markdown-it"
 import highlight from "highlight.js";
+import { RoleEnum } from "./index"
 const BEGINWIDTHKEEPALIVE = ' : keep-alive'
 const BEGINWIDTHDATA = 'data:'
 const mdOptions: MarkdownOptions = {
@@ -23,11 +24,11 @@ const mdOptions: MarkdownOptions = {
         return (
           `<pre class="hljs">
               <code>
-                ${ highlight.highlight(lang, content, true).value}
+                ${highlight.highlight(lang, content, true).value}
               </code>
             </pre>`
         );
-      } catch (__) {}
+      } catch (__) { }
     }
     return "";
   },
@@ -184,14 +185,14 @@ export class Core {
   }
   /** 函数重载 start */
 
-  protected buildConversation(
-    role: 'user',
+  public buildConversation(
+    role: RoleEnum.USER,
     content: string,
     option: AI.GetAnswerOptions
   ): AI.Conversation
 
-  protected buildConversation(
-    role: 'assistant',
+  public buildConversation(
+    role: RoleEnum.ASSISTANT,
     content: string,
     option: AI.GetAnswerOptions
   ): AI.Gpt.AssistantConversation
@@ -205,7 +206,7 @@ export class Core {
    * @param { AI.GetAnswerOptions } option
    * @returns { AI.Conversation | AI.Gpt.AssistantConversation}
    */
-  protected buildConversation(
+  public buildConversation(
     role: 'user' | 'assistant',
     content: string,
     option: AI.GetAnswerOptions
@@ -224,7 +225,9 @@ export class Core {
         messageId: '',
         parentMessageId: option.messageId || this.uuid,
         content,
-        detail: null
+        detail: null,
+        thinking:true,
+        done: false
       }
     } else {
       throw new Error('Invalid role type')
@@ -233,7 +236,7 @@ export class Core {
 
   /**
    * 获取对话
-   * @param {string} id
+   * @param {string} id _messageStore 中的key
    * @returns {Promise<AI.Conversation | undefined>}
    */
   protected getConversation(

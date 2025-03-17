@@ -13,6 +13,8 @@
 import { computed, type PropType } from 'vue'
 import * as ElIcon from '@element-plus/icons-vue'
 import { svgIcons } from '@assets/svg-icons/index'
+// TODO  通过 svg-icon 组件统一显示icon
+// import * as IconPark from "@icon-park/vue-next"
 
 type ElIconName = keyof typeof ElIcon
 

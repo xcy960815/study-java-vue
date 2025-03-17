@@ -166,7 +166,8 @@ export default defineConfig(({ mode }) => {
     },
     logLevel: 'info',
     server: {
-      host: '0.0.0.0', // 确保服务监听所有网络接口
+      // host: '0.0.0.0', // 确保服务监听所有网络接口
+      host:true,
       port: VITE_PORT,
       proxy: {
         [VITE_API_DOMAIN_PREFIX]: {
@@ -269,6 +270,9 @@ export default defineConfig(({ mode }) => {
         ),
         '@enums': fileURLToPath(
           new URL('./src/enums', import.meta.url)
+        ),
+        '@plugins': fileURLToPath(
+          new URL('./src/plugins', import.meta.url)
         )
       }
     }

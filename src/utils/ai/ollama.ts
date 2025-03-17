@@ -1,6 +1,6 @@
-import { Core } from '../ai/core'
-
-const MODEL = 'gpt-3.5-turbo'
+import { Core } from './core'
+import { RoleEnum } from "./index"
+const MODEL = 'deepseek-chat'
 
 export class Ollama extends Core {
   /**
@@ -59,14 +59,6 @@ export class Ollama extends Core {
   }
 
   /**
-   * 当前模型的请求地址
-   * @returns {string}
-   */
-  private get completionsUrl() {
-    return `/ollama/chat`
-  }
-
-  /**
    * 获取答案
    * @param {string} question
    * @param {AI.Gpt.GetAnswerOptions} options
@@ -82,7 +74,7 @@ export class Ollama extends Core {
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
-      'user',
+      RoleEnum.USER,
       question,
       options
     )
@@ -90,10 +82,11 @@ export class Ollama extends Core {
     await this.upsertConversation(userMessage)
     // 构建Ai助手消息
     const assistantMessage = this.buildConversation(
-      'assistant',
+      RoleEnum.ASSISTANT,
       '',
       { ...options, messageId: userMessage.messageId }
     )
+
     // 包装成一个promise 发起请求
     const responseP =
       new Promise<AI.Gpt.AssistantConversation>(
@@ -109,11 +102,13 @@ export class Ollama extends Core {
                 if (data === '[DONE]') {
                   assistantMessage.content =
                     assistantMessage.content.trim()
-                  return resolve(assistantMessage)
+                  assistantMessage.done = true
+                  assistantMessage.thinking = false
+                  resolve(assistantMessage)
                 }
-                const response: AI.Gpt.Response =
-                  JSON.parse(data)
+                const response: AI.Gpt.Response = JSON.parse(data)
                 assistantMessage.messageId = response.id
+                assistantMessage.thinking = false
                 if (response?.choices?.length) {
                   const delta = response.choices[0].delta
                   if (delta?.content) {
@@ -164,12 +159,11 @@ export class Ollama extends Core {
             return reject(error)
           }
         }
-      ).then(async (Conversation) => {
-        return this.upsertConversation(Conversation).then(
+      ).then(async (conversation) => {
+        return this.upsertConversation(conversation).then(
           () => {
-            Conversation.parentMessageId =
-              Conversation.messageId
-            return Conversation
+            conversation.parentMessageId = conversation.messageId
+            return conversation
           }
         )
       })
