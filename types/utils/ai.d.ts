@@ -41,7 +41,7 @@ declare namespace AI {
     systemMessage?: string
     /** 超时时间 */
     milliseconds?: number
-    
+
     /** 是否将markdown语法转换成html */
     // markdown2Html?: boolean
 
@@ -152,8 +152,15 @@ declare namespace AI {
      * ai是否回答完毕
      */
     done?: boolean
+    /**
+     * 会话角色
+     */
     role: Role
+    /**
+     * 会话内容 
+     */
     content: string
+
     messageId: string
     /**
      * 下次的父id 用于查找会话记录
@@ -243,12 +250,8 @@ declare namespace AI {
     export interface GetAnswerOptions
       extends AI.GetAnswerOptions {
       systemPromptPrefix?: string
-      onProgress?: (
-        partialResponse: AssistantConversation
-      ) => void
-      requestParams?: Partial<
-        Omit<RequestParams, 'messages' | 'n' | 'stream'>
-      >
+      requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
+      onProgress?: (partialResponse: AssistantConversation) => void
     }
 
     /**

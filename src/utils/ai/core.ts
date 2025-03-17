@@ -210,8 +210,7 @@ export class Core {
       return {
         role: RoleEnum.User,
         messageId: option.messageId || this.uuid,
-        parentMessageId:
-          option.parentMessageId || this.uuid,
+        parentMessageId:option.parentMessageId || this.uuid,
         content
       }
     } else if (role === RoleEnum.Assistant) {
@@ -336,6 +335,7 @@ export class Core {
         statusText: response.statusText
       }
       const { error } = JSON.parse(await response.text())
+
       throw new AiError(error.message, errorOption)
     }
     /* 如果没有 onMessage 回调函数，直接返回 response */
@@ -383,11 +383,10 @@ export class Core {
    * @param {string} content
    * @returns {string}
    */
-  public  markdownToHtml(
+  public markdownToHtml(
     content: string
   ): string {
-    const html =  this._markdown.render(content)
-    return html
+    return this._markdown.render(content)
   }
 
   /**
@@ -448,7 +447,6 @@ export class Core {
   public cancelConversation(reson?: string) {
     this._abortController.abort(reson)
   }
-
   /**
    *
    * @returns {Promise<AI.Model[]>}
