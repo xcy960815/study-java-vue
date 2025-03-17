@@ -4,50 +4,20 @@ import {
 } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
 import Gpt3Tokenizer from 'gpt3-tokenizer'
-import { marked } from 'marked'
-// import hljs from 'highlight.js'
 import Markdown from "markdown-it";
 import { type Options as MarkdownOptions } from "markdown-it"
 import highlight from "highlight.js";
-import { RoleEnum } from "./index"
-const BEGINWIDTHKEEPALIVE = ' : keep-alive'
-const BEGINWIDTHDATA = 'data:'
-const mdOptions: MarkdownOptions = {
-  linkify: true,
-  typographer: true,
-  breaks: true,
-  langPrefix: "language-",
-  // 代码高亮
-  highlight(content, lang) {
-    if (lang && highlight.getLanguage(lang)) {
-      try {
-        return (
-          `<pre class="hljs">
-              <code>
-                ${highlight.highlight(lang, content, true).value}
-              </code>
-            </pre>`
-        );
-      } catch (__) { }
-    }
-    return "";
-  },
-};
 
-export const markdown = new Markdown(mdOptions);
-// marked.setOptions({
-//   renderer: new marked.Renderer(),
-//   // highlight: function (code, _lang) {
-//   //   return hljs.highlightAuto(code).value;
-//   // },
-//   // langPrefix: 'hljs language-',
-//   pedantic: false,
-//   gfm: true,
-//   breaks: true
-//   // sanitize: false,
-//   // smartypants: false,
-//   // xhtml: false,
-// })
+export enum RoleEnum {
+  User = 'user',
+  System = 'system',
+  Assistant = 'assistant'
+}
+const BEGINWIDTHKEEPALIVE = ' : keep-alive'
+
+const BEGINWIDTHDATA = 'data:'
+
+
 /**
  * 基础类 有一些公共方法
  * @internal
@@ -78,9 +48,11 @@ export class Core {
   /** 超时时间 */
   protected _milliseconds: number
   /** 是否开启markdown转html */
-  protected _markdown2Html: boolean
+  // protected _markdown2Html: boolean
   /* 当前模型的请求地址 */
   private _completionsUrl: string | undefined
+
+  private _markdown: Markdown
 
   constructor(options: AI.CoreOptions) {
     const {
@@ -94,7 +66,7 @@ export class Core {
       systemMessage,
       milliseconds,
       completionsUrl,
-      markdown2Html
+      // markdown2Html
     } = options
 
     this._apiKey = apiKey ?? ""
@@ -105,8 +77,7 @@ export class Core {
 
     this._debug = !!debug
 
-    this._withContent =
-      withContent === undefined ? true : withContent
+    this._withContent = withContent === undefined ? true : withContent
 
     this._maxModelTokens = maxModelTokens ?? 4096
 
@@ -118,17 +89,39 @@ export class Core {
       type: 'gpt3'
     })
 
-    this._systemMessage =
-      systemMessage ??
-      `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假`
+    this._systemMessage = systemMessage ?? `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假`
 
     this._abortController = new AbortController()
 
     this._milliseconds = milliseconds ?? 1000 * 60
 
-    this._markdown2Html = markdown2Html ?? false
+    // this._markdown2Html = markdown2Html ?? false
 
     this._completionsUrl = completionsUrl
+
+    this._markdown = new Markdown(this.markdownOptions);
+
+  }
+
+  private get markdownOptions(): MarkdownOptions {
+    return {
+      linkify: true,
+      typographer: true,
+      breaks: true,
+      langPrefix: "language-",
+      highlight(content, lang) {
+        if (lang && highlight.getLanguage(lang)) {
+          return (
+            `<pre class="hljs">
+              <code>
+                ${highlight.highlight(lang, content, true).value}
+              </code>
+            </pre>`
+          );
+        }
+        return "";
+      }
+    }
   }
 
   /**
@@ -161,9 +154,11 @@ export class Core {
    * @returns {HeadersInit}
    */
   protected get headers(): HeadersInit {
+
     // if (!this._apiKey) {
     //   throw new AiError('没有设置apiKey')
     // }
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${this._apiKey}`
@@ -186,13 +181,13 @@ export class Core {
   /** 函数重载 start */
 
   public buildConversation(
-    role: RoleEnum.USER,
+    role: RoleEnum.User,
     content: string,
     option: AI.GetAnswerOptions
   ): AI.Conversation
 
   public buildConversation(
-    role: RoleEnum.ASSISTANT,
+    role: RoleEnum.Assistant,
     content: string,
     option: AI.GetAnswerOptions
   ): AI.Gpt.AssistantConversation
@@ -201,32 +196,32 @@ export class Core {
 
   /**
    * 构建会话消息
-   * @param { "user" | "assistant" } role
+   * @param { RoleEnum.User | RoleEnum.Assistant } role
    * @param {string} content
    * @param { AI.GetAnswerOptions } option
    * @returns { AI.Conversation | AI.Gpt.AssistantConversation}
    */
   public buildConversation(
-    role: 'user' | 'assistant',
+    role: RoleEnum.User | RoleEnum.Assistant,
     content: string,
     option: AI.GetAnswerOptions
   ): AI.Conversation | AI.Gpt.AssistantConversation {
-    if (role === 'user') {
+    if (role === RoleEnum.User) {
       return {
-        role: 'user',
+        role: RoleEnum.User,
         messageId: option.messageId || this.uuid,
         parentMessageId:
           option.parentMessageId || this.uuid,
         content
       }
-    } else if (role === 'assistant') {
+    } else if (role === RoleEnum.Assistant) {
       return {
-        role: 'assistant',
+        role: RoleEnum.Assistant,
         messageId: '',
         parentMessageId: option.messageId || this.uuid,
         content,
         detail: null,
-        thinking:true,
+        thinking: true,
         done: false
       }
     } else {
@@ -388,11 +383,10 @@ export class Core {
    * @param {string} content
    * @returns {string}
    */
-  protected async _markdownToHtml(
+  public  markdownToHtml(
     content: string
-  ): Promise<string> {
-    // const html = await marked.parse(content)
-    const html = await markdown.render(content)
+  ): string {
+    const html =  this._markdown.render(content)
     return html
   }
 

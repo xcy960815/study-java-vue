@@ -18,7 +18,8 @@
       "@components/*": ["./src/components/*"],
       "@router": ["./src/router"],
       "@enums/*": ["./src/enums/*"],
-      "@plugins/*": ["./src/plugins/*"]
+      "@plugins/*": ["./src/plugins/*"],
+      "@types/*":["./types/*"]
     }
   }
 }

@@ -14,7 +14,6 @@ export const getToken = async () => {
   } else {
     return localStorage.getItem(TOKENNAME)
   }
-
 }
 
 /**
@@ -32,7 +31,6 @@ export const setToken = async (token: string) => {
   } else {
     return localStorage.setItem(TOKENNAME, token)
   }
-
 }
 
 /**
@@ -49,3 +47,4 @@ export const removeToken = async () => {
     return localStorage.removeItem(TOKENNAME)
   }
 }
+

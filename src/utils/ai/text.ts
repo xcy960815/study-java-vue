@@ -1,4 +1,4 @@
-import { Core } from './core'
+import { Core, RoleEnum } from './core'
 
 const MODEL = 'text-davinci-003'
 
@@ -88,13 +88,6 @@ export class Text extends Core {
     }
     return requestInit
   }
-  /**
-   * 当前模型的请求地址
-   * @returns {string}
-   */
-  private get completionsUrl() {
-    return '/v1/completions'
-  }
 
   /**
    * 发送请求到OpenAI
@@ -113,7 +106,7 @@ export class Text extends Core {
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
-      'user',
+      RoleEnum.User,
       text,
       options
     )
@@ -121,7 +114,7 @@ export class Text extends Core {
 
     /* 构建助手消息 */
     const assistantMessage = this.buildConversation(
-      'assistant',
+      RoleEnum.Assistant,
       '',
       { ...options, messageId: userMessage.messageId }
     )
@@ -149,13 +142,6 @@ export class Text extends Core {
                   // 这个模型返回的数据是一个字一个字返回的 需要累加操作
                   assistantMessage.content +=
                     response.choices[0].text
-                  if (this._markdown2Html) {
-                    this._markdownToHtml(
-                      assistantMessage.content
-                    ).then((content) => {
-                      assistantMessage.content = content
-                    })
-                  }
                   assistantMessage.detail = response
                   onProgress?.(assistantMessage)
                 }
@@ -186,14 +172,6 @@ export class Text extends Core {
               if (data?.choices?.length) {
                 assistantMessage.content =
                   data?.choices[0]?.text?.trim() || ''
-
-                if (this._markdown2Html) {
-                  this._markdownToHtml(
-                    assistantMessage.content
-                  ).then((content) => {
-                    assistantMessage.content = content
-                  })
-                }
               }
               assistantMessage.detail = data
 
@@ -232,9 +210,8 @@ export class Text extends Core {
     prompt: string
     maxTokens: number
   }> {
-    const systemMessage = `System:${
-      options.systemMessage || this._systemMessage
-    }${this._endToken}`
+    const systemMessage = `System:${options.systemMessage || this._systemMessage
+      }${this._endToken}`
     // 系统提示符前缀
     const systemPromptPrefix =
       options.systemPromptPrefix ||

@@ -1,5 +1,4 @@
-import { Core } from './core'
-import { RoleEnum } from "./index"
+import { Core, RoleEnum } from './core'
 const MODEL = 'deepseek-chat'
 
 export class Ollama extends Core {
@@ -38,9 +37,7 @@ export class Ollama extends Core {
       requestParams
     } = options
     // 获取用户和gpt历史对话记录
-    const { messages, maxTokens } =
-      await this._getConversationHistory(question, options)
-
+    const { messages, maxTokens } = await this._getConversationHistory(question, options)
     const body = {
       ...this._requestParams,
       ...requestParams,
@@ -74,7 +71,7 @@ export class Ollama extends Core {
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
-      RoleEnum.USER,
+      RoleEnum.User,
       question,
       options
     )
@@ -82,7 +79,7 @@ export class Ollama extends Core {
     await this.upsertConversation(userMessage)
     // 构建Ai助手消息
     const assistantMessage = this.buildConversation(
-      RoleEnum.ASSISTANT,
+      RoleEnum.Assistant,
       '',
       { ...options, messageId: userMessage.messageId }
     )
@@ -114,13 +111,6 @@ export class Ollama extends Core {
                   if (delta?.content) {
                     assistantMessage.content +=
                       delta.content
-                    if (this._markdown2Html) {
-                      this._markdownToHtml(
-                        assistantMessage.content
-                      ).then((content) => {
-                        assistantMessage.content = content
-                      })
-                    }
                   }
                   assistantMessage.detail = response
                   if (delta?.role) {
@@ -149,7 +139,7 @@ export class Ollama extends Core {
                 assistantMessage.content =
                   message?.content || ''
                 assistantMessage.role =
-                  message?.role || 'assistant'
+                  message?.role || RoleEnum.Assistant
               }
               assistantMessage.detail = data
               resolve(assistantMessage)
@@ -195,12 +185,12 @@ export class Ollama extends Core {
     // 当前系统和用户消息
     const messages: Array<AI.Gpt.RequestMessage> = [
       {
-        role: 'system',
+        role: RoleEnum.System,
         content: systemMessage || this._systemMessage
       },
       // 用户当前的问题
       {
-        role: 'user',
+        role: RoleEnum.User,
         content: text
       }
     ]

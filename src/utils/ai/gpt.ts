@@ -1,7 +1,6 @@
-import { Core } from './core'
+import { Core, RoleEnum } from './core'
 
 const MODEL = 'deepseek-chat'
-
 export class Gpt extends Core {
   /**
    * 请求参数
@@ -76,7 +75,7 @@ export class Gpt extends Core {
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
-      'user',
+      RoleEnum.User,
       question,
       options
     )
@@ -84,7 +83,7 @@ export class Gpt extends Core {
     await this.upsertConversation(userMessage)
     // 构建Ai助手消息
     const assistantMessage = this.buildConversation(
-      'assistant',
+      RoleEnum.Assistant,
       '',
       { ...options, messageId: userMessage.messageId }
     )
@@ -115,13 +114,6 @@ export class Gpt extends Core {
                   if (delta?.content) {
                     assistantMessage.content +=
                       delta.content
-                    if (this._markdown2Html) {
-                      this._markdownToHtml(
-                        assistantMessage.content
-                      ).then((content) => {
-                        assistantMessage.content = content
-                      })
-                    }
                   }
                   assistantMessage.detail = response
                   if (delta?.role) {
@@ -163,8 +155,7 @@ export class Gpt extends Core {
       ).then(async (conversation) => {
         return this.upsertConversation(conversation).then(
           () => {
-            conversation.parentMessageId =
-              conversation.messageId
+            conversation.parentMessageId = conversation.messageId
             return conversation
           }
         )
@@ -258,3 +249,4 @@ export class Gpt extends Core {
     return { messages, maxTokens }
   }
 }
+

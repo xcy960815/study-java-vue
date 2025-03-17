@@ -8,10 +8,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { OllamaModel, RoleEnum } from '@utils/ai'
+import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from "@components/ai-chat/index.vue"
-
+import { RoleEnum } from "@utils/ai/core"
+import { cloneDeep } from "lodash"
 defineOptions({
   name: 'ollama-chat'
 })
@@ -56,11 +57,10 @@ const parentMessageId = ref('')
  * 流式会话
  */
 const completions = async (question: string) => {
-
   setTimeout(async () => {
     conversations.value = await ollamaModel.getAllConversations()
     const userMessage = conversations.value[conversations.value.length - 1]
-    conversation.value = ollamaModel.buildConversation(RoleEnum.ASSISTANT, "", userMessage)
+    conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, "", userMessage)
   })
 
   const model = route.query.model as string
@@ -72,7 +72,8 @@ const completions = async (question: string) => {
       model
     },
     onProgress(partialResponse) {
-      conversation.value = JSON.parse(JSON.stringify(partialResponse))
+      partialResponse.content = ollamaModel.markdownToHtml(partialResponse.content)
+      conversation.value = cloneDeep(partialResponse)
     }
   }
 
@@ -93,10 +94,8 @@ const completions = async (question: string) => {
 .ollama-chat {
   position: relative;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
-  .ollama-chat {
-    display: flex;
-    flex-direction: column;
-  }
 }
 </style>

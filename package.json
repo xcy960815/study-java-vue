@@ -32,7 +32,7 @@
     "highlight.js": "^11.11.1",
     "jsencrypt": "^3.3.2",
     "lodash": "^4.17.21",
-    "markdown-it": "^14.1.0",
+    "markdown-it": "^13.0.1",
     "marked": "^15.0.6",
     "pinia": "^2.3.0",
     "pinia-plugin-persistedstate": "^4.2.0",

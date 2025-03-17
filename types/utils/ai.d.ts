@@ -1,4 +1,5 @@
 declare namespace AI {
+
   export type ClearablePromiseOptions = {
     milliseconds: number
     message?: string
@@ -26,9 +27,13 @@ declare namespace AI {
     organization?: string
     /** 是否开启debug模式 */
     debug?: boolean
-    /** @defaultValue 4096 **/
+    /**
+     * @defaultValue 4096
+     */
     maxModelTokens?: number
-    /** @defaultValue 1000 **/
+    /**
+     * @defaultValue 1000
+     */
     maxResponseTokens?: number
     /** 是否携带上下文 */
     withContent?: boolean
@@ -36,8 +41,10 @@ declare namespace AI {
     systemMessage?: string
     /** 超时时间 */
     milliseconds?: number
+    
     /** 是否将markdown语法转换成html */
-    markdown2Html?: boolean
+    // markdown2Html?: boolean
+
     // 自定义请求地址 要求跟chatgpt 返回的数据一样
     completionsUrl?: string
   }
@@ -54,13 +61,20 @@ declare namespace AI {
   /**
    * 公共角色枚举
    */
-  export const RoleEnum = {
-    System: 'system',
-    User: 'user',
-    Assistant: 'assistant'
-  } as const
+  // export const RoleEnum = {
+  //   System: 'system',
+  //   User: 'user',
+  //   Assistant: 'assistant'
+  // } as const
+  // type Role = (typeof RoleEnum)[keyof typeof RoleEnum]
+  // @link https://blog.csdn.net/wu_xianqiang/article/details/139464560
+  export const enum RoleEnum {
+    System = 'system',
+    User = 'user',
+    Assistant = 'assistant'
+  }
 
-  type Role = (typeof RoleEnum)[keyof typeof RoleEnum]
+  type Role = `${RoleEnum}`
 
   export interface Response {
     /** id */
@@ -74,6 +88,7 @@ declare namespace AI {
     /** 当用户设置stream:true时，不会返回 usage 字段 */
     usage?: ResponseUsage
   }
+
   /**
    * 公共请求参数
    */
@@ -123,12 +138,20 @@ declare namespace AI {
 
   /**
    * 系统、用户、助手（gpt）会话消息
-   * @param {Role} role 角色 system 给系统设置的人设 user用户 assistant 助手 gpt
+   * @param {Role} role 角色 system 给系统设置的人设 user 用户 assistant 助手 gpt
    * @param {string} content {string} 对话内容
    * @param {string} messageId 当前对话产生的id
    * @param parentMessageId 上次对话消息id
    */
   export interface Conversation {
+    /**
+     * ai 是否在思考中
+     */
+    thinking?: boolean
+    /**
+     * ai是否回答完毕
+     */
+    done?: boolean
     role: Role
     content: string
     messageId: string
@@ -193,8 +216,6 @@ declare namespace AI {
     }
 
     export interface AssistantConversation extends AI.Conversation {
-      thinking: boolean
-      done: boolean
       detail?: Response | null
     }
 

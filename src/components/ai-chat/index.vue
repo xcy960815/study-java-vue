@@ -1,6 +1,6 @@
 <template>
     <!-- 会话列表 -->
-    <div class="flex-1 mx-2 mt-20 mb-2 conversation-list">
+    <div class="flex-1 my-2 conversation-list">
         <!-- 历史会话 -->
         <div class="history-conversation group flex flex-col px-4 py-3 hover:bg-slate-100 rounded-lg"
             v-for="item of conversations" :key="item.messageId">
