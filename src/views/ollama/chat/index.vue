@@ -7,7 +7,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { renderMarkdownText } from '@plugins/markdown'
+import { onMounted, ref } from 'vue'
 import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from "@components/ai-chat/index.vue"
@@ -18,10 +19,7 @@ defineOptions({
 })
 const route = useRoute()
 
-const model = ref<string>(
-  (route.query.model as string) || 'deepseek-r1:14b'
-)
-
+const model = (route.query.model as string) || 'deepseek-r1:14b'
 /**
  * 角色别名
  */
@@ -41,13 +39,15 @@ const conversations = ref<AI.Conversation[]>([])
  */
 const conversation = ref<AI.Gpt.AssistantConversation | null>(null)
 
+/**
+ * ollama 模型
+ */
 const ollamaModel = new OllamaModel({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: "/ollama/completions",
-  // markdown2Html:true,
   requestParams: {
-    model: model.value,
+    model: model,
   }
 })
 
@@ -63,7 +63,7 @@ const completions = async (question: string) => {
     conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, "", userMessage)
   })
 
-  const model = route.query.model as string
+
 
   const questionOption: AI.Gpt.GetAnswerOptions = {
     parentMessageId: parentMessageId.value,
@@ -72,7 +72,7 @@ const completions = async (question: string) => {
       model
     },
     onProgress(partialResponse) {
-      partialResponse.content = ollamaModel.markdownToHtml(partialResponse.content)
+      partialResponse.content = renderMarkdownText(partialResponse.content)
       conversation.value = cloneDeep(partialResponse)
     }
   }

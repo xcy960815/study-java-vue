@@ -89,7 +89,7 @@ export class Core {
       type: 'gpt3'
     })
 
-    this._systemMessage = systemMessage ?? `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假`
+    this._systemMessage = systemMessage ?? `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`
 
     this._abortController = new AbortController()
 
@@ -105,21 +105,28 @@ export class Core {
 
   private get markdownOptions(): MarkdownOptions {
     return {
+      html: true,
       linkify: true,
-      typographer: true,
       breaks: true,
+      xhtmlOut: true,
+      typographer: true,
       langPrefix: "language-",
-      highlight(content, lang) {
+      highlight:(content, lang)=> {
         if (lang && highlight.getLanguage(lang)) {
-          return (
-            `<pre class="hljs">
-              <code>
-                ${highlight.highlight(lang, content, true).value}
-              </code>
-            </pre>`
-          );
+          try {
+            return (
+              '<pre class="hljs"><code>' +
+              highlight.highlight(lang, content, true).value +
+              "</code></pre>"
+            );
+          } catch (__) { }
         }
-        return "";
+    
+        return (
+          '<pre class="hljs"><code>' +
+          this._markdown.utils.escapeHtml(content) +
+          "</code></pre>"
+        );
       }
     }
   }
@@ -477,10 +484,4 @@ export class AiError extends Error {
       this.url = url
     }
   }
-}
-
-try {
-
-} catch (error: any) {
-  console.log(error)
 }

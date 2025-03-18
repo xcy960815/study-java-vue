@@ -1,24 +1,28 @@
 <template>
-  <svg
-    v-if="isExternalIcon"
-    aria-hidden="true"
-    class="svg-icon"
-  >
+  <svg v-if="isLocalIcon" :height="size" :width="size" aria-hidden="true" :class="`local-icon-${name}`"
+    class="svg-icon mr-1">
     <use :xlink:href="symbolId" :fill="color" />
   </svg>
-  <component class="svg-icon" v-else :is="name"></component>
+  <component :is="name" v-if="isIconParkIcon" class="svg-icon mr-1" :theme="theme" :size="size" :fill="color" />
 </template>
 
 <script lang="ts" setup>
+
 import { computed, type PropType } from 'vue'
-import * as ElIcon from '@element-plus/icons-vue'
-import { svgIcons } from '@assets/svg-icons/index'
-// TODO  通过 svg-icon 组件统一显示icon
-// import * as IconPark from "@icon-park/vue-next"
 
-type ElIconName = keyof typeof ElIcon
+import * as ElIcons from '@element-plus/icons-vue'
 
-type SvgIconName = (typeof svgIcons)[number]
+import { localIcons } from '@assets/svg-icons/index'
+
+import { type Theme } from "@icon-park/vue-next/lib/runtime";
+
+import * as IconParkAll from "@icon-park/vue-next";
+
+const { IconProvider, DEFAULT_ICON_CONFIGS, ...IconParkIcons } = IconParkAll
+
+type IconParkNames = Exclude<keyof typeof IconParkIcons, "IconProvider" | "DEFAULT_ICON_CONFIGS">
+
+type LocalIconNames = keyof typeof localIcons
 
 defineOptions({
   name: 'svg-icon'
@@ -30,12 +34,20 @@ const props = defineProps({
     default: 'icon'
   },
   name: {
-    type: String as PropType<SvgIconName | ElIconName>,
+    type: String as PropType<LocalIconNames | IconParkNames>,
     required: true
   },
   color: {
     type: String,
-    default: '#fff'
+    default: '#333'
+  },
+  theme: {
+    type: String as PropType<Theme>,
+    default: 'outline'
+  },
+  size: {
+    type: Number,
+    default: 14
   }
 })
 
@@ -43,10 +55,23 @@ const props = defineProps({
  * 判断是否为外部图标
  * @returns { boolean }
  */
-const isExternalIcon = computed(() => {
-  const iconNames = Object.keys(ElIcon)
-  const isExternal = !iconNames.includes(props.name)
-  return isExternal
+const isLocalIcon = computed(() => {
+  const iconNames = Object.keys(localIcons)
+  return iconNames.includes(props.name)
+})
+
+/**
+ * 判断是否为 ElIcon 图标
+ * @returns { boolean }
+ */
+const isElIcon = computed(() => {
+  const iconNames = Object.keys(ElIcons)
+  return iconNames.includes(props.name)
+})
+
+const isIconParkIcon = computed(() => {
+  const iconNames = Object.keys(IconParkIcons)
+  return iconNames.includes(props.name)
 })
 
 const symbolId = computed(
@@ -56,8 +81,6 @@ const symbolId = computed(
 
 <style lang="less" scoped>
 .svg-icon {
-  width: 1em;
-  height: 1em;
   vertical-align: middle;
   overflow: hidden;
   fill: currentColor;

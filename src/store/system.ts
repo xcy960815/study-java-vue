@@ -65,7 +65,7 @@ export const systemInfoStore = defineStore<
       const currenHistoryItem = this.historyList.find(
         (item) => item.fullPath === historyItem.fullPath
       )
-      console.log("currenHistoryItem--currenHistoryItem",currenHistoryItem);
+      // console.log("currenHistoryItem--currenHistoryItem",currenHistoryItem);
       
       if (!!currenHistoryItem) {
         const currenHistoryIndex = this.historyList.findIndex(

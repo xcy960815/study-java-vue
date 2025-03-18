@@ -1,4 +1,6 @@
-/** 该文件作用是修改系统主题颜色 */
+/** 
+ * 该文件作用是修改系统主题颜色
+ */
 
 import { type FormInstance } from 'element-plus'
 import { reactive, ref, nextTick } from 'vue'
@@ -82,7 +84,6 @@ export const setSystemTheme = () => {
     setStyleProperty(`--${name}-color`, DEFAULT)
     setStyleProperty(`--${name}-deep-color`, dark[2])
     setStyleProperty(`--${name}-deeper-color`, dark[4])
-
     // elementPlus主题色更新
     setStyleProperty(`--el-color-${name}`, DEFAULT)
     setStyleProperty(`--el-color-${name}-dark-2`, dark[2])

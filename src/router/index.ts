@@ -23,7 +23,8 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../views/login/index.vue`),
     meta: {
       title: '登录',
-      hidden: true
+      hidden: true,
+      icon:"Login"
     }
   },
   {
@@ -33,7 +34,8 @@ export const routes: RouteRecordRaw[] = [
       import(`../components/layout/index.vue`),
     meta: {
       title: '密码',
-      hidden: true
+      hidden: true,
+      icon:"password"
     },
     props: {
       content: defineAsyncComponent(
@@ -48,7 +50,7 @@ export const routes: RouteRecordRaw[] = [
       import(`../components/layout/index.vue`),
     meta: {
       title: '用户',
-      icon: 'user'
+      icon: 'User'
     },
     children: [
       {
@@ -56,7 +58,7 @@ export const routes: RouteRecordRaw[] = [
         name: 'userList',
         component: () => import(`../views/user/list.vue`),
         meta: {
-          icon: 'user-list',
+          icon: 'ListView',
           keepAlive: true,
           title: '用户列表'
         }
@@ -79,7 +81,7 @@ export const routes: RouteRecordRaw[] = [
       import(`../components/layout/index.vue`),
     meta: {
       title: '商品',
-      icon: 'goods-category'
+      icon: "Commodity"
     },
     children: [
       {
@@ -90,7 +92,7 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '商品列表',
           keepAlive: true,
-          icon: 'goods-category-list'
+          icon: 'ListView',
         }
       },
       {
@@ -112,7 +114,7 @@ export const routes: RouteRecordRaw[] = [
       import(`../components/layout/index.vue`),
     meta: {
       title: 'deepseek',
-      icon: 'deepseek'
+      icon: "Brain"
     },
     children: [
       {
@@ -122,7 +124,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/deepseek/models/index.vue`),
         meta: {
           title: '模型列表',
-          icon: 'deepseek'
+          icon: 'ListView',
         }
       },
       {
@@ -133,7 +135,8 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           keepAlive: true,
           title: '聊天',
-          icon: 'chat'
+          hidden:true,
+          icon: 'Intercom'
         }
       }
     ]
@@ -145,9 +148,8 @@ export const routes: RouteRecordRaw[] = [
       import(`../components/layout/index.vue`),
     meta: {
       title: 'ollama',
-      icon: 'ollama'
+      icon: "Brain"
     },
-
     children: [
       {
         path: '/ollama/models',
@@ -156,7 +158,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/ollama/models/index.vue`),
         meta: {
           title: '模型列表',
-          icon: 'ollama'
+          icon: 'ListView',
         }
       },
       {
@@ -166,8 +168,9 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/ollama/chat/index.vue`),
         meta: {
           keepAlive: true,
+          hidden:true,
           title: '会话',
-          icon: 'chat'
+          icon: 'Intercom'
         }
       }
     ]
@@ -178,7 +181,8 @@ export const routes: RouteRecordRaw[] = [
     component: () =>
       import(`../components/layout/index.vue`),
     meta: {
-      title: '超级管理员'
+      title: '超级管理员',
+      icon:"DataUser"
     },
     children: [
       {
@@ -188,7 +192,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/admin-user/list.vue`),
         meta: {
           title: '超级管理员列表',
-          icon: 'admin-user'
+          icon: 'ListView',
         }
       }
     ]
@@ -199,7 +203,8 @@ export const routes: RouteRecordRaw[] = [
     component: () =>
       import(`../components/layout/index.vue`),
     meta: {
-      title: '文件上传'
+      title: '文件上传',
+      icon:"InboxUploadR"
     },
     children: [
       {
@@ -209,7 +214,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/file-upload/file-upload.vue`),
         meta: {
           title: '文件上传',
-          icon: 'Files'
+          icon: 'Upload'
         }
       },
       {
@@ -219,7 +224,7 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/file-upload/large-file-upload.vue`),
         meta: {
           title: '大文件切片上传',
-          icon: 'UploadFilled'
+          icon: 'UploadThree'
         }
       }
     ]
