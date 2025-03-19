@@ -1,14 +1,14 @@
 <template>
   <div class="ollama-chat">
-    <ai-chat :role-alias="roleAlias" @completions="completions" :conversations="conversations"
-      :conversation="conversation">
+    <ai-chat :role-alias="roleAlias" @completions="completions" @cancel-conversation="cancelConversation"
+      :conversations="conversations" :conversation="conversation">
     </ai-chat>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { renderMarkdownText } from '@plugins/markdown'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from "@components/ai-chat/index.vue"
@@ -86,6 +86,13 @@ const completions = async (question: string) => {
     conversations.value = await ollamaModel.getAllConversations()
     parentMessageId.value = response.parentMessageId
   }
+}
+/**
+ * 取消当前会话
+ */
+const cancelConversation = () => {
+  ollamaModel.cancelConversation("用户手动取消会话")
+  conversation.value = null
 }
 
 

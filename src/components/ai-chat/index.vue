@@ -27,11 +27,11 @@
         </div>
     </div>
     <!-- 问题&发送消息按钮 -->
-    <chat-input v-bind="$attrs"></chat-input>
+    <chat-input :conversation="conversation" v-bind="$attrs"></chat-input>
 </template>
 
 <script lang='ts' setup>
-import { type PropType, watch } from "vue"
+import { type PropType } from "vue"
 import ChatThinking from "./chat-thinking.vue"
 import ChatCopy from "./chat-copy.vue"
 import ChatInput from "./chat-input.vue"

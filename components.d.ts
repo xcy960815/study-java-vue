@@ -9,11 +9,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AiChat: typeof import('./src/components/ai-chat/index.vue')['default']
-    C: typeof import('./src/components/ai-chat/c.vue')['default']
     ChatCopy: typeof import('./src/components/ai-chat/chat-copy.vue')['default']
     ChatInput: typeof import('./src/components/ai-chat/chat-input.vue')['default']
-    ChatLoading: typeof import('./src/components/ai-chat/chat-loading.vue')['default']
-    ChatLoding: typeof import('./src/components/ai-chat/chat-loding.vue')['default']
     ChatThinking: typeof import('./src/components/ai-chat/chat-thinking.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
@@ -55,7 +52,6 @@ declare module 'vue' {
     MenuItem: typeof import('./src/components/layout/menu/menu-item.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SeedMessage: typeof import('./src/components/ai-chat/seed-message.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
     Themen: typeof import('./src/components/layout/header/themen.vue')['default']
   }

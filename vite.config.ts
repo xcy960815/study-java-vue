@@ -72,8 +72,28 @@ export default defineConfig(({ mode }) => {
                 return 'lodash'
               }
               if (id.includes('@element-plus/icons-vue')) {
-                // 单独拆分 icons
+                // 单独拆分 element-plus/icons-vue
                 return 'icons-vue'
+              }
+              if (id.includes('@icon-park/vue-next')) {
+                // 单独拆分 icon-park
+                return 'icon-park'
+              }
+              if (id.includes('axios')) {
+                // axios 单独打包
+                return 'axios'
+              }
+              if (id.includes('gpt3-tokenizer')) {
+                // gpt3-tokenizer 单独打包
+                return 'gpt3-tokenizer'
+              }
+              if (id.includes("katex")) {
+                // katex 单独打包
+                return 'katex'
+              }
+              if (id.includes("highlight")) {
+                // highlight 单独打包
+                return 'highlight'
               }
               if (id.includes('element-plus')) {
                 // element-plus 单独打包
@@ -118,13 +138,12 @@ export default defineConfig(({ mode }) => {
                 originalFileName.split('/')
               const parentname =
                 originalFileNames[
-                  originalFileNames.length - 2
+                originalFileNames.length - 2
                 ]
               // css文件单独输出到css文件夹
               if (name?.endsWith('.css')) {
-                return `assets/css/${
-                  parentname ? parentname + '-' : ''
-                }[name]-[hash].css`
+                return `assets/css/${parentname ? parentname + '-' : ''
+                  }[name]-[hash].css`
               }
               // 图片文件单独输出到img文件夹
               else if (
@@ -132,15 +151,13 @@ export default defineConfig(({ mode }) => {
                   name?.endsWith(ext)
                 )
               ) {
-                return `assets/img/${
-                  parentname ? parentname + '-' : ''
-                }[name}]-[hash].[ext]`
+                return `assets/img/${parentname ? parentname + '-' : ''
+                  }[name}]-[hash].[ext]`
               }
               // 其他资源输出到assets文件夹
               else {
-                return `assets/${
-                  parentname ? parentname + '-' : ''
-                }[name]-[hash].[ext]`
+                return `assets/${parentname ? parentname + '-' : ''
+                  }[name]-[hash].[ext]`
               }
             } else {
               // css文件单独输出到css文件夹
@@ -167,7 +184,7 @@ export default defineConfig(({ mode }) => {
     logLevel: 'info',
     server: {
       // host: '0.0.0.0', // 确保服务监听所有网络接口
-      host:true,
+      host: true,
       port: VITE_PORT,
       proxy: {
         [VITE_API_DOMAIN_PREFIX]: {

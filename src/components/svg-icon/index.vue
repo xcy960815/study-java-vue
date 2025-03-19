@@ -1,9 +1,10 @@
 <template>
-  <svg v-if="isLocalIcon" :height="size" :width="size" aria-hidden="true" :class="`local-icon-${name}`"
-    class="svg-icon mr-1">
-    <use :xlink:href="symbolId" :fill="color" />
-  </svg>
-  <component :is="name" v-if="isIconParkIcon" class="svg-icon mr-1" :theme="theme" :size="size" :fill="color" />
+  <div class="svg-icon mr-1">
+    <svg v-if="isLocalIcon" :height="size" :width="size" aria-hidden="true" :class="`local-icon-${name}`">
+      <use :xlink:href="symbolId" :fill="fill" />
+    </svg>
+    <component :is="name" v-if="isIconParkIcon" :theme="theme" :size="size" :fill="fill" />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -12,7 +13,7 @@ import { computed, type PropType } from 'vue'
 
 import * as ElIcons from '@element-plus/icons-vue'
 
-import { localIcons } from '@assets/svg-icons/index'
+import { localIcons } from '@assets/svg-icons'
 
 import { type Theme } from "@icon-park/vue-next/lib/runtime";
 
@@ -37,10 +38,18 @@ const props = defineProps({
     type: String as PropType<LocalIconNames | IconParkNames>,
     required: true
   },
-  color: {
+  // fill: {
+  //   type: [String, Array] as PropType<string | string[]>,
+  //   default: ['#333', '#eeff2f'] //'#333'
+  // },
+  fill: {
     type: String,
     default: '#333'
   },
+  // theme: {
+  //   type: String as PropType<Theme>,
+  //   default: 'two-tone'
+  // },
   theme: {
     type: String as PropType<Theme>,
     default: 'outline'

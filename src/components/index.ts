@@ -3,7 +3,7 @@
  */
 import HandleTooBar from './handle-toolbar/index.vue'
 import SvgIcon from './svg-icon/index.vue'
-import * as ElIcon from '@element-plus/icons-vue'
+// import * as ElIcon from '@element-plus/icons-vue'
 import * as IconParkAll from "@icon-park/vue-next";
 
 const { IconProvider, DEFAULT_ICON_CONFIGS, ...IconPark } = IconParkAll
@@ -19,9 +19,9 @@ export const registerGlobalComponents = {
     // SvgIcon 组件
     app.component(SvgIcon.name!, SvgIcon)
     // element-plus 图标
-    for (const [key, component] of Object.entries(ElIcon)) {
-      app.component(key, component)
-    }
+    // for (const [key, component] of Object.entries(ElIcon)) {
+    //   app.component(key, component)
+    // }
     // icon-park 图标
     for (const [key, component] of Object.entries(IconPark)) {
       app.component(key, component)

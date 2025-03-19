@@ -1,4 +1,5 @@
-import { Core, RoleEnum } from './core'
+import {Core, RoleEnum} from './core'
+
 const MODEL = 'deepseek-chat'
 
 export class Ollama extends Core {
@@ -33,7 +34,7 @@ export class Ollama extends Core {
   ): Promise<AI.FetchRequestInit> {
     const {
       onProgress,
-      stream = onProgress ? true : false,
+      stream = !!onProgress,
       requestParams
     } = options
     // 获取用户和gpt历史对话记录
@@ -46,13 +47,12 @@ export class Ollama extends Core {
       max_tokens: maxTokens
     }
 
-    const requestInit: AI.FetchRequestInit = {
+    return {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
       signal: this._abortController.signal
     }
-    return requestInit
   }
 
   /**
@@ -67,7 +67,7 @@ export class Ollama extends Core {
   ): Promise<AI.Gpt.AssistantConversation> {
     const {
       onProgress,
-      stream = onProgress ? true : false
+      stream = !!onProgress
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
@@ -157,6 +157,11 @@ export class Ollama extends Core {
           }
         )
       })
+      // .finally(() => {
+      //   console.log('finally');
+
+      // })
+      // TODO 用户手动取消之后保留会话
     return this.clearablePromise(responseP, {
       milliseconds: this._milliseconds,
       message: ``
@@ -166,8 +171,11 @@ export class Ollama extends Core {
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<AI.Gpt.SendMessageOptions>} options
-   * @returns {Promise<{ messages: AI.Gpt.Message[]; }>}
+   * @param {Required<AI.Gpt.GetAnswerOptions>} options
+   * @returns {Promise<{
+   * messages: AI.Gpt.RequestMessage[]
+   * text:string
+   * }>}
    */
   private async _getConversationHistory(
     text: string,

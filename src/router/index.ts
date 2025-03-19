@@ -262,6 +262,8 @@ eventEmitter.on('token-invalid', () => {
 eventEmitter.on('login', () => {
   const redirect = router.currentRoute.value.query
     .redirect as string
+    console.log("login--redirect",redirect);
+
   router.replace({
     path: redirect || '/user/list'
   })
@@ -270,9 +272,9 @@ eventEmitter.on('login', () => {
 eventEmitter.on('logout', () => {
   const route = router.currentRoute.value
   const redirect = route.fullPath
-  // TODO 重定向之后 不会携带路径的参数 
-  console.log("redirect--redirect",router);
-  
+  // TODO 重定向之后 不会携带路径的参数
+  console.log("logout--redirect",router);
+
   router.replace({
     path: '/login',
     query: {
@@ -301,7 +303,7 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
-router.afterEach((to, from) => {
+router.afterEach((_to, _from) => {
   // console.log(to, from)
   // console.log('afterEach')
 })
