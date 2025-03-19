@@ -3,16 +3,13 @@ import {
   type EventSourceParser
 } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
-import Gpt3Tokenizer from 'gpt3-tokenizer'
+// import Gpt3Tokenizer from 'gpt3-tokenizer'
+import { encode } from "gpt-tokenizer";
 import Markdown from "markdown-it";
 import { type Options as MarkdownOptions } from "markdown-it"
 import highlight from "highlight.js";
+import { RoleEnum } from "@enums"
 
-export enum RoleEnum {
-  User = 'user',
-  System = 'system',
-  Assistant = 'assistant'
-}
 const BEGINWIDTHKEEPALIVE = ' : keep-alive'
 
 const BEGINWIDTHDATA = 'data:'
@@ -44,7 +41,7 @@ export class Core {
   /** 取消fetch请求控制器 */
   protected _abortController: AbortController
   /** 用于计算token */
-  protected _gpt3Tokenizer: Gpt3Tokenizer
+  // protected _gpt3Tokenizer: Gpt3Tokenizer
   /** 超时时间 */
   protected _milliseconds: number
   /** 是否开启markdown转html */
@@ -85,9 +82,9 @@ export class Core {
 
     this._messageStore = new Map<string, AI.Conversation>()
 
-    this._gpt3Tokenizer = new Gpt3Tokenizer({
-      type: 'gpt3'
-    })
+    // this._gpt3Tokenizer = new Gpt3Tokenizer({
+    //   type: 'gpt3'
+    // })
 
     this._systemMessage = systemMessage ?? `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`
 
@@ -111,7 +108,7 @@ export class Core {
       xhtmlOut: true,
       typographer: true,
       langPrefix: "language-",
-      highlight:(content, lang)=> {
+      highlight: (content, lang) => {
         if (lang && highlight.getLanguage(lang)) {
           try {
             return (
@@ -121,7 +118,7 @@ export class Core {
             );
           } catch (__) { }
         }
-    
+
         return (
           '<pre class="hljs"><code>' +
           this._markdown.utils.escapeHtml(content) +
@@ -180,10 +177,11 @@ export class Core {
    * @param {string} text
    * @returns {Promise<number>}
    */
-  protected async getTokenCount(
+  protected getTokenCount(
     text: string
-  ): Promise<number> {
-    return await this._gpt3Tokenizer.encode(text).bpe.length
+  ): number {
+    // return await this._gpt3Tokenizer.encode(text).bpe.length
+    return encode(text).length
   }
   /** 函数重载 start */
 
@@ -217,7 +215,7 @@ export class Core {
       return {
         role: RoleEnum.User,
         messageId: option.messageId || this.uuid,
-        parentMessageId:option.parentMessageId || this.uuid,
+        parentMessageId: option.parentMessageId || this.uuid,
         content
       }
     } else if (role === RoleEnum.Assistant) {

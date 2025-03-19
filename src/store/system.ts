@@ -1,15 +1,13 @@
 import { defineStore } from 'pinia'
-import { Names } from './store-name'
+import { StoreNames } from '@enums'
 import router from "@router"
 
-// import { useRouter, type RouteLocationNormalizedLoadedGeneric } from "vue-router"
-
 export const systemInfoStore = defineStore<
-  Names.SYSTEM,
+  StoreNames.SYSTEM,
   BaseStore.State<SystemStore.State>,
   BaseStore.Getters<SystemStore.State, SystemStore.Getters>,
   BaseStore.Actions<SystemStore.State, SystemStore.Actions>
->(Names.SYSTEM, {
+>(StoreNames.SYSTEM, {
   state: () => {
     return {
       openMenuFlag: true,
@@ -62,11 +60,13 @@ export const systemInfoStore = defineStore<
      * @param {RouteLocationNormalizedLoadedGeneric} historyItem 
      */
     addHistoryItem(historyItem) {
+      // 登录页面不需要记录
+      if (historyItem.path === "/login") return
       const currenHistoryItem = this.historyList.find(
         (item) => item.fullPath === historyItem.fullPath
       )
-      // console.log("currenHistoryItem--currenHistoryItem",currenHistoryItem);
-      
+      // console.log("this.historyList", JSON.parse(JSON.stringify(this.historyList)));
+      // if(historyItem.openMore) return
       if (!!currenHistoryItem) {
         const currenHistoryIndex = this.historyList.findIndex(
           (item) => item.fullPath === currenHistoryItem.fullPath

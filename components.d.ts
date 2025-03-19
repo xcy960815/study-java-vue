@@ -47,6 +47,7 @@ declare module 'vue' {
     HandleToolbar: typeof import('./src/components/handle-toolbar/index.vue')['default']
     Header: typeof import('./src/components/layout/header/index.vue')['default']
     History: typeof import('./src/components/layout/history/index.vue')['default']
+    Icon: typeof import('./src/components/icon/index.vue')['default']
     Layout: typeof import('./src/components/layout/index.vue')['default']
     Menu: typeof import('./src/components/layout/menu/index.vue')['default']
     MenuItem: typeof import('./src/components/layout/menu/menu-item.vue')['default']

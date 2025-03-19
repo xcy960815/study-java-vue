@@ -5,7 +5,7 @@
 /**
  * 当前文件下的svg文件已经在vite-config中注册了 现在做的是 让路由的meta下面的icon 支持提示
  */
-const localIcons = {
+const svgIcons = {
   user: 'user',
   lock: 'lock',
   'goods-category': 'goods-category',
@@ -22,4 +22,4 @@ const localIcons = {
   chat: 'chat'
 }
 
-export { localIcons }
+export { svgIcons }

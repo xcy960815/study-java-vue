@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
-import { Names } from './store-name'
+import { StoreNames } from '@enums'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from '@/utils/event-emits'
 import { loginModule } from '@apis'
 import { setToken, removeToken } from '@utils/token'
 
-export const loginStore = defineStore(Names.LOGIN, {
+export const loginStore = defineStore(StoreNames.LOGIN, {
   state: () => {
     return {}
   },

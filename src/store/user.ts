@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { Names } from './store-name'
+import { StoreNames } from '@enums'
 import { userModule } from '@apis'
 
-export const userInfoStore = defineStore(Names.USER, {
+export const userInfoStore = defineStore(StoreNames.USER, {
   state: () => {
     return {
       address: '',

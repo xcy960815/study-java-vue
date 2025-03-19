@@ -39,7 +39,7 @@ const allowClosable = (historyItem: RouteLocationNormalizedLoadedGeneric) => {
  * @param {RouteLocationNormalizedLoadedGeneric} historyItem 
  */
 const tagType = (historyItem: RouteLocationNormalizedLoadedGeneric) => {
-    return historyItem.path === router.currentRoute.value.path ? 'success' : 'info'
+    return historyItem.fullPath === router.currentRoute.value.fullPath ? 'success' : 'info'
 }
 
 /**

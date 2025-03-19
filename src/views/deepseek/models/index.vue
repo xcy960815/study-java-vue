@@ -25,6 +25,8 @@ import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { ref, reactive, onMounted } from 'vue'
 import { deepseekModule } from '@apis'
 import { useRouter } from 'vue-router'
+import { useSystemInfoStore } from "@store"
+const systemInfoStore = useSystemInfoStore()
 const router = useRouter()
 const showSearch = ref(false)
 
@@ -39,6 +41,12 @@ const handleStartChat = (row: DeepSeekDto.ModelOption) => {
   router.push({
     path: '/deepseek/chat',
     query: row ? { model: row.id } : {}
+  }).then(res => {
+    console.log("res",res);
+
+  })
+  setTimeout(() => {
+    systemInfoStore.addHistoryItem
   })
 }
 

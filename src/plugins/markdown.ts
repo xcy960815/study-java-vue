@@ -8,8 +8,7 @@ import { preWrapperPlugin } from './pre-wrapper'
 
 import markdownItKatex from '@vscode/markdown-it-katex'
 
-// @ts-ignore TODO 添加的全局 module 不生效
-import splitAtDelimiters from 'katex/contrib/auto-render/splitAtDelimiters.js'
+import splitAtDelimiters from 'katex/contrib/auto-render/splitAtDelimiters'
 
 import 'katex/dist/katex.min.css'
 
@@ -41,8 +40,7 @@ const transformMathMarkdown = (markdownText: string) => {
       display: false
     }
   ])
-  // @ts-ignore
-  return data.reduce((result, segment: any) => {
+  return data.reduce((result, segment) => {
     if (segment.type === 'text') {
       return result + segment.data
     }

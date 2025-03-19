@@ -1,5 +1,5 @@
-import {Core, RoleEnum} from './core'
-
+import { Core } from './core'
+import { RoleEnum } from "@enums"
 const MODEL = 'deepseek-chat'
 
 export class Ollama extends Core {
@@ -157,11 +157,11 @@ export class Ollama extends Core {
           }
         )
       })
-      // .finally(() => {
-      //   console.log('finally');
+    // .finally(() => {
+    //   console.log('finally');
 
-      // })
-      // TODO 用户手动取消之后保留会话
+    // })
+    // TODO 用户手动取消之后保留会话
     return this.clearablePromise(responseP, {
       milliseconds: this._milliseconds,
       message: ``

@@ -63,6 +63,7 @@ export default defineConfig(({ mode }) => {
     base: VITE_BASE_URL,
     envDir: './env', // 环境变量目录 若不设置会在 import.meta.env 中取不到变量
     build: {
+      chunkSizeWarningLimit: 1024, // 将警告体积变成1MB
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -102,6 +103,10 @@ export default defineConfig(({ mode }) => {
               if (id.includes('vue')) {
                 // vue 单独打包
                 return 'vue'
+              }
+              if (id.includes('gpt-tokenizer')) {
+                // gpt-tokenizer 单独打包
+                return 'gpt-tokenizer'
               }
               return 'vendor' // 其他库放在 vendor.js 里
             }
@@ -291,9 +296,9 @@ export default defineConfig(({ mode }) => {
         '@plugins': fileURLToPath(
           new URL('./src/plugins', import.meta.url)
         ),
-        '@types': fileURLToPath(
-          new URL('./types', import.meta.url)
-        )
+        // '@types': fileURLToPath(
+        //   new URL('./types', import.meta.url)
+        // )
       }
     }
   }

@@ -12,7 +12,7 @@ import { ref } from 'vue'
 import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from "@components/ai-chat/index.vue"
-import { RoleEnum } from "@utils/ai/core"
+import { RoleEnum } from "@enums"
 import { cloneDeep } from "lodash"
 defineOptions({
   name: 'ollama-chat'

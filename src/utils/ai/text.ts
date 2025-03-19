@@ -1,5 +1,5 @@
-import { Core, RoleEnum } from './core'
-
+import { Core } from './core'
+import { RoleEnum } from "@enums"
 const MODEL = 'text-davinci-003'
 
 const USER_PROMPT_PREFIX = 'User'

@@ -58,7 +58,8 @@ export const routes: RouteRecordRaw[] = [
         name: 'userList',
         component: () => import(`../views/user/list.vue`),
         meta: {
-          icon: 'ListView',
+          // icon: 'ListView',
+          icon:"other",
           keepAlive: true,
           title: '用户列表'
         }
@@ -133,6 +134,7 @@ export const routes: RouteRecordRaw[] = [
         component: () =>
           import(`../views/deepseek/chat/index.vue`),
         meta: {
+          openMore:true,
           keepAlive: true,
           title: '聊天',
           hidden:true,
@@ -167,6 +169,7 @@ export const routes: RouteRecordRaw[] = [
         component: () =>
           import(`../views/ollama/chat/index.vue`),
         meta: {
+          openMore:true,
           keepAlive: true,
           hidden:true,
           title: '会话',
@@ -262,8 +265,7 @@ eventEmitter.on('token-invalid', () => {
 eventEmitter.on('login', () => {
   const redirect = router.currentRoute.value.query
     .redirect as string
-    console.log("login--redirect",redirect);
-
+    console.log("登录",redirect);
   router.replace({
     path: redirect || '/user/list'
   })
@@ -273,7 +275,7 @@ eventEmitter.on('logout', () => {
   const route = router.currentRoute.value
   const redirect = route.fullPath
   // TODO 重定向之后 不会携带路径的参数
-  console.log("logout--redirect",router);
+  console.log("退出登录",router);
 
   router.replace({
     path: '/login',

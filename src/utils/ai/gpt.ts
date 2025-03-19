@@ -1,5 +1,5 @@
-import { Core, RoleEnum } from './core'
-
+import { Core } from './core'
+import { RoleEnum } from "@enums"
 const MODEL = 'deepseek-chat'
 export class Gpt extends Core {
   /**

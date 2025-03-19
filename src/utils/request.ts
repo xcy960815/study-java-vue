@@ -2,7 +2,7 @@ import axios, { type AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
 import { getToken, removeToken } from './token'
-import { loginEnum } from '@enums/login'
+import { loginEnum } from '@/enums'
 
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 

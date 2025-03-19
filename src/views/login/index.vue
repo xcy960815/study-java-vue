@@ -1,23 +1,10 @@
 <template>
-  <div
-    class="login-page w-screen h-screen flex items-center justify-center"
-  >
+  <div class="login-page w-screen h-screen flex items-center justify-center">
     <canvas class="login-backage" id="cvs"></canvas>
-    <el-form
-      ref="loginFormRef"
-      :model="loginFormData"
-      :rules="loginFormRules"
-      class="login-form"
-    >
+    <el-form ref="loginFormRef" :model="loginFormData" :rules="loginFormRules" class="login-form">
       <h3 class="login-title">{{ viteAppTitle }}</h3>
       <el-form-item prop="username">
-        <el-input
-          v-model="loginFormData.username"
-          type="text"
-          auto-complete="off"
-          size="large"
-          placeholder="账号"
-        >
+        <el-input v-model="loginFormData.username" type="text" auto-complete="off" size="large" placeholder="账号">
           <template #prefix>
             <el-icon class="el-input__icon">
               <User />
@@ -26,24 +13,15 @@
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input
-          v-model="loginFormData.password"
-          :type="passwordInputType"
-          size="large"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter.native="handleLogin"
-        >
+        <el-input v-model="loginFormData.password" :type="passwordInputType" size="large" auto-complete="off"
+          placeholder="密码" @keyup.enter.native="handleLogin">
           <template #prefix>
             <el-icon class="el-input__icon">
               <Lock />
             </el-icon>
           </template>
           <template #suffix>
-            <el-icon
-              class="el-input__icon_view"
-              @click="handleClickPasswordIcon"
-            >
+            <el-icon class="el-input__icon_view" @click="handleClickPasswordIcon">
               <View v-show="showVievIcon" />
               <Hide v-show="showHideIcon" />
             </el-icon>
@@ -52,40 +30,21 @@
       </el-form-item>
 
       <el-form-item prop="captcha">
-        <el-input
-          class="captcha-input flex-1"
-          v-model="loginFormData.captcha"
-          size="large"
-          placeholder="验证码"
-          @keyup.enter.native="handleLogin"
-        >
+        <el-input class="captcha-input flex-1" v-model="loginFormData.captcha" size="large" placeholder="验证码"
+          @keyup.enter.native="handleLogin">
         </el-input>
-        <el-image
-          @click="handleGetCaptcha"
-          class="captcha-image cursor-pointer h-10 flex-1 ml-1"
-          fill="fill"
-          :src="captchaUrl"
-        >
+        <el-image @click="handleGetCaptcha" class="captcha-image cursor-pointer h-10 flex-1 ml-1" fill="fill"
+          :src="captchaUrl">
           <template #error>
             <span>图片加载失败</span>
           </template>
         </el-image>
       </el-form-item>
       <!-- 记住密码 -->
-      <el-checkbox
-        class="remember-checkbox mb-[25px]"
-        v-model="loginFormData.rememberMe"
-        >记住密码</el-checkbox
-      >
+      <el-checkbox class="remember-checkbox mb-[25px]" v-model="loginFormData.rememberMe">记住密码</el-checkbox>
       <el-form-item style="width: 100%">
-        <el-button
-          :disabled="loginButtonDisabled"
-          :loading="logining"
-          size="default"
-          type="primary"
-          style="width: 100%"
-          @click="handleLogin"
-        >
+        <el-button :disabled="loginButtonDisabled" :loading="logining" size="default" type="primary" style="width: 100%"
+          @click="handleLogin">
           <span v-if="!logining">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
@@ -103,6 +62,7 @@ import { encryptByRsa } from '@utils/encryption'
 import MD5 from 'MD5'
 import { initBackground } from './background'
 import { loginModule } from '@apis'
+
 initBackground()
 
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
@@ -203,6 +163,7 @@ const handleGetCaptcha = async () => {
     captchaUrl.value = result.data
   }
 }
+
 
 onMounted(() => {
   handleGetCaptcha()

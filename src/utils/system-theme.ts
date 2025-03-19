@@ -1,11 +1,12 @@
 /** 
  * 该文件作用是修改系统主题颜色
  */
-
+import { render, createVNode } from "vue"
+import { svg2bese64 } from "@utils/svg2base64"
 import { type FormInstance } from 'element-plus'
 import { reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
-
+import * as iconPark from '@icon-park/vue-next'
 import { merge } from "lodash"
 import { genMixColor } from './generate-color'
 import { useDark } from '@vueuse/core'
@@ -196,20 +197,26 @@ export const changeTabTile = (title: string) => {
  * @param iconPath {string}
  */
 export const setTabIco = (iconPath: string) => {
-  const linkElement =
+  if (!iconPath) return
+  let linkElement =
     document.querySelector<HTMLLinkElement>(
       "link[rel*='icon']"
-    ) || document.createElement('link')
+    )
+  if (!linkElement) {
+    linkElement = document.createElement('link')
+    document.head.appendChild(linkElement)
+  }
   linkElement.type = 'image/x-icon'
   linkElement.rel = 'shortcut icon'
   linkElement.href = iconPath
-  document.head.appendChild(linkElement)
+
 }
 
-const icos = import.meta.glob<{ default: string }>(
-  '../assets/svg-icons/*.svg',
-  { eager: true }
-)
+
+// const icos = import.meta.glob<{ default: string }>(
+//   '../assets/svg-icons/*.svg',
+//   { eager: true }
+// )
 
 /**
  * 修改页面tab的ico
@@ -218,23 +225,11 @@ const icos = import.meta.glob<{ default: string }>(
 export const changeTabIco = (
   to: RouteLocationNormalizedGeneric
 ) => {
-  const [parentModule] = to.matched
-  const parentModuleName = parentModule.name as string
-  const processedIcos = Object.fromEntries(
-    Object.entries(icos).map(([key, value]) => {
-      // 去掉前缀和后缀
-      const newKey = key
-        .replace('../assets/svg-icons/', '')
-        .replace('.svg', '')
-      return [newKey, value]
-    })
-  )
-  const targetIco = processedIcos[parentModuleName]
-
-  if (targetIco) {
-    setTabIco(targetIco.default)
-  } else
-    setTabIco(
-      '/study-java-web/src/assets/svg-icons/other.svg'
-    )
+  const icon = iconPark[to.meta.icon as keyof typeof iconPark] || iconPark.System
+  const size = 16; // 图标大小
+  const vnode = createVNode(icon, { theme: "outline", size, fill: "#333" });
+  const container = document.createElement("div");
+  render(vnode, container);
+  const svg = container.querySelector<SVGElement>("svg")!;
+  setTabIco(svg2bese64(svg))
 }

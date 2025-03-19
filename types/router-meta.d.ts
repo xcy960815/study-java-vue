@@ -1,4 +1,4 @@
-import { localIcons } from '@assets/svg-icons/index'
+import { svgIcons } from '@assets/svg-icons/index'
 
 import * as ElIcons from '@element-plus/icons-vue'
 
@@ -10,10 +10,10 @@ declare module 'vue-router' {
 
   type IconParkNames = keyof typeof IconParkIcons
 
-  type LocalIconNames = keyof typeof localIcons
-
+  type LocalIconNames = keyof typeof svgIcons
 
   interface RouteMeta {
+    openMore?: boolean
     title?: string
     permission?: string | Array<string>
     link?: string
