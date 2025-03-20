@@ -103,10 +103,10 @@
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
       "prettier --write",
-      "npm run eslint:fix"
+      "pnpm run eslint:fix"
     ],
     "*.{html,vue,css,sass,less}": [
-      "npm run stylelint:fix"
+      "pnpm run stylelint:fix"
     ]
   }
 }
