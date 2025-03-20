@@ -12,53 +12,27 @@ module.exports = {
     ecmaVersion: 2020
   },
   rules: {
-    // 首个参数 0 = off, 1 = warn, 2 = error
-    'no-shadow':"off",
-    // js
-    'no-console': process.env.NODE_ENV === 'production' ? 1 : 0,
-    'no-debugger': process.env.NODE_ENV === 'production' ? 1 : 0,
-    // 禁止使用拖尾逗号
-    'comma-dangle': [2, 'never'],
-    // 禁止使用分号
-    semi: [2, 'never'],
-    // 禁用行尾空白
-    'no-trailing-spaces': [2],
-    // 禁止直接调用 Object.prototypes 的内置属性
-    'no-prototype-builtins': 0,
-    // 强制一行的最大长度
-    'max-len': 0,
-    // 禁止对函数参数再赋值
-    'no-param-reassign': 0,
-    // 要求箭头函数的参数使用圆括号
-    'arrow-parens': 0,
-    // 禁用一元操作符 ++ 和 --
-    'no-plusplus': 0,
-    // 禁止使用特定的语法
-    'no-restricted-syntax': 0,
- 
-    // ts
-    // 禁用 any
-    '@typescript-eslint/no-explicit-any': 0,
-    // 禁用 空函数
-    '@typescript-eslint/no-empty-function': 0,
-    // 禁用 忽略
-    '@typescript-eslint/ban-ts-comment': 0,
- 
-    // vue
-    // script 缩进
-    'vue/script-indent': [2, 2, { baseIndent: 1, switchCase: 1 }],
-    // prop 在 模板 和 JSX 中应该始终使用 kebab-case
-    'vue/attribute-hyphenation': [2, 'always'],
-    // 只有1个导出时，用export default
-    'import/prefer-default-export': 0,
-    'linebreak-style': 0,
-    // 禁止使用悬空下划线
-    'no-underscore-dangle': 0,
-    // 使用驼峰
-    'camelcase': 0,
-    // 允许枚举
-    "no-shadow": "off",
-    "@typescript-eslint/no-shadow": ["error"]
+    // eslint（https://eslint.bootcss.com/docs/rules/）
+    'no-var': 'error', // 要求使用 let 或 const 而不是 var
+    'no-multiple-empty-lines': ['warn', { max: 1 }], // 不允许多个空行
+    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-unexpected-multiline': 'error', // 禁止空余的多行
+    'no-useless-escape': 'off', // 禁止不必要的转义字符
+
+    // typeScript (https://typescript-eslint.io/rules)
+    '@typescript-eslint/no-unused-vars': 'error', // 禁止定义未使用的变量
+    '@typescript-eslint/prefer-ts-expect-error': 'error', // 禁止使用 @ts-ignore
+    '@typescript-eslint/no-explicit-any': 'off', // 禁止使用 any 类型
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-namespace': 'off', // 禁止使用自定义 TypeScript 模块和命名空间。
+    '@typescript-eslint/semi': 'off',
+
+    // eslint-plugin-vue (https://eslint.vuejs.org/rules/)
+    'vue/multi-word-component-names': 'off', // 要求组件名称始终为 “-” 链接的单词
+    'vue/script-setup-uses-vars': 'error', // 防止<script setup>使用的变量<template>被标记为未使用
+    'vue/no-mutating-props': 'off', // 不允许组件 prop的改变
+    'vue/attribute-hyphenation': 'off' // 对模板中的自定义组件强制执行属性命名样式
   },
   overrides: [
     {

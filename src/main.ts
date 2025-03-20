@@ -9,6 +9,7 @@ import 'virtual:svg-icons-register'
 import store from './store'
 import router from '@/router'
 import { registerGlobalComponents } from './components'
+var _ = "123"
 const app = createApp(App)
 app
   // .use(ElementPlus)
