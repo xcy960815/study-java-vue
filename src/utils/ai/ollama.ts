@@ -6,9 +6,7 @@ export class Ollama extends Core {
   /**
    * 请求参数
    */
-  private _requestParams: Partial<
-    Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>
-  >
+  private readonly _requestParams: Partial<Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>>
 
   constructor(options: AI.Gpt.GptCoreOptions) {
     const { requestParams, ...coreOptions } = options
