@@ -61,7 +61,7 @@ import { useRouter } from 'vue-router'
 import {
   setStyleProperty,
   LAYOUTSIDECONTAINERWIDTHKEY
-} from '@/utils/system-theme'
+} from '@/utils/system-style'
 import Theme from './themen.vue'
 const router = useRouter()
 

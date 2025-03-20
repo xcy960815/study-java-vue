@@ -223,7 +223,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
-      vueDevTools(),
+      // vueDevTools(),
       createHtmlPlugin({
         inject: {
           data: {
@@ -295,10 +295,7 @@ export default defineConfig(({ mode }) => {
         ),
         '@plugins': fileURLToPath(
           new URL('./src/plugins', import.meta.url)
-        ),
-        // '@types': fileURLToPath(
-        //   new URL('./types', import.meta.url)
-        // )
+        )
       }
     }
   }

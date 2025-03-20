@@ -14,7 +14,7 @@
 import { useSystemInfoStore } from '@store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { setSystemTheme } from '@/utils/system-theme'
+import { setSystemTheme } from '@/utils/system-style'
 
 
 const route = useRoute()

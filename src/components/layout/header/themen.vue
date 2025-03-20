@@ -66,7 +66,7 @@
 </template>
 
 <script lang="ts" setup>
-import { setSystemTheme } from '@/utils/system-theme'
+import { setSystemTheme } from '@/utils/system-style'
 const {
   isDark,
   handleConfirmTheme,

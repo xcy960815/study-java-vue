@@ -6,7 +6,7 @@
         <SvgIcon v-if="isSvgIcon" :type="name as SvgIconNames" :theme="theme" :size="size" :fill="fill"></SvgIcon>
 
         <!-- <component :is="name" v-if="isIconParkIcon" :theme="theme" :size="size" :fill="fill" /> -->
-        
+        <!-- 使用 IconPark 代替 component 就不用注册全局组件了 -->
         <IconPark v-if="isIconParkIcon" :type="name" :theme="theme" :size="size" :fill="fill"></IconPark>
     </div>
 </template>

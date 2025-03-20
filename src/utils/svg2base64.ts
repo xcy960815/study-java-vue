@@ -5,10 +5,10 @@ const PREFIX = 'data:image/svg+xml;base64,';
 export const utf8Encode = (input: string): string => {
     input = input.replace(/\r\n/g, '\n');
 
-    let i = 0;
+    
     let output = '';
 
-    for (; i < input.length; i++) {
+    for (let i = 0; i < input.length; i++) {
         const c = input.charCodeAt(i);
 
         if (c < 128) {

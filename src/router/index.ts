@@ -6,7 +6,7 @@ import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import { getToken } from '@utils/token'
-import { changeTabIco } from '@/utils/system-theme'
+import { changeTabIco } from '@/utils/system-style'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -103,7 +103,8 @@ export const routes: RouteRecordRaw[] = [
           import(`../views/goods-category/info.vue`),
         meta: {
           hidden: true,
-          title: '商品详情'
+          title: '商品详情',
+          icon:"DocDetail"
         }
       }
     ]

@@ -264,7 +264,7 @@ const handleClickEditGoodCategoryDetail = (
   row: GoodsCategoryDto
 ) => {
   router.push({
-    path: `/goods-category/detail`,
+    path: `/goods-category/info`,
     query: {
       id: row.categoryId
     }
