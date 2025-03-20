@@ -211,7 +211,7 @@ export class Ollama extends Core {
         prompt += item.content
       })
 
-      tokenCount = await this.getTokenCount(prompt)
+      tokenCount = this.getTokenCount(prompt)
 
       // 当前 prompt token 数量大于最大 token 数量时，不再向上查找
       if (prompt && tokenCount > maxTokenCount) {
