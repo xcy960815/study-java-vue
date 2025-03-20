@@ -160,7 +160,9 @@ declare namespace AI {
      * 会话内容 
      */
     content: string
-
+    /**
+     * 当前的id
+     */
     messageId: string
     /**
      * 下次的父id 用于查找会话记录
@@ -209,8 +211,7 @@ declare namespace AI {
     export interface ResponseDelta
       extends ResponseMessage { }
 
-    export interface ResponseChoice
-      extends AI.ResponseChoice {
+    export interface ResponseChoice extends AI.ResponseChoice {
       message?: ResponseMessage
       delta?: ResponseDelta
     }
@@ -226,14 +227,9 @@ declare namespace AI {
       detail?: Response | null
     }
 
-    export interface GetAnswerOptions
-      extends AI.GetAnswerOptions {
-      onProgress?: (
-        partialResponse: AssistantConversation
-      ) => void
-      requestParams?: Partial<
-        Omit<RequestParams, 'messages' | 'n' | 'stream'>
-      >
+    export interface GetAnswerOptions extends AI.GetAnswerOptions {
+      onProgress?: (partialResponse: AssistantConversation) => void
+      requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
     export interface GptCoreOptions extends CoreOptions {
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>

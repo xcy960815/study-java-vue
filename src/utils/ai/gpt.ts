@@ -1,13 +1,12 @@
-import { Core } from './core'
-import { RoleEnum } from "@enums"
+import {Core} from './core'
+import {RoleEnum} from "@enums"
+
 const MODEL = 'deepseek-chat'
 export class Gpt extends Core {
   /**
    * 请求参数
    */
-  private _requestParams: Partial<
-    Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>
-  >
+  private _requestParams: Partial<Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>>
 
   constructor(options: AI.Gpt.GptCoreOptions) {
     const { requestParams, ...coreOptions } = options
@@ -34,7 +33,7 @@ export class Gpt extends Core {
   ): Promise<AI.FetchRequestInit> {
     const {
       onProgress,
-      stream = onProgress ? true : false,
+      stream = !!onProgress,
       requestParams
     } = options
 
@@ -50,13 +49,12 @@ export class Gpt extends Core {
       max_tokens: maxTokens
     }
 
-    const requestInit: AI.FetchRequestInit = {
+    return {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
       signal: this._abortController.signal
     }
-    return requestInit
   }
 
   /**
@@ -71,7 +69,7 @@ export class Gpt extends Core {
   ): Promise<AI.Gpt.AssistantConversation> {
     const {
       onProgress,
-      stream = onProgress ? true : false
+      stream = !!onProgress
     } = options
     // 构建用户消息
     const userMessage = this.buildConversation(
@@ -170,8 +168,8 @@ export class Gpt extends Core {
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<AI.Gpt.SendMessageOptions>} options
-   * @returns {Promise<{ messages: AI.Gpt.Message[]; }>}
+   * @param {Required<AI.Gpt.GetAnswerOptions>} options
+   * @returns {Promise<{ messages: AI.Gpt.RequestMessage[]; }>}
    */
   private async _getConversationHistory(
     text: string,
