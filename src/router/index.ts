@@ -289,7 +289,7 @@ eventEmitter.on('logout', () => {
 /*************** 统一管理通用路由跳转 *****************/
 
 // 全局路由守卫
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   changeTabIco(to)
   const token = await getToken()
   if (to.path === '/login') {
