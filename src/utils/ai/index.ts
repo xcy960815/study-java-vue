@@ -5,4 +5,3 @@ export { Text as TextModle } from './text'
 export { Ollama as OllamaModel } from './ollama'
 
 export { AiError } from './core'
-

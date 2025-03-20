@@ -44,7 +44,8 @@
 }
 
 @keyframes ball-grid-beat {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -52,4 +53,3 @@
   }
 }
 </style>
-

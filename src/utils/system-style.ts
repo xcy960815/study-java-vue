@@ -1,21 +1,20 @@
-/** 
+/**
  * 该文件作用是修改系统主题颜色
  */
-import { render, createVNode } from "vue"
-import { svg2bese64 } from "@utils/svg2base64"
+import { render, createVNode } from 'vue'
+import { svg2bese64 } from '@utils/svg2base64'
 import { type FormInstance } from 'element-plus'
 import { reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
 import * as iconPark from '@icon-park/vue-next'
-import { merge } from "lodash"
+import { merge } from 'lodash'
 import { genMixColor } from './generate-color'
 import { useDark } from '@vueuse/core'
 
 /**
  * 侧边栏宽度key
  */
-export const LAYOUTSIDECONTAINERWIDTHKEY =
-  '--layout-side-container-width'
+export const LAYOUTSIDECONTAINERWIDTHKEY = '--layout-side-container-width'
 
 /**
  * 系统主题key
@@ -23,14 +22,8 @@ export const LAYOUTSIDECONTAINERWIDTHKEY =
 const SYSTEMTHEMECOLORKEY = 'system-theme-color'
 
 // 设置css变量
-export function setStyleProperty(
-  propName: string,
-  value: string
-) {
-  document.documentElement.style.setProperty(
-    propName,
-    value
-  )
+export function setStyleProperty(propName: string, value: string) {
+  document.documentElement.style.setProperty(propName, value)
 }
 
 export type Theme = {
@@ -64,20 +57,12 @@ export const setSystemTheme = () => {
     return theme ? JSON.parse(theme) : defaultThemeConfig
   }
 
-  const themeConfig = reactive<Theme>(
-    Object.assign({}, getTheme())
-  )
+  const themeConfig = reactive<Theme>(Object.assign({}, getTheme()))
 
   const themeDialogVisible = ref(false)
 
-  function updateBrandExtendColorsVar(
-    color: string,
-    name: string
-  ) {
-    const { DEFAULT, dark, light } = genMixColor(
-      color,
-      isDark.value
-    )
+  function updateBrandExtendColorsVar(color: string, name: string) {
+    const { DEFAULT, dark, light } = genMixColor(color, isDark.value)
 
     // 每种主题色由浅到深分为五个阶梯以供开发者使用。
     setStyleProperty(`--${name}-lighter-color`, light[5])
@@ -102,10 +87,7 @@ export const setSystemTheme = () => {
   function updateThemeColorVar({ colors }: Theme) {
     // 遍历当前主题色，生成混合色，并更新到css变量（tailwind + elementPlus）
     for (const brand in colors) {
-      updateBrandExtendColorsVar(
-        colors[brand as keyof Theme['colors']] as string,
-        brand
-      )
+      updateBrandExtendColorsVar(colors[brand as keyof Theme['colors']] as string, brand)
     }
   }
 
@@ -120,10 +102,7 @@ export const setSystemTheme = () => {
     data = merge(oldTheme, data || {})
 
     // 将缓存到浏览器
-    localStorage.setItem(
-      SYSTEMTHEMECOLORKEY,
-      JSON.stringify(data)
-    )
+    localStorage.setItem(SYSTEMTHEMECOLORKEY, JSON.stringify(data))
 
     // 将主题更新到css变量中，使之生效
     updateThemeColorVar(data)
@@ -142,10 +121,7 @@ export const setSystemTheme = () => {
   const handleConfirmTheme = () => {
     setTheme(themeConfig)
     // 本地保存
-    localStorage.setItem(
-      SYSTEMTHEMECOLORKEY,
-      JSON.stringify(themeConfig)
-    )
+    localStorage.setItem(SYSTEMTHEMECOLORKEY, JSON.stringify(themeConfig))
     themeDialogVisible.value = false
   }
 
@@ -198,10 +174,7 @@ export const changeTabTile = (title: string) => {
  */
 export const setTabIco = (iconPath: string) => {
   if (!iconPath) return
-  let linkElement =
-    document.querySelector<HTMLLinkElement>(
-      "link[rel*='icon']"
-    )
+  let linkElement = document.querySelector<HTMLLinkElement>("link[rel*='icon']")
   if (!linkElement) {
     linkElement = document.createElement('link')
     document.head.appendChild(linkElement)
@@ -209,9 +182,7 @@ export const setTabIco = (iconPath: string) => {
   linkElement.type = 'image/x-icon'
   linkElement.rel = 'shortcut icon'
   linkElement.href = iconPath
-
 }
-
 
 // const icos = import.meta.glob<{ default: string }>(
 //   '../assets/svg-icons/*.svg',
@@ -222,14 +193,12 @@ export const setTabIco = (iconPath: string) => {
  * 修改页面tab的ico
  * @param to {RouteLocationNormalizedGeneric}
  */
-export const changeTabIco = (
-  to: RouteLocationNormalizedGeneric
-) => {
+export const changeTabIco = (to: RouteLocationNormalizedGeneric) => {
   const icon = iconPark[to.meta.icon as keyof typeof iconPark] || iconPark.System
-  const size = 16; // 图标大小
-  const vnode = createVNode(icon, { theme: "outline", size, fill: "#333" });
-  const container = document.createElement("div");
-  render(vnode, container);
-  const svg = container.querySelector<SVGElement>("svg")!;
+  const size = 16 // 图标大小
+  const vnode = createVNode(icon, { theme: 'outline', size, fill: '#333' })
+  const container = document.createElement('div')
+  render(vnode, container)
+  const svg = container.querySelector<SVGElement>('svg')!
   setTabIco(svg2bese64(svg))
 }

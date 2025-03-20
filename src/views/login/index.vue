@@ -13,8 +13,14 @@
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input v-model="loginFormData.password" :type="passwordInputType" size="large" auto-complete="off"
-          placeholder="密码" @keyup.enter.native="handleLogin">
+        <el-input
+          v-model="loginFormData.password"
+          :type="passwordInputType"
+          size="large"
+          auto-complete="off"
+          placeholder="密码"
+          @keyup.enter.native="handleLogin"
+        >
           <template #prefix>
             <el-icon class="el-input__icon">
               <Lock />
@@ -30,11 +36,20 @@
       </el-form-item>
 
       <el-form-item prop="captcha">
-        <el-input class="captcha-input flex-1" v-model="loginFormData.captcha" size="large" placeholder="验证码"
-          @keyup.enter.native="handleLogin">
+        <el-input
+          class="captcha-input flex-1"
+          v-model="loginFormData.captcha"
+          size="large"
+          placeholder="验证码"
+          @keyup.enter.native="handleLogin"
+        >
         </el-input>
-        <el-image @click="handleGetCaptcha" class="captcha-image cursor-pointer h-10 flex-1 ml-1" fill="fill"
-          :src="captchaUrl">
+        <el-image
+          @click="handleGetCaptcha"
+          class="captcha-image cursor-pointer h-10 flex-1 ml-1"
+          fill="fill"
+          :src="captchaUrl"
+        >
           <template #error>
             <span>图片加载失败</span>
           </template>
@@ -43,8 +58,14 @@
       <!-- 记住密码 -->
       <el-checkbox class="remember-checkbox mb-[25px]" v-model="loginFormData.rememberMe">记住密码</el-checkbox>
       <el-form-item style="width: 100%">
-        <el-button :disabled="loginButtonDisabled" :loading="logining" size="default" type="primary" style="width: 100%"
-          @click="handleLogin">
+        <el-button
+          :disabled="loginButtonDisabled"
+          :loading="logining"
+          size="default"
+          type="primary"
+          style="width: 100%"
+          @click="handleLogin"
+        >
           <span v-if="!logining">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
@@ -78,12 +99,8 @@ const loginFormData = reactive<LoginRequestVo>({
 
 const passwordInputType = ref('password')
 
-const showHideIcon = computed(
-  () => passwordInputType.value === 'text'
-)
-const showVievIcon = computed(
-  () => passwordInputType.value === 'password'
-)
+const showHideIcon = computed(() => passwordInputType.value === 'text')
+const showVievIcon = computed(() => passwordInputType.value === 'password')
 
 const loginButtonDisabled = computed(() => {
   return (
@@ -95,10 +112,7 @@ const loginButtonDisabled = computed(() => {
 })
 
 const handleClickPasswordIcon = () => {
-  passwordInputType.value =
-    passwordInputType.value === 'password'
-      ? 'text'
-      : 'password'
+  passwordInputType.value = passwordInputType.value === 'password' ? 'text' : 'password'
 }
 
 const loginFormRef = ref<FormInstance>()
@@ -132,18 +146,14 @@ const loginStore = useLoginStore()
  * 登入
  */
 const handleLogin = async () => {
-  const valid = await loginFormRef.value
-    ?.validate()
-    .catch(() => false)
+  const valid = await loginFormRef.value?.validate().catch(() => false)
   if (!valid) return
   logining.value = true
   const loginData = { ...loginFormData }
 
   // loginData.password = encryptByRsa(loginFormData.password) || loginData.password
 
-  loginData.password = loginData.password
-    ? MD5(loginFormData.password)
-    : loginData.password
+  loginData.password = loginData.password ? MD5(loginFormData.password) : loginData.password
 
   loginStore.login(loginData).finally(() => {
     logining.value = false
@@ -154,16 +164,13 @@ const captchaUrl = ref('')
 const captchaLoading = ref(false)
 const handleGetCaptcha = async () => {
   captchaLoading.value = true
-  const result = await loginModule
-    .getCaptcha()
-    .finally(() => {
-      captchaLoading.value = false
-    })
+  const result = await loginModule.getCaptcha().finally(() => {
+    captchaLoading.value = false
+  })
   if (result.code === 200) {
     captchaUrl.value = result.data
   }
 }
-
 
 onMounted(() => {
   handleGetCaptcha()

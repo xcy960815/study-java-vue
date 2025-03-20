@@ -1,21 +1,11 @@
-import {
-  ref,
-  readonly,
-  watchEffect,
-  type Ref,
-  type DeepReadonly
-} from 'vue'
+import { ref, readonly, watchEffect, type Ref, type DeepReadonly } from 'vue'
 
-export type AsyncComputedOnCancel = (
-  cancelCallback: () => void
-) => void
+export type AsyncComputedOnCancel = (cancelCallback: () => void) => void
 
 export type AsyncComputedResult<T> = DeepReadonly<Ref<T>>
 
 export function useAsyncComputed<T>(
-  callback: (
-    onCancel: AsyncComputedOnCancel
-  ) => T | Promise<T>,
+  callback: (onCancel: AsyncComputedOnCancel) => T | Promise<T>,
   defaultValue?: T
 ): AsyncComputedResult<T> {
   let counter = 0

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { StoreNames } from '@enums'
-import router from "@router"
+import router from '@router'
 
 export const systemInfoStore = defineStore<
   StoreNames.SYSTEM,
@@ -38,18 +38,11 @@ export const systemInfoStore = defineStore<
     },
     /**
      * 添加缓存列表
-     * @param {RouteLocationNormalizedLoadedGeneric} keepLiveItem 
+     * @param {RouteLocationNormalizedLoadedGeneric} keepLiveItem
      */
     addKeepLiveItem(keepLiveItem) {
-      if (
-        !!keepLiveItem.meta.keepAlive &&
-        !this.keepLiveList.includes(
-          keepLiveItem.name as string
-        )
-      ) {
-        this.keepLiveList.push(
-          keepLiveItem.name as string
-        )
+      if (!!keepLiveItem.meta.keepAlive && !this.keepLiveList.includes(keepLiveItem.name as string)) {
+        this.keepLiveList.push(keepLiveItem.name as string)
       }
     },
     setHistoryList(list) {
@@ -57,34 +50,27 @@ export const systemInfoStore = defineStore<
     },
     /**
      * 添加历史记录
-     * @param {RouteLocationNormalizedLoadedGeneric} historyItem 
+     * @param {RouteLocationNormalizedLoadedGeneric} historyItem
      */
     addHistoryItem(historyItem) {
       // 登录页面不需要记录
-      if (historyItem.path === "/login") return
-      const currenHistoryItem = this.historyList.find(
-        (item) => item.fullPath === historyItem.fullPath
-      )
+      if (historyItem.path === '/login') return
+      const currenHistoryItem = this.historyList.find((item) => item.fullPath === historyItem.fullPath)
       // console.log("this.historyList", JSON.parse(JSON.stringify(this.historyList)));
       // if(historyItem.openMore) return
       if (!!currenHistoryItem) {
-        const currenHistoryIndex = this.historyList.findIndex(
-          (item) => item.fullPath === currenHistoryItem.fullPath
-        )
+        const currenHistoryIndex = this.historyList.findIndex((item) => item.fullPath === currenHistoryItem.fullPath)
         this.historyList.splice(currenHistoryIndex, 1, historyItem)
       } else {
         this.historyList.push(historyItem)
       }
-
     },
     /**
      * 移除历史记录
-     * @param {RouteLocationNormalizedLoadedGeneric} historyItem 
+     * @param {RouteLocationNormalizedLoadedGeneric} historyItem
      */
     removeHistoryItem(historyItem) {
-      const historyIndex = this.historyList.findIndex(
-        (item) => item.fullPath === historyItem.fullPath
-      )
+      const historyIndex = this.historyList.findIndex((item) => item.fullPath === historyItem.fullPath)
       if (historyIndex !== -1) {
         this.historyList.splice(historyIndex, 1)
       }

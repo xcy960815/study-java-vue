@@ -13,7 +13,6 @@ function capitalizeFirstLetter(str: string) {
 }
 
 const getBaseLanguageName = (nameOrAlias: string, components = PrismJsComponents) => {
-
   const _nameOrAlias = nameOrAlias.toLowerCase()
 
   const allLanguages = components.languages
@@ -39,7 +38,6 @@ const getBaseLanguageName = (nameOrAlias: string, components = PrismJsComponents
     }
 
     if (Array.isArray(alias)) {
-
       if (aliasTitles && aliasTitles[_nameOrAlias]) {
         lang.value = aliasTitles[_nameOrAlias]
         break
@@ -75,8 +73,7 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
     const lang = extractLang(token.info)
 
     const content = fence(...args)
-    return (
-      `
+    return `
       <div class="markdown-code-wrapper flex language-${lang}${getAdaptiveThemeMarker(options)}${active}">
         <div class="markdown-code-header">
           <span class="markdown-code-lang">${getBaseLanguageName(lang)}</span>
@@ -89,7 +86,6 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
         ${content}
       </div>
       `
-    )
   }
 }
 
@@ -99,9 +95,7 @@ export function getAdaptiveThemeMarker(options: Options) {
 
 export function extractTitle(info: string, html = false) {
   if (html) {
-    return (
-      info.replace(/<!--[^]*?-->/g, '').match(/data-title="(.*?)"/)?.[1] || ''
-    )
+    return info.replace(/<!--[^]*?-->/g, '').match(/data-title="(.*?)"/)?.[1] || ''
   }
   return info.match(/\[(.*)\]/)?.[1] || extractLang(info) || 'txt'
 }

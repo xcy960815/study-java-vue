@@ -1,10 +1,6 @@
 <template>
-  <el-row  class="handle-toolbar" :gutter="20">
-    <el-col
-      v-for="(slotContent, index) in defaultSlotContents"
-      :key="index"
-      :span="columnSpans[index] || 2" 
-    >
+  <el-row class="handle-toolbar" :gutter="20">
+    <el-col v-for="(slotContent, index) in defaultSlotContents" :key="index" :span="columnSpans[index] || 2">
       <component class="el-col-item" :is="slotContent" />
     </el-col>
     <el-col :span="2" class="right-panel">
@@ -49,9 +45,9 @@ const columnSpans = ref<number[]>([])
  */
 const calculateSpans = () => {
   nextTick(() => {
-    const parentWidth = document.querySelector<HTMLDivElement>(".handle-toolbar")?.offsetWidth!
-    const elColItems = document.querySelectorAll<HTMLDivElement>(".el-col-item")
-    columnSpans.value = Array.from(elColItems).map(el => {
+    const parentWidth = document.querySelector<HTMLDivElement>('.handle-toolbar')?.offsetWidth!
+    const elColItems = document.querySelectorAll<HTMLDivElement>('.el-col-item')
+    columnSpans.value = Array.from(elColItems).map((el) => {
       const width = el?.offsetWidth
       return (width / parentWidth) * 24
     })

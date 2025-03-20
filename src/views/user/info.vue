@@ -9,17 +9,10 @@
     status-icon
   >
     <el-form-item label="昵称" prop="nickName">
-      <el-input
-        v-model="userInfoFormData.nickName"
-        placeholder="请输入用户昵称"
-      />
+      <el-input v-model="userInfoFormData.nickName" placeholder="请输入用户昵称" />
     </el-form-item>
     <el-form-item label="账号" prop="loginName">
-      <el-input
-        v-model="userInfoFormData.loginName"
-        disabled
-        placeholder="请输入用户账号"
-      />
+      <el-input v-model="userInfoFormData.loginName" disabled placeholder="请输入用户账号" />
     </el-form-item>
     <!-- <el-form-item label="密码" prop="passwordMd5">
       <el-input
@@ -28,18 +21,10 @@
       />
     </el-form-item> -->
     <el-form-item label="个性签名" prop="introduceSign">
-      <el-input
-        v-model="userInfoFormData.introduceSign"
-        type="textarea"
-        placeholder="请输入个性签名"
-      />
+      <el-input v-model="userInfoFormData.introduceSign" type="textarea" placeholder="请输入个性签名" />
     </el-form-item>
     <el-form-item label="地址" prop="address">
-      <el-input
-        v-model="userInfoFormData.address"
-        type="textarea"
-        placeholder="请输入住址"
-      />
+      <el-input v-model="userInfoFormData.address" type="textarea" placeholder="请输入住址" />
     </el-form-item>
     <el-form-item label="头像" prop="avatar">
       <el-upload
@@ -49,32 +34,21 @@
         :show-file-list="false"
         :before-upload="handleBeforeAvatarUpload"
       >
-        <img
-          v-if="userInfoFormData.avatar"
-          :src="userInfoFormData.avatar"
-          class="avatar-uploader-img"
-        />
+        <img v-if="userInfoFormData.avatar" :src="userInfoFormData.avatar" class="avatar-uploader-img" />
         <el-icon v-else class="avatar-uploader-icon">
           <Plus />
         </el-icon>
       </el-upload>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="saveUserInfo">
-        保存
-      </el-button>
+      <el-button type="primary" @click="saveUserInfo"> 保存 </el-button>
       <el-button @click="resetUserInfo">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
 
 <script lang="ts" setup>
-import type {
-  FormInstance,
-  FormRules,
-  UploadRequestOptions,
-  UploadRawFile
-} from 'element-plus'
+import type { FormInstance, FormRules, UploadRequestOptions, UploadRawFile } from 'element-plus'
 import { userModule } from '@apis'
 import { onMounted, reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -120,9 +94,7 @@ const userInfoFormData = reactive<UserInfoDto>({
   avatar: ''
 })
 
-const userInfoFormRules = reactive<
-  FormRules<Partial<UserInfoDto>>
->({})
+const userInfoFormRules = reactive<FormRules<Partial<UserInfoDto>>>({})
 
 /**
  * 获取用户信息
@@ -137,13 +109,9 @@ const getUserInfo = async () => {
  * 保存用户信息
  */
 const saveUserInfo = async () => {
-  const valid = await userInfoFormRef.value
-    ?.validate()
-    .catch(() => false)
+  const valid = await userInfoFormRef.value?.validate().catch(() => false)
   if (!valid) return
-  const result = await userModule.updateUserInfo(
-    userInfoFormData
-  )
+  const result = await userModule.updateUserInfo(userInfoFormData)
   if (result.code === 200) {
     ElMessage({
       message: '保存成功',
@@ -156,9 +124,7 @@ const saveUserInfo = async () => {
  * @param rawFile {UploadRawFile} 上传的文件
  * @returns {boolean}
  */
-const handleBeforeAvatarUpload = (
-  rawFile: UploadRawFile
-): boolean => {
+const handleBeforeAvatarUpload = (rawFile: UploadRawFile): boolean => {
   const imageType = ['image/jpeg', 'image/png', 'image/jpg']
   if (!imageType.includes(rawFile.type)) {
     ElMessage.error('上传文件必须是图片格式！')
@@ -175,12 +141,8 @@ const handleBeforeAvatarUpload = (
  * 上传用户头像
  * @param data {UploadRequestOptions}
  */
-const handleUploadUserAvatar = async (
-  data: UploadRequestOptions
-) => {
-  console.log(
-    'handleUploadUserAvatar-handleUploadUserAvatar'
-  )
+const handleUploadUserAvatar = async (data: UploadRequestOptions) => {
+  console.log('handleUploadUserAvatar-handleUploadUserAvatar')
 
   const userId = userInfoFormData.userId || ''
   if (!userId) return

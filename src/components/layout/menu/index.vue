@@ -1,18 +1,10 @@
 <template>
-  <el-aside
-    id="sidebarContainer"
-    class="layout-side-container"
-  >
+  <el-aside id="sidebarContainer" class="layout-side-container">
     <h4 class="layout-side-title">{{ viteAppTitle }}</h4>
     <div class="layout-side-view">
       <!-- text-color="#fff" -->
       <!-- active-text-color="#fff" -->
-      <el-menu
-        class="layout-menu-view"
-        :collapse="isCollapse"
-        router
-        :default-active="currentRoute"
-      >
+      <el-menu class="layout-menu-view" :collapse="isCollapse" router :default-active="currentRoute">
         <menu-item :menu-data="menuData"></menu-item>
       </el-menu>
       <div id="drap-meuline" class="drap-meuline"></div>
@@ -20,18 +12,11 @@
   </el-aside>
 </template>
 <script lang="ts" setup>
-import {
-  setStyleProperty,
-  LAYOUTSIDECONTAINERWIDTHKEY
-} from '@/utils/system-style'
+import { setStyleProperty, LAYOUTSIDECONTAINERWIDTHKEY } from '@/utils/system-style'
 import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted, ref } from 'vue'
-import {
-  useRoute,
-  useRouter,
-  type RouteRecordRaw
-} from 'vue-router'
+import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router'
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
@@ -47,26 +32,16 @@ const isCollapse = computed(() => {
 
 const menuData = computed(() => {
   const routes = router.options.routes
-  function filterRoutes(
-    data: ReadonlyArray<RouteRecordRaw>
-  ) {
+  function filterRoutes(data: ReadonlyArray<RouteRecordRaw>) {
     return data
       .map((node) => {
         const newNode = { ...node }
-        if (
-          newNode.children &&
-          newNode.children.length > 0
-        ) {
+        if (newNode.children && newNode.children.length > 0) {
           newNode.children = filterRoutes(newNode.children)
         }
         return newNode
       })
-      .filter(
-        (node) =>
-          node.meta &&
-          node.meta?.title &&
-          !node.meta?.hidden
-      )
+      .filter((node) => node.meta && node.meta?.title && !node.meta?.hidden)
   }
   return filterRoutes(routes)
 })
@@ -75,14 +50,9 @@ const menuData = computed(() => {
  * 初始化左侧菜单宽度
  */
 const initLayoutSideContainerWidth = () => {
-  const history_width =
-    localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) ||
-    '300px'
+  const history_width = localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) || '300px'
   if (!isCollapse.value) {
-    setStyleProperty(
-      LAYOUTSIDECONTAINERWIDTHKEY,
-      history_width
-    )
+    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
   } else {
     setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
   }
@@ -90,9 +60,7 @@ const initLayoutSideContainerWidth = () => {
 const initDrap = () => {
   // 获取dom，对左菜单进行拖拽
   const drapLine = document.getElementById('drap-meuline')!
-  const sidebarContainer = document.getElementById(
-    'sidebarContainer'
-  )!
+  const sidebarContainer = document.getElementById('sidebarContainer')!
   drapLine.onmousedown = (e) => {
     e.preventDefault() // 阻止默认事件
     // 设置最大/最小宽度
@@ -104,31 +72,20 @@ const initDrap = () => {
     document.onmousemove = (e_) => {
       const _e_ = e_ || window.event
       let left_width = _e_.clientX - mouse_x
-      left_width =
-        left_width < min_width ? min_width : left_width
-      left_width =
-        left_width > max_width ? max_width : left_width
+      left_width = left_width < min_width ? min_width : left_width
+      left_width = left_width > max_width ? max_width : left_width
       if (!isCollapse.value) {
-        setStyleProperty(
-          LAYOUTSIDECONTAINERWIDTHKEY,
-          left_width + 'px'
-        )
+        setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, left_width + 'px')
       }
     }
     document.onmouseup = () => {
       document.onmousemove = null
       document.onmouseup = null
       if (sidebarContainer.offsetWidth <= 64) {
-        setStyleProperty(
-          LAYOUTSIDECONTAINERWIDTHKEY,
-          64 + 'px'
-        )
+        setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, 64 + 'px')
         systemInfoStore.setOpenMenuFlag(false)
       } else {
-        localStorage.setItem(
-          '--layout-side-container-width',
-          sidebarContainer.offsetWidth + 'px'
-        )
+        localStorage.setItem('--layout-side-container-width', sidebarContainer.offsetWidth + 'px')
       }
     }
   }
@@ -148,7 +105,11 @@ onMounted(() => {
     height: 50px;
     font-weight: 600;
     font-size: 16px;
-    font-family: Avenir, Helvetica Neue, Arial, Helvetica,
+    font-family:
+      Avenir,
+      Helvetica Neue,
+      Arial,
+      Helvetica,
       sans-serif;
     text-align: center;
     line-height: 50px;

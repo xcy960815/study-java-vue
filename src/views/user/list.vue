@@ -14,9 +14,7 @@
     </el-form-item>
   </el-form>
   <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getUserList">
-    <el-button size="small" type="primary" @click="handleClickAddUser">
-      新增用户
-    </el-button>
+    <el-button size="small" type="primary" @click="handleClickAddUser"> 新增用户 </el-button>
   </Handle-ToolBar>
 
   <el-table border :data="userListInfo.tableData" style="width: 100%">
@@ -33,12 +31,23 @@
       </template>
     </el-table-column>
   </el-table>
-  <el-pagination v-model:current-page="userListInfo.pageNum" v-model:page-size="userListInfo.pageSize"
-    :page-sizes="[10, 20, 30, 40]" layout="total, sizes, prev, pager, next, jumper" :total="userListInfo.total"
-    @size-change="userListInfo.handlePageSizeChange" @current-change="userListInfo.handlePageNumChange" />
+  <el-pagination
+    v-model:current-page="userListInfo.pageNum"
+    v-model:page-size="userListInfo.pageSize"
+    :page-sizes="[10, 20, 30, 40]"
+    layout="total, sizes, prev, pager, next, jumper"
+    :total="userListInfo.total"
+    @size-change="userListInfo.handlePageSizeChange"
+    @current-change="userListInfo.handlePageNumChange"
+  />
   <el-dialog v-model="addOrEditUserDialogVisible" :title="addOrEditUserDialogTitle">
-    <el-form ref="addOrEditUserFormRef" :model="addOrEditUserFormData" :rules="addOrEditUserFormRules"
-      label-width="auto" status-icon>
+    <el-form
+      ref="addOrEditUserFormRef"
+      :model="addOrEditUserFormData"
+      :rules="addOrEditUserFormRules"
+      label-width="auto"
+      status-icon
+    >
       <el-form-item label="用户昵称" prop="nickName">
         <el-input v-model="addOrEditUserFormData.nickName" placeholder="请输入用户昵称" />
       </el-form-item>
@@ -55,16 +64,14 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="addOrEditUserDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleClickAddOrEditConfirm">
-          确认
-        </el-button>
+        <el-button type="primary" @click="handleClickAddOrEditConfirm"> 确认 </el-button>
       </div>
     </template>
   </el-dialog>
 </template>
 <script lang="ts">
 export default {
-  name: "userList"
+  name: 'userList'
 }
 </script>
 <script setup lang="ts">
@@ -129,9 +136,7 @@ const getUserList = async () => {
 
 const addOrEditUserFormRef = ref<FormInstance>()
 
-const addOrEditUserFormData = reactive<
-  Omit<UserInfoDto, 'userId' | 'age' | 'createTime'>
->({
+const addOrEditUserFormData = reactive<Omit<UserInfoDto, 'userId' | 'age' | 'createTime'>>({
   nickName: '',
   loginName: '',
   introduceSign: '',
@@ -140,9 +145,7 @@ const addOrEditUserFormData = reactive<
   avatar: ''
 })
 
-const addOrEditUserFormRules: FormRules<
-  typeof addOrEditUserFormData
-> = {
+const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
   nickName: [
     {
       required: true,
@@ -199,13 +202,9 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditUserDialogTitle.value === '新增用户') {
-    result = await userModule.insertUserInfo(
-      addOrEditUserFormData
-    )
+    result = await userModule.insertUserInfo(addOrEditUserFormData)
   } else {
-    result = await userModule.updateUserInfo<boolean>(
-      addOrEditUserFormData
-    )
+    result = await userModule.updateUserInfo<boolean>(addOrEditUserFormData)
   }
 
   if (result.code === 200) {
@@ -221,10 +220,9 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
     type: 'warning'
   })
     .then(async () => {
-      const result =
-        await userModule.deleteUserInfo<boolean>({
-          userId: row.userId
-        })
+      const result = await userModule.deleteUserInfo<boolean>({
+        userId: row.userId
+      })
       if (result.code !== 200) return
       getUserList()
       ElMessage({
@@ -245,5 +243,4 @@ const showSearch = ref(true)
 onMounted(() => {
   getUserList()
 })
-
 </script>

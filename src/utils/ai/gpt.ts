@@ -1,5 +1,5 @@
-import {Core} from './core'
-import {RoleEnum} from "@enums"
+import { Core } from './core'
+import { RoleEnum } from '@enums'
 
 const MODEL = 'deepseek-chat'
 export class Gpt extends Core {
@@ -27,19 +27,11 @@ export class Gpt extends Core {
    * @param {AI.Gpt.GetAnswerOptions} options
    * @returns {Promise<AI.FetchRequestInit>}
    */
-  private async _getFetchRequestInit(
-    question: string,
-    options: AI.Gpt.GetAnswerOptions
-  ): Promise<AI.FetchRequestInit> {
-    const {
-      onProgress,
-      stream = !!onProgress,
-      requestParams
-    } = options
+  private async _getFetchRequestInit(question: string, options: AI.Gpt.GetAnswerOptions): Promise<AI.FetchRequestInit> {
+    const { onProgress, stream = !!onProgress, requestParams } = options
 
     /* 获取用户和gpt历史对话记录 */
-    const { messages, maxTokens } =
-      await this._getConversationHistory(question, options)
+    const { messages, maxTokens } = await this._getConversationHistory(question, options)
     /* 创建请求体 */
     const body = {
       ...this._requestParams,
@@ -63,101 +55,69 @@ export class Gpt extends Core {
    * @param {AI.Gpt.GetAnswerOptions} options
    * @returns {Promise<AI.Gpt.AssistantConversation>}
    */
-  public async getAnswer(
-    question: string,
-    options: AI.Gpt.GetAnswerOptions
-  ): Promise<AI.Gpt.AssistantConversation> {
-    const {
-      onProgress,
-      stream = !!onProgress
-    } = options
+  public async getAnswer(question: string, options: AI.Gpt.GetAnswerOptions): Promise<AI.Gpt.AssistantConversation> {
+    const { onProgress, stream = !!onProgress } = options
     // 构建用户消息
-    const userMessage = this.buildConversation(
-      RoleEnum.User,
-      question,
-      options
-    )
+    const userMessage = this.buildConversation(RoleEnum.User, question, options)
     // 保存用户对话
     await this.upsertConversation(userMessage)
     // 构建Ai助手消息
-    const assistantMessage = this.buildConversation(
-      RoleEnum.Assistant,
-      '',
-      { ...options, messageId: userMessage.messageId }
-    )
+    const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
+      ...options,
+      messageId: userMessage.messageId
+    })
     // 保存Ai助手消息
     await this.upsertConversation(assistantMessage)
     // 包装成一个promise 发起请求
-    const responsePromise =
-      new Promise<AI.Gpt.AssistantConversation>(
-        async (resolve, reject) => {
-          try {
-            const requestInit =
-              await this._getFetchRequestInit(
-                question,
-                options
-              )
-            if (stream) {
-              requestInit.onMessage = (data: string) => {
-                if (data === '[DONE]') {
-                  assistantMessage.content =
-                    assistantMessage.content.trim()
-                  return resolve(assistantMessage)
-                }
-                const response: AI.Gpt.Response =
-                  JSON.parse(data)
-                assistantMessage.messageId = response.id
-                if (response?.choices?.length) {
-                  const delta = response.choices[0].delta
-                  if (delta?.content) {
-                    assistantMessage.content +=
-                      delta.content
-                  }
-                  assistantMessage.detail = response
-                  if (delta?.role) {
-                    assistantMessage.role = delta.role
-                  }
-                  onProgress?.(assistantMessage)
-                }
-              }
-              await this._fetchSSE<AI.Gpt.Response>(
-                this.completionsUrl,
-                requestInit
-              ).catch(reject)
-            } else {
-              // 发送数据请求
-              const response =
-                await this._fetchSSE<AI.Gpt.Response>(
-                  this.completionsUrl,
-                  requestInit
-                )
-              const data = await response?.json()
-              if (data?.id) {
-                assistantMessage.messageId = data.id
-              }
-              if (data?.choices?.length) {
-                const message = data.choices[0].message
-                assistantMessage.content =
-                  message?.content || ''
-                assistantMessage.role =
-                  message?.role || 'assistant'
-              }
-              assistantMessage.detail = data
-              resolve(assistantMessage)
+    const responsePromise = new Promise<AI.Gpt.AssistantConversation>(async (resolve, reject) => {
+      try {
+        const requestInit = await this._getFetchRequestInit(question, options)
+        if (stream) {
+          requestInit.onMessage = (data: string) => {
+            if (data === '[DONE]') {
+              assistantMessage.content = assistantMessage.content.trim()
+              return resolve(assistantMessage)
             }
-          } catch (error) {
-            console.error('AI EventStream error', error)
-            return reject(error)
+            const response: AI.Gpt.Response = JSON.parse(data)
+            assistantMessage.messageId = response.id
+            if (response?.choices?.length) {
+              const delta = response.choices[0].delta
+              if (delta?.content) {
+                assistantMessage.content += delta.content
+              }
+              assistantMessage.detail = response
+              if (delta?.role) {
+                assistantMessage.role = delta.role
+              }
+              onProgress?.(assistantMessage)
+            }
           }
+          await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
+        } else {
+          // 发送数据请求
+          const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
+          const data = await response?.json()
+          if (data?.id) {
+            assistantMessage.messageId = data.id
+          }
+          if (data?.choices?.length) {
+            const message = data.choices[0].message
+            assistantMessage.content = message?.content || ''
+            assistantMessage.role = message?.role || 'assistant'
+          }
+          assistantMessage.detail = data
+          resolve(assistantMessage)
         }
-      ).then(async (conversation) => {
-        return this.upsertConversation(conversation).then(
-          () => {
-            conversation.parentMessageId = conversation.messageId
-            return conversation
-          }
-        )
+      } catch (error) {
+        console.error('AI EventStream error', error)
+        return reject(error)
+      }
+    }).then(async (conversation) => {
+      return this.upsertConversation(conversation).then(() => {
+        conversation.parentMessageId = conversation.messageId
+        return conversation
       })
+    })
 
     return this.clearablePromise(responsePromise, {
       milliseconds: this._milliseconds,
@@ -179,8 +139,7 @@ export class Gpt extends Core {
     maxTokens: number
   }> {
     const { systemMessage } = options
-    const maxTokenCount =
-      this._maxModelTokens - this._maxResponseTokens
+    const maxTokenCount = this._maxModelTokens - this._maxResponseTokens
     // 上次的会话id
     let parentMessageId = options.parentMessageId
 
@@ -217,9 +176,7 @@ export class Gpt extends Core {
         break
       }
 
-      const parentMessage = await this.getConversation(
-        parentMessageId
-      )
+      const parentMessage = await this.getConversation(parentMessageId)
 
       if (!parentMessage) {
         break
@@ -236,15 +193,8 @@ export class Gpt extends Core {
       parentMessageId = parentMessage.parentMessageId
     }
 
-    const maxTokens = Math.max(
-      1,
-      Math.min(
-        this._maxModelTokens - tokenCount,
-        this._maxResponseTokens
-      )
-    )
+    const maxTokens = Math.max(1, Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens))
 
     return { messages, maxTokens }
   }
 }
-

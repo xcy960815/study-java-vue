@@ -17,9 +17,7 @@ const getAdminUserList = async () => {
     pageSize: 10,
     pageNum: 1
   }
-  const result = await adminUserModule.getAdminUserList(
-    requestParams
-  )
+  const result = await adminUserModule.getAdminUserList(requestParams)
   if (result.code === 200) {
     adminUserList.value = result.data
   }

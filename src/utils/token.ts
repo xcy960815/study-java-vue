@@ -47,4 +47,3 @@ export const removeToken = async () => {
     return localStorage.removeItem(TOKENNAME)
   }
 }
-

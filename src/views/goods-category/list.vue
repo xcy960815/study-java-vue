@@ -1,24 +1,11 @@
 <template>
   <!-- 商品列表 -->
-  <el-form
-    :model="queryFormData"
-    label-width="auto"
-    inline
-    v-show="showSearch"
-  >
+  <el-form :model="queryFormData" label-width="auto" inline v-show="showSearch">
     <el-form-item label="商品id">
-      <el-input
-        v-model="queryFormData.categoryId"
-        placeholder="商品id"
-        @change="getGoodsCategoryList"
-      />
+      <el-input v-model="queryFormData.categoryId" placeholder="商品id" @change="getGoodsCategoryList" />
     </el-form-item>
     <el-form-item label="商品名称">
-      <el-input
-        v-model="queryFormData.categoryName"
-        placeholder="商品名称"
-        @change="getGoodsCategoryList"
-      />
+      <el-input v-model="queryFormData.categoryName" placeholder="商品名称" @change="getGoodsCategoryList" />
     </el-form-item>
     <el-form-item label="商品等级">
       <el-select
@@ -33,63 +20,21 @@
       </el-select>
     </el-form-item>
   </el-form>
-  <Handle-ToolBar
-    v-model:showSearch="showSearch"
-    @queryTableData="getGoodsCategoryList"
-  >
-    <el-button
-      size="small"
-      type="primary"
-      @click="handleClickAddGoodCategory"
-    >
-      新增商品
-    </el-button>
+  <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getGoodsCategoryList">
+    <el-button size="small" type="primary" @click="handleClickAddGoodCategory"> 新增商品 </el-button>
   </Handle-ToolBar>
 
-  <el-table
-    border
-    :data="goodsCategoryInfo.tableData"
-    style="width: 100%"
-  >
-    <el-table-column
-      prop="categoryId"
-      label="商品id"
-      width="100"
-    />
-    <el-table-column
-      prop="categoryName"
-      label="商品名称"
-      width="150"
-    />
-    <el-table-column
-      prop="categoryLevel"
-      label="商品等级"
-    />
+  <el-table border :data="goodsCategoryInfo.tableData" style="width: 100%">
+    <el-table-column prop="categoryId" label="商品id" width="100" />
+    <el-table-column prop="categoryName" label="商品名称" width="150" />
+    <el-table-column prop="categoryLevel" label="商品等级" />
     <el-table-column prop="createTime" label="创建时间" />
     <el-table-column prop="updateTime" label="更新时间" />
     <el-table-column fixed="right" label="操作" width="150">
       <template #default="{ row }">
-        <el-button
-          link
-          type="primary"
-          size="small"
-          @click="handleClickEditGoodCategoryDetail(row)"
-          >详情</el-button
-        >
-        <el-button
-          link
-          type="primary"
-          size="small"
-          @click="handleClickEditGoodCategory(row)"
-          >编辑</el-button
-        >
-        <el-button
-          link
-          type="danger"
-          size="small"
-          @click="handleClickDeleteGoodsCategory(row)"
-          >删除</el-button
-        >
+        <el-button link type="primary" size="small" @click="handleClickEditGoodCategoryDetail(row)">详情</el-button>
+        <el-button link type="primary" size="small" @click="handleClickEditGoodCategory(row)">编辑</el-button>
+        <el-button link type="danger" size="small" @click="handleClickDeleteGoodsCategory(row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -102,10 +47,7 @@
     @size-change="goodsCategoryInfo.handlePageSizeChange"
     @current-change="goodsCategoryInfo.handlePageNumChange"
   />
-  <el-dialog
-    v-model="addOrEditGoodsCategoryDialogVisible"
-    :title="addOrEditGoodsCategoryDialogTitle"
-  >
+  <el-dialog v-model="addOrEditGoodsCategoryDialogVisible" :title="addOrEditGoodsCategoryDialogTitle">
     <el-form
       ref="addOrEditGoodsCategoryFormRef"
       :model="addOrEditGoodsCategoryFormData"
@@ -114,20 +56,10 @@
       status-icon
     >
       <el-form-item label="商品名称" prop="categoryName">
-        <el-input
-          v-model="
-            addOrEditGoodsCategoryFormData.categoryName
-          "
-          placeholder="请输入商品名称"
-        />
+        <el-input v-model="addOrEditGoodsCategoryFormData.categoryName" placeholder="请输入商品名称" />
       </el-form-item>
       <el-form-item label="商品等级" prop="categoryLevel">
-        <el-input
-          v-model="
-            addOrEditGoodsCategoryFormData.categoryLevel
-          "
-          placeholder="请输入商品等级"
-        />
+        <el-input v-model="addOrEditGoodsCategoryFormData.categoryLevel" placeholder="请输入商品等级" />
       </el-form-item>
       <!-- <el-form-item label="个性签名" prop="introduceSign">
         <el-input v-model="addOrEditGoodsCategoryFormData.introduceSign
@@ -139,18 +71,8 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button
-          @click="
-            addOrEditGoodsCategoryDialogVisible = false
-          "
-          >取消</el-button
-        >
-        <el-button
-          type="primary"
-          @click="handleClickAddOrEditConfirm"
-        >
-          确认
-        </el-button>
+        <el-button @click="addOrEditGoodsCategoryDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleClickAddOrEditConfirm"> 确认 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -158,16 +80,11 @@
 <script setup lang="ts">
 import { goodsCategoryModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
-import {
-  type FormInstance,
-  type FormRules,
-  ElMessage,
-  ElMessageBox
-} from 'element-plus'
+import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 defineOptions({
-  name: "goods-category-list"
+  name: 'goods-category-list'
 })
 interface GoodsCategoryInfo {
   tableData: GoodsCategoryDto[]
@@ -210,12 +127,11 @@ const goodsCategoryInfo = reactive<GoodsCategoryInfo>({
 const getGoodsCategoryList = async () => {
   const pageSize = goodsCategoryInfo.pageSize
   const pageNum = goodsCategoryInfo.pageNum
-  const result =
-    await goodsCategoryModule.getGoodsCategoryList({
-      pageSize,
-      pageNum,
-      ...queryFormData
-    })
+  const result = await goodsCategoryModule.getGoodsCategoryList({
+    pageSize,
+    pageNum,
+    ...queryFormData
+  })
   if (result.code === 200) {
     goodsCategoryInfo.tableData = result.data.data
     goodsCategoryInfo.total = result.data.total
@@ -224,33 +140,31 @@ const getGoodsCategoryList = async () => {
 
 const addOrEditGoodsCategoryFormRef = ref<FormInstance>()
 
-const addOrEditGoodsCategoryFormData =
-  reactive<GoodsCategoryVo>({
-    categoryId: null,
+const addOrEditGoodsCategoryFormData = reactive<GoodsCategoryVo>({
+  categoryId: null,
 
-    /**
-     * 分类级别(1-一级分类 2-二级分类 3-三级分类)
-     */
-    categoryLevel: 0,
+  /**
+   * 分类级别(1-一级分类 2-二级分类 3-三级分类)
+   */
+  categoryLevel: 0,
 
-    /**
-     * 父分类id
-     */
-    parentId: 0,
+  /**
+   * 父分类id
+   */
+  parentId: 0,
 
-    /**
-     * 分类名称
-     */
-    categoryName: '',
+  /**
+   * 分类名称
+   */
+  categoryName: '',
 
-    /**
-     * 排序值(字段越大越靠前)
-     */
-    categoryRank: 0
-  })
+  /**
+   * 排序值(字段越大越靠前)
+   */
+  categoryRank: 0
+})
 
-const addOrEditGoodsCategoryFormRules: FormRules<GoodsCategoryVo> =
-  {}
+const addOrEditGoodsCategoryFormRules: FormRules<GoodsCategoryVo> = {}
 
 const handleClickAddGoodCategory = () => {
   addOrEditGoodsCategoryDialogTitle.value = '新增商品'
@@ -260,9 +174,7 @@ const handleClickAddGoodCategory = () => {
   })
 }
 const router = useRouter()
-const handleClickEditGoodCategoryDetail = (
-  row: GoodsCategoryDto
-) => {
+const handleClickEditGoodCategoryDetail = (row: GoodsCategoryDto) => {
   router.push({
     path: `/goods-category/info`,
     query: {
@@ -288,9 +200,7 @@ const handleClickAddOrEditConfirm = async () => {
 
   if (!valid) return
   let result
-  if (
-    addOrEditGoodsCategoryDialogTitle.value === '新增商品'
-  ) {
+  if (addOrEditGoodsCategoryDialogTitle.value === '新增商品') {
     // result = await goodsCategoryModule.insertUserInfo(
     //   addOrEditGoodsCategoryFormData
     // )
@@ -306,9 +216,7 @@ const handleClickAddOrEditConfirm = async () => {
   // }
 }
 
-const handleClickDeleteGoodsCategory = (
-  row: GoodsCategoryDto
-) => {
+const handleClickDeleteGoodsCategory = (row: GoodsCategoryDto) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',

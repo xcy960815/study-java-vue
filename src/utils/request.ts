@@ -19,10 +19,7 @@ const request = axios.create({
 request.interceptors.request.use(
   async (config) => {
     const token = await getToken()
-    const isWithoutAuthorizationUrl =
-      !withoutAuthorizationUrls.some((url) =>
-        config.url?.includes(url)
-      )
+    const isWithoutAuthorizationUrl = !withoutAuthorizationUrls.some((url) => config.url?.includes(url))
     if (isWithoutAuthorizationUrl) {
       // 添加请求头
       config.headers['Authorization'] = `Bearer ${token}`

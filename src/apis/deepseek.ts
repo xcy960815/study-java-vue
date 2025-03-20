@@ -3,14 +3,14 @@ import { Gpt } from '@utils/ai'
 
 const gpt = new Gpt({
   completionsUrl: '/deepseek/completions',
-//   apiKey: '',
-  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
+  //   apiKey: '',
+  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX
   // markdown2Html: true
 })
 
 /**
  * 构建deepseek 请求地址
- * @param {string} url 请求地址 
+ * @param {string} url 请求地址
  * @returns {string}
  */
 const buildRequestUrl = (url: string) => `/deepseek${url}`
@@ -21,9 +21,7 @@ const buildRequestUrl = (url: string) => `/deepseek${url}`
  */
 export const models = <T extends DeepSeekDto.Models>() => {
   const url = buildRequestUrl('/models')
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url
-  )
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
 
 /**
@@ -32,14 +30,8 @@ export const models = <T extends DeepSeekDto.Models>() => {
  * @param questionOption
  * @returns
  */
-export const completions = async (
-  question: string,
-  questionOption: AI.Gpt.GetAnswerOptions
-) => {
-  const response = await gpt.getAnswer(
-    question,
-    questionOption
-  )
+export const completions = async (question: string, questionOption: AI.Gpt.GetAnswerOptions) => {
+  const response = await gpt.getAnswer(question, questionOption)
   return response
 }
 /**

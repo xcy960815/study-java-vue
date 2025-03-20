@@ -1,5 +1,5 @@
 import { Core } from './core'
-import { RoleEnum } from "@enums"
+import { RoleEnum } from '@enums'
 const MODEL = 'text-davinci-003'
 
 const USER_PROMPT_PREFIX = 'User'
@@ -8,10 +8,7 @@ const SYSTEM_PROMPT_PREFIX_DEFAULT = 'ChatGPT'
 
 export class Text extends Core {
   /** 默认请求参数 */
-  private _requestParams: Omit<
-    AI.Text.RequestParams,
-    'prompt'
-  >
+  private _requestParams: Omit<AI.Text.RequestParams, 'prompt'>
   /** 用户提示前缀 */
   private _userPromptPrefix: string
   /** 系统提示前缀 */
@@ -22,12 +19,7 @@ export class Text extends Core {
   // private _sepToken: string;
 
   constructor(options: AI.Text.TextCoreOptions) {
-    const {
-      requestParams,
-      userPromptPrefix,
-      systemPromptPrefix,
-      ...coreOption
-    } = options
+    const { requestParams, userPromptPrefix, systemPromptPrefix, ...coreOption } = options
 
     super(coreOption)
 
@@ -47,12 +39,10 @@ export class Text extends Core {
       this._requestParams.stop = [this._endToken]
     }
     /** 用户前缀 */
-    this._userPromptPrefix =
-      userPromptPrefix || USER_PROMPT_PREFIX
+    this._userPromptPrefix = userPromptPrefix || USER_PROMPT_PREFIX
 
     /** 系统前缀 */
-    this._systemPromptPrefix =
-      systemPromptPrefix || SYSTEM_PROMPT_PREFIX_DEFAULT
+    this._systemPromptPrefix = systemPromptPrefix || SYSTEM_PROMPT_PREFIX_DEFAULT
   }
 
   /**
@@ -65,14 +55,9 @@ export class Text extends Core {
     question: string,
     options: AI.Text.GetAnswerOptions
   ): Promise<AI.FetchRequestInit> {
-    const {
-      onProgress,
-      stream = onProgress ? true : false,
-      requestParams
-    } = options
+    const { onProgress, stream = onProgress ? true : false, requestParams } = options
     // 获取用户和gpt历史对话记录
-    const { prompt, maxTokens } =
-      await this._getConversationHistory(question, options)
+    const { prompt, maxTokens } = await this._getConversationHistory(question, options)
     const body = {
       ...this._requestParams,
       ...requestParams,
@@ -95,103 +80,70 @@ export class Text extends Core {
    * @param {AI.Text.GetAnswerOptions} options
    * @returns {Promise<AI.Text.AssistantConversation>}
    */
-  public async getAnswer(
-    text: string,
-    options: AI.Text.GetAnswerOptions
-  ): Promise<AI.Text.AssistantConversation> {
-    const {
-      onProgress,
-      stream = onProgress ? true : false,
-      requestParams
-    } = options
+  public async getAnswer(text: string, options: AI.Text.GetAnswerOptions): Promise<AI.Text.AssistantConversation> {
+    const { onProgress, stream = onProgress ? true : false, requestParams } = options
     // 构建用户消息
-    const userMessage = this.buildConversation(
-      RoleEnum.User,
-      text,
-      options
-    )
+    const userMessage = this.buildConversation(RoleEnum.User, text, options)
     await this.upsertConversation(userMessage)
 
     /* 构建助手消息 */
-    const assistantMessage = this.buildConversation(
-      RoleEnum.Assistant,
-      '',
-      { ...options, messageId: userMessage.messageId }
-    )
-    const responseP =
-      new Promise<AI.Text.AssistantConversation>(
-        async (resolve, reject) => {
-          const requestInit =
-            await this._getFetchRequestInit(text, options)
+    const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
+      ...options,
+      messageId: userMessage.messageId
+    })
+    const responseP = new Promise<AI.Text.AssistantConversation>(async (resolve, reject) => {
+      const requestInit = await this._getFetchRequestInit(text, options)
 
-          if (stream) {
-            requestInit.onMessage = (data: string) => {
-              if (data === '[DONE]') {
-                assistantMessage.content =
-                  assistantMessage.content.trim()
-                resolve(assistantMessage)
-                return
-              }
-              try {
-                const response: AI.Text.Response =
-                  JSON.parse(data)
-                if (response.id) {
-                  assistantMessage.messageId = response.id
-                }
-                if (response?.choices?.length) {
-                  // 这个模型返回的数据是一个字一个字返回的 需要累加操作
-                  assistantMessage.content +=
-                    response.choices[0].text
-                  assistantMessage.detail = response
-                  onProgress?.(assistantMessage)
-                }
-              } catch (error) {
-                console.warn(
-                  'ChatGPT stream SEE event unexpected error',
-                  error
-                )
-                reject(error)
-                return
-              }
+      if (stream) {
+        requestInit.onMessage = (data: string) => {
+          if (data === '[DONE]') {
+            assistantMessage.content = assistantMessage.content.trim()
+            resolve(assistantMessage)
+            return
+          }
+          try {
+            const response: AI.Text.Response = JSON.parse(data)
+            if (response.id) {
+              assistantMessage.messageId = response.id
             }
-            await this._fetchSSE(
-              this.completionsUrl,
-              requestInit
-            ).catch(reject)
-          } else {
-            try {
-              const response =
-                await this._fetchSSE<AI.Text.Response>(
-                  this.completionsUrl,
-                  requestInit
-                )
-              const data = await response?.json()
-              if (data?.id) {
-                assistantMessage.messageId = data.id
-              }
-              if (data?.choices?.length) {
-                assistantMessage.content =
-                  data?.choices[0]?.text?.trim() || ''
-              }
-              assistantMessage.detail = data
-
-              resolve(assistantMessage)
-
-              return
-            } catch (error) {
-              return reject(error)
+            if (response?.choices?.length) {
+              // 这个模型返回的数据是一个字一个字返回的 需要累加操作
+              assistantMessage.content += response.choices[0].text
+              assistantMessage.detail = response
+              onProgress?.(assistantMessage)
             }
+          } catch (error) {
+            console.warn('ChatGPT stream SEE event unexpected error', error)
+            reject(error)
+            return
           }
         }
-      ).then((Conversation) => {
-        return this.upsertConversation(Conversation).then(
-          () => {
-            Conversation.parentMessageId =
-              Conversation.messageId
-            return Conversation
+        await this._fetchSSE(this.completionsUrl, requestInit).catch(reject)
+      } else {
+        try {
+          const response = await this._fetchSSE<AI.Text.Response>(this.completionsUrl, requestInit)
+          const data = await response?.json()
+          if (data?.id) {
+            assistantMessage.messageId = data.id
           }
-        )
+          if (data?.choices?.length) {
+            assistantMessage.content = data?.choices[0]?.text?.trim() || ''
+          }
+          assistantMessage.detail = data
+
+          resolve(assistantMessage)
+
+          return
+        } catch (error) {
+          return reject(error)
+        }
+      }
+    }).then((Conversation) => {
+      return this.upsertConversation(Conversation).then(() => {
+        Conversation.parentMessageId = Conversation.messageId
+        return Conversation
       })
+    })
     return this.clearablePromise(responseP, {
       milliseconds: this._milliseconds,
       message: ``
@@ -210,14 +162,10 @@ export class Text extends Core {
     prompt: string
     maxTokens: number
   }> {
-    const systemMessage = `System:${options.systemMessage || this._systemMessage
-      }${this._endToken}`
+    const systemMessage = `System:${options.systemMessage || this._systemMessage}${this._endToken}`
     // 系统提示符前缀
-    const systemPromptPrefix =
-      options.systemPromptPrefix ||
-      `${this._systemPromptPrefix}:`
-    const maxTokenCount =
-      this._maxModelTokens - this._maxResponseTokens
+    const systemPromptPrefix = options.systemPromptPrefix || `${this._systemPromptPrefix}:`
+    const maxTokenCount = this._maxModelTokens - this._maxResponseTokens
     let parentMessageId = options.parentMessageId
     // 当前用户消息
     const currentUserPrompt = `${this._userPromptPrefix}:${message}${this._endToken}`
@@ -236,17 +184,12 @@ export class Text extends Core {
       if (!parentMessageId) {
         break
       }
-      const parentMessage = await this.getConversation(
-        parentMessageId
-      )
+      const parentMessage = await this.getConversation(parentMessageId)
       if (!parentMessage) {
         break
       }
       const parentMessageRole = parentMessage.role
-      const parentMessagePromptPrefix =
-        parentMessageRole === 'user'
-          ? this._userPromptPrefix
-          : this._systemPromptPrefix
+      const parentMessagePromptPrefix = parentMessageRole === 'user' ? this._userPromptPrefix : this._systemPromptPrefix
       // 历史消息
       const parentMessagePrompt = `${parentMessagePromptPrefix}:${parentMessage.content}${this._endToken}`
       historyPrompt = `${parentMessagePrompt}${historyPrompt}`
@@ -255,13 +198,7 @@ export class Text extends Core {
 
     const prompt = `${systemMessage}${historyPrompt}${currentUserPrompt}${systemPromptPrefix}`
 
-    const maxTokens = Math.max(
-      1,
-      Math.min(
-        this._maxModelTokens - tokenCount,
-        this._maxResponseTokens
-      )
-    )
+    const maxTokens = Math.max(1, Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens))
 
     return { prompt, maxTokens }
   }

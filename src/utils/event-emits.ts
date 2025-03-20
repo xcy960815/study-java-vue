@@ -1,8 +1,4 @@
-const eventNames = [
-  'token-invalid',
-  'login',
-  'logout'
-] as const
+const eventNames = ['token-invalid', 'login', 'logout'] as const
 
 // 定义事件名称
 type EventNames = (typeof eventNames)[number]
@@ -16,10 +12,7 @@ interface EventMap {
 
 // 自定义事件发射器类
 class CustomEventEmitter {
-  private listeners: Map<
-    EventNames,
-    Set<(...args: any[]) => void>
-  > = new Map()
+  private listeners: Map<EventNames, Set<(...args: any[]) => void>> = new Map()
 
   /**
    * 监听事件
@@ -27,16 +20,11 @@ class CustomEventEmitter {
    * @param listener
    * @returns
    */
-  public on<T extends EventNames>(
-    eventName: T,
-    listener: (...args: EventMap[T]) => void
-  ): this {
+  public on<T extends EventNames>(eventName: T, listener: (...args: EventMap[T]) => void): this {
     if (!this.listeners.has(eventName)) {
       this.listeners.set(eventName, new Set())
     }
-    this.listeners
-      .get(eventName)!
-      .add(listener as (...args: any[]) => void)
+    this.listeners.get(eventName)!.add(listener as (...args: any[]) => void)
     return this
   }
 
@@ -46,10 +34,7 @@ class CustomEventEmitter {
    * @param args
    * @returns
    */
-  public emit<T extends EventNames>(
-    eventName: T,
-    ...args: EventMap[T]
-  ): boolean {
+  public emit<T extends EventNames>(eventName: T, ...args: EventMap[T]): boolean {
     const listeners = this.listeners.get(eventName)
     if (!listeners || listeners.size === 0) return false
     listeners.forEach((listener) => listener(...args))
@@ -62,13 +47,8 @@ class CustomEventEmitter {
    * @param listener
    * @returns
    */
-  public off<T extends EventNames>(
-    eventName: T,
-    listener: (...args: EventMap[T]) => void
-  ): this {
-    this.listeners
-      .get(eventName)
-      ?.delete(listener as (...args: any[]) => void)
+  public off<T extends EventNames>(eventName: T, listener: (...args: EventMap[T]) => void): this {
+    this.listeners.get(eventName)?.delete(listener as (...args: any[]) => void)
     return this
   }
 }

@@ -8,16 +8,10 @@
     status-icon
   >
     <el-form-item label="商品名称" prop="categoryName">
-      <el-input
-        v-model="goodsCategoryFormData.categoryName"
-        placeholder="请输入商品名称"
-      />
+      <el-input v-model="goodsCategoryFormData.categoryName" placeholder="请输入商品名称" />
     </el-form-item>
     <el-form-item label="商品等级" prop="categoryLevel">
-      <el-input
-        v-model="goodsCategoryFormData.categoryLevel"
-        placeholder="请输入商品等级"
-      />
+      <el-input v-model="goodsCategoryFormData.categoryLevel" placeholder="请输入商品等级" />
     </el-form-item>
     <!-- <el-form-item label="个性签名" prop="introduceSign">
             <el-input v-model="goodsCategoryFormData.introduceSign
@@ -31,23 +25,17 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import {
-  type FormInstance,
-  type FormRules
-} from 'element-plus'
+import { type FormInstance, type FormRules } from 'element-plus'
 import { getGoodsCategoryDetail } from '@apis/goods-category'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const goodsCategoryFormRef = ref<FormInstance>()
 
-const goodsCategoryFormData = reactive<
-  Partial<GoodsCategoryDto>
->({
+const goodsCategoryFormData = reactive<Partial<GoodsCategoryDto>>({
   categoryName: '',
   categoryLevel: ''
 })
-const goodsCategoryFormRules: FormRules<GoodsCategoryDto> =
-  {}
+const goodsCategoryFormRules: FormRules<GoodsCategoryDto> = {}
 
 const getGoodsCategoryFormData = async () => {
   const categoryId = Number(route.query.id)

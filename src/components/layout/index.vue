@@ -1,9 +1,7 @@
 <template>
   <el-container class="layout-container w-screen h-screen flex">
     <layout-menu></layout-menu>
-    <el-container
-      class="layout-view-container flex-1 flex flex-col"
-    >
+    <el-container class="layout-view-container flex-1 flex flex-col">
       <layout-header></layout-header>
       <!-- 历史记录 -->
       <layout-history></layout-history>

@@ -17,32 +17,18 @@
     <div class="right-panel">
       <!-- 主题配置 -->
       <theme></theme>
-      <el-dropdown
-        trigger="contextmenu"
-        @command="handleChooseItem"
-        size="default"
-      >
+      <el-dropdown trigger="contextmenu" @command="handleChooseItem" size="default">
         <div class="user-info">
-          <el-avatar
-            class="user-avatar"
-            shape="square"
-            :src="userInfo.avatar"
-          />
+          <el-avatar class="user-avatar" shape="square" :src="userInfo.avatar" />
           <span class="user-name">
             {{ userInfo.nickName }}
           </span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="user-info"
-              >个人中心</el-dropdown-item
-            >
-            <el-dropdown-item command="change-password"
-              >修改密码</el-dropdown-item
-            >
-            <el-dropdown-item command="login-out"
-              >退出登录</el-dropdown-item
-            >
+            <el-dropdown-item command="user-info">个人中心</el-dropdown-item>
+            <el-dropdown-item command="change-password">修改密码</el-dropdown-item>
+            <el-dropdown-item command="login-out">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -52,16 +38,9 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
-import {
-  useUserInfoStore,
-  useSystemInfoStore,
-  useLoginStore
-} from '@store'
+import { useUserInfoStore, useSystemInfoStore, useLoginStore } from '@store'
 import { useRouter } from 'vue-router'
-import {
-  setStyleProperty,
-  LAYOUTSIDECONTAINERWIDTHKEY
-} from '@/utils/system-style'
+import { setStyleProperty, LAYOUTSIDECONTAINERWIDTHKEY } from '@/utils/system-style'
 import Theme from './themen.vue'
 const router = useRouter()
 
@@ -70,9 +49,7 @@ const userInfo = computed(() => userInfoStore.$state)
 
 const systemInfoStore = useSystemInfoStore()
 
-const openMenuFlag = computed(
-  () => systemInfoStore.getOpenMenuFlag
-)
+const openMenuFlag = computed(() => systemInfoStore.getOpenMenuFlag)
 
 /**
  * 点击展开收起小图标
@@ -80,13 +57,8 @@ const openMenuFlag = computed(
 const toggleClick = () => {
   systemInfoStore.reversalOpenMenuFlag()
   if (openMenuFlag.value) {
-    const history_width =
-      localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) ||
-      '300px'
-    setStyleProperty(
-      LAYOUTSIDECONTAINERWIDTHKEY,
-      history_width
-    )
+    const history_width = localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) || '300px'
+    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
   } else {
     setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
   }

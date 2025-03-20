@@ -1,19 +1,15 @@
-import {
-  createParser,
-  type EventSourceParser
-} from 'eventsource-parser'
+import { createParser, type EventSourceParser } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
 // import Gpt3Tokenizer from 'gpt3-tokenizer'
-import { encode } from "gpt-tokenizer";
-import Markdown from "markdown-it";
-import { type Options as MarkdownOptions } from "markdown-it"
-import highlight from "highlight.js";
-import { RoleEnum } from "@enums"
+import { encode } from 'gpt-tokenizer'
+import Markdown from 'markdown-it'
+import { type Options as MarkdownOptions } from 'markdown-it'
+import highlight from 'highlight.js'
+import { RoleEnum } from '@enums'
 
 const BEGINWIDTHKEEPALIVE = ' : keep-alive'
 
 const BEGINWIDTHDATA = 'data:'
-
 
 /**
  * 基础类 有一些公共方法
@@ -62,11 +58,11 @@ export class Core {
       maxResponseTokens,
       systemMessage,
       milliseconds,
-      completionsUrl,
+      completionsUrl
       // markdown2Html
     } = options
 
-    this._apiKey = apiKey ?? ""
+    this._apiKey = apiKey ?? ''
 
     this._apiBaseUrl = apiBaseUrl ?? 'https://api.AI.com'
 
@@ -86,7 +82,9 @@ export class Core {
     //   type: 'gpt3'
     // })
 
-    this._systemMessage = systemMessage ?? `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`
+    this._systemMessage =
+      systemMessage ??
+      `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`
 
     this._abortController = new AbortController()
 
@@ -96,8 +94,7 @@ export class Core {
 
     this._completionsUrl = completionsUrl
 
-    this._markdown = new Markdown(this.markdownOptions);
-
+    this._markdown = new Markdown(this.markdownOptions)
   }
 
   private get markdownOptions(): MarkdownOptions {
@@ -107,23 +104,15 @@ export class Core {
       breaks: true,
       xhtmlOut: true,
       typographer: true,
-      langPrefix: "language-",
+      langPrefix: 'language-',
       highlight: (content, lang) => {
         if (lang && highlight.getLanguage(lang)) {
           try {
-            return (
-              '<pre class="hljs"><code>' +
-              highlight.highlight(lang, content, true).value +
-              "</code></pre>"
-            );
-          } catch (__) { }
+            return '<pre class="hljs"><code>' + highlight.highlight(lang, content, true).value + '</code></pre>'
+          } catch (__) {}
         }
 
-        return (
-          '<pre class="hljs"><code>' +
-          this._markdown.utils.escapeHtml(content) +
-          "</code></pre>"
-        );
+        return '<pre class="hljs"><code>' + this._markdown.utils.escapeHtml(content) + '</code></pre>'
       }
     }
   }
@@ -141,8 +130,7 @@ export class Core {
    * @returns {string}
    */
   protected get completionsUrl() {
-    return `${this._apiBaseUrl}${this._completionsUrl ?? '/v1/chat/completions'
-      }`
+    return `${this._apiBaseUrl}${this._completionsUrl ?? '/v1/chat/completions'}`
   }
 
   /**
@@ -158,7 +146,6 @@ export class Core {
    * @returns {HeadersInit}
    */
   protected get headers(): HeadersInit {
-
     // if (!this._apiKey) {
     //   throw new AiError('没有设置apiKey')
     // }
@@ -177,19 +164,13 @@ export class Core {
    * @param {string} text
    * @returns {Promise<number>}
    */
-  protected getTokenCount(
-    text: string
-  ): number {
+  protected getTokenCount(text: string): number {
     // return await this._gpt3Tokenizer.encode(text).bpe.length
     return encode(text).length
   }
   /** 函数重载 start */
 
-  public buildConversation(
-    role: RoleEnum.User,
-    content: string,
-    option: AI.GetAnswerOptions
-  ): AI.Conversation
+  public buildConversation(role: RoleEnum.User, content: string, option: AI.GetAnswerOptions): AI.Conversation
 
   public buildConversation(
     role: RoleEnum.Assistant,
@@ -238,9 +219,7 @@ export class Core {
    * @param {string} id _messageStore 中的key
    * @returns {Promise<AI.Conversation | undefined>}
    */
-  protected getConversation(
-    id: string
-  ): Promise<AI.Conversation | undefined> {
+  protected getConversation(id: string): Promise<AI.Conversation | undefined> {
     return new Promise((resolve) => {
       const message = this._messageStore.get(id)
       resolve(message)
@@ -252,9 +231,7 @@ export class Core {
    */
   public getAllConversations(): Promise<AI.Conversation[]> {
     return new Promise((resolve) => {
-      const messages = Array.from(
-        this._messageStore.values()
-      )
+      const messages = Array.from(this._messageStore.values())
       resolve(messages)
     })
   }
@@ -263,9 +240,7 @@ export class Core {
    * @param {AI.Conversation} message
    * @returns {Promise<void>}
    */
-  protected upsertConversation(
-    message: AI.Conversation
-  ): Promise<void> {
+  protected upsertConversation(message: AI.Conversation): Promise<void> {
     return new Promise((resolve) => {
       // 这里做层浅拷贝 因为map存储的值如果是对象的话 会受到指针的影响
       this._messageStore.set(message?.messageId, {
@@ -303,9 +278,7 @@ export class Core {
    * @param {ReadableStream<Uint8Array>} stream
    * @returns {AsyncIterable<Uint8Array>}
    */
-  private async *streamAsyncIterable(
-    stream: ReadableStream<Uint8Array>
-  ): AsyncIterable<Uint8Array> {
+  private async *streamAsyncIterable(stream: ReadableStream<Uint8Array>): AsyncIterable<Uint8Array> {
     const reader = stream.getReader()
     try {
       while (true) {
@@ -349,9 +322,7 @@ export class Core {
     }
     const parser = this._createParser(onMessage)
     const body = response.body
-    for await (const chunk of this.streamAsyncIterable(
-      body!
-    )) {
+    for await (const chunk of this.streamAsyncIterable(body!)) {
       const chunkString = new TextDecoder().decode(chunk)
       parser.feed(chunkString)
     }
@@ -361,17 +332,12 @@ export class Core {
    * @param {(p:string) => void} onMessage
    * @returns {EventSourceParser}
    */
-  private _createParser(
-    onMessage: (p: string) => void
-  ): EventSourceParser {
+  private _createParser(onMessage: (p: string) => void): EventSourceParser {
     return createParser({
       onEvent: (event) => {
         const data = event.data.trim()
         if (data) {
-          if (
-            data.startsWith(BEGINWIDTHDATA) &&
-            !data.startsWith(BEGINWIDTHKEEPALIVE)
-          ) {
+          if (data.startsWith(BEGINWIDTHDATA) && !data.startsWith(BEGINWIDTHKEEPALIVE)) {
             // 兼容deepseek接口 deepseek 接口返回的数据是以data:开头的 且 有时候会带有 : keep-alive 这两种情况 JSON.parse 解析不了
             onMessage?.(data.slice(6))
           } else {
@@ -388,51 +354,42 @@ export class Core {
    * @param {string} content
    * @returns {string}
    */
-  public markdownToHtml(
-    content: string
-  ): string {
+  public markdownToHtml(content: string): string {
     return this._markdown.render(content)
   }
 
   /**
    * 清空promise
    */
-  protected clearablePromise<V extends Object>(
-    inputPromise: PromiseLike<V>,
-    options: AI.ClearablePromiseOptions
-  ) {
+  protected clearablePromise<V extends Object>(inputPromise: PromiseLike<V>, options: AI.ClearablePromiseOptions) {
     const { milliseconds, message } = options
     let timer: ReturnType<typeof setTimeout> | undefined
-    const wrappedPromise = new Promise<V>(
-      (resolve, reject) => {
-        // 清空定时器
-        if (milliseconds === Number.POSITIVE_INFINITY) {
-          inputPromise.then(resolve, reject)
-          return
-        }
-        try {
-          timer = setTimeout.call(
-            undefined,
-            () => {
-              // 终止请求
-              this._abortController.abort()
-              const errorMessage =
-                message ??
-                `Promise timed out after ${milliseconds} milliseconds`
-              const timeoutError = new AiError(errorMessage)
-              reject(timeoutError)
-            },
-            milliseconds
-          )
-        } catch (error) {
-          reject(error)
-        } finally {
-          inputPromise.then((inputPromiseResult) => {
-            resolve(inputPromiseResult)
-          })
-        }
+    const wrappedPromise = new Promise<V>((resolve, reject) => {
+      // 清空定时器
+      if (milliseconds === Number.POSITIVE_INFINITY) {
+        inputPromise.then(resolve, reject)
+        return
       }
-    )
+      try {
+        timer = setTimeout.call(
+          undefined,
+          () => {
+            // 终止请求
+            this._abortController.abort()
+            const errorMessage = message ?? `Promise timed out after ${milliseconds} milliseconds`
+            const timeoutError = new AiError(errorMessage)
+            reject(timeoutError)
+          },
+          milliseconds
+        )
+      } catch (error) {
+        reject(error)
+      } finally {
+        inputPromise.then((inputPromiseResult) => {
+          resolve(inputPromiseResult)
+        })
+      }
+    })
 
     /**
      * 默认清除定时器
@@ -474,7 +431,7 @@ export class AiError extends Error {
   url?: string
   constructor(message: string, option?: AI.AiErrorOption) {
     super(message)
-    this.name = 'AIError';
+    this.name = 'AIError'
     if (option) {
       const { status, statusText, url } = option
       this.status = status

@@ -1,15 +1,8 @@
 <template>
   <template v-for="menuItem in menuData">
-    <el-sub-menu
-      v-if="hasSubMenu(menuItem)"
-      :index="menuItem.path"
-    >
+    <el-sub-menu v-if="hasSubMenu(menuItem)" :index="menuItem.path">
       <template #title>
-        <icon
-          v-if="menuItem.meta?.icon"
-          :name="menuItem.meta?.icon"
-          class="icon"
-        ></icon>
+        <icon v-if="menuItem.meta?.icon" :name="menuItem.meta?.icon" class="icon"></icon>
         <!-- 占位符 -->
         <span class="icon" v-else></span>
         <span>{{ menuItem.meta?.title }}</span>
@@ -17,11 +10,7 @@
       <menu-item :menu-data="menuItem.children"></menu-item>
     </el-sub-menu>
     <el-menu-item v-else :index="menuItem.path">
-      <icon
-        v-if="menuItem.meta?.icon"
-        :name="menuItem.meta?.icon"
-        class="icon"
-      ></icon>
+      <icon v-if="menuItem.meta?.icon" :name="menuItem.meta?.icon" class="icon"></icon>
       <!-- 占位符 -->
       <span class="icon" v-else></span>
       <span>{{ menuItem.meta?.title }}</span>

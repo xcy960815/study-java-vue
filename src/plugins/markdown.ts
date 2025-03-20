@@ -20,12 +20,14 @@ const markdownIt = new MarkdownIt({
   typographer: true
 })
 
-markdownIt.use(markdownItHighlight, {
-  hljs
-}).use(preWrapperPlugin, {
-  hasSingleTheme: true
-}).use(markdownItKatex)
-
+markdownIt
+  .use(markdownItHighlight, {
+    hljs
+  })
+  .use(preWrapperPlugin, {
+    hasSingleTheme: true
+  })
+  .use(markdownItKatex)
 
 const transformMathMarkdown = (markdownText: string) => {
   const data = splitAtDelimiters(markdownText, [
@@ -104,14 +106,10 @@ const transformThinkMarkdown = (source: string): string => {
   return result
 }
 
-
 export const renderMarkdownText = (content: string) => {
   const thinkTransformed = transformThinkMarkdown(content)
   const mathTransformed = transformMathMarkdown(thinkTransformed)
-  console.log("mathTransformed",mathTransformed);
-  
+  console.log('mathTransformed', mathTransformed)
+
   return markdownIt.render(mathTransformed)
 }
-
-
-

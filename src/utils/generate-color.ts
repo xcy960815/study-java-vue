@@ -13,23 +13,7 @@ type HSL = {
   l: number
 }
 
-type HEX_VALUE =
-  | '0'
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | 'A'
-  | 'B'
-  | 'C'
-  | 'D'
-  | 'E'
-  | 'F'
+type HEX_VALUE = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
 
 // 组合字符串类型枚举的数量太多了，没办法限定了直接string
 // type HEX =
@@ -93,9 +77,7 @@ function normalizationColor(color: string): HEX {
     } else if (len === 6) {
       return `#${val}`
     } else if (len === 3) {
-      return val
-        .split('')
-        .reduce((pre, cur) => `${pre}${cur + cur}`, '#')
+      return val.split('').reduce((pre, cur) => `${pre}${cur + cur}`, '#')
     } else {
       throw new TypeError('hex color is invalid.')
     }
@@ -154,8 +136,7 @@ function rgbToHsl(rgb: RGB): HSL {
   if (max === min) {
     hsl.h = 0
   } else if (max === r) {
-    hsl.h =
-      60 * ((g - b) / (max - min)) + (g >= b ? 0 : 360)
+    hsl.h = 60 * ((g - b) / (max - min)) + (g >= b ? 0 : 360)
   } else if (max === g) {
     hsl.h = 60 * ((b - r) / (max - min)) + 120
   } else {
@@ -234,9 +215,7 @@ function hexToRGB(hex: HEX): RGB {
     throw new Error('请传入合法的16进制颜色值，eg: #FF0000')
   }
 
-  const hexValArr = (
-    hexRegExp.exec(hex)?.[1] || '000000'
-  ).split('') as Array<HEX_VALUE>
+  const hexValArr = (hexRegExp.exec(hex)?.[1] || '000000').split('') as Array<HEX_VALUE>
 
   return {
     r: HEX_MAP[hexValArr[0]] * 16 + HEX_MAP[hexValArr[1]],
@@ -253,23 +232,14 @@ function hexToRGB(hex: HEX): RGB {
 function rgbToHex(rgb: RGB): HEX {
   const HEX_MAP_REVERSE: Record<string, HEX_VALUE> = {}
   for (const key in HEX_MAP) {
-    HEX_MAP_REVERSE[HEX_MAP[key as HEX_VALUE]] =
-      key as HEX_VALUE
+    HEX_MAP_REVERSE[HEX_MAP[key as HEX_VALUE]] = key as HEX_VALUE
   }
-  function getRemainderAndQuotient(
-    val: number
-  ): `${HEX_VALUE}${HEX_VALUE}` {
+  function getRemainderAndQuotient(val: number): `${HEX_VALUE}${HEX_VALUE}` {
     val = Math.round(val)
-    return `${HEX_MAP_REVERSE[Math.floor(val / 16)]}${
-      HEX_MAP_REVERSE[val % 16]
-    }`
+    return `${HEX_MAP_REVERSE[Math.floor(val / 16)]}${HEX_MAP_REVERSE[val % 16]}`
   }
 
-  return `#${getRemainderAndQuotient(
-    rgb.r
-  )}${getRemainderAndQuotient(
-    rgb.g
-  )}${getRemainderAndQuotient(rgb.b)}`
+  return `#${getRemainderAndQuotient(rgb.r)}${getRemainderAndQuotient(rgb.g)}${getRemainderAndQuotient(rgb.b)}`
 }
 
 // hsl 转 16进制
@@ -291,32 +261,14 @@ function getMixColorFromVar(isDark?: boolean) {
   let mixLightColor, mixDarkColor
 
   if (isDark) {
-    mixLightColor = getComputedStyle(
-      document.documentElement
-    )
-      .getPropertyValue(VAR_BG)
-      .trim()
-    mixDarkColor = getComputedStyle(
-      document.documentElement
-    )
-      .getPropertyValue(VAR_WHITE)
-      .trim()
+    mixLightColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_BG).trim()
+    mixDarkColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim()
   } else {
-    mixLightColor = getComputedStyle(
-      document.documentElement
-    )
-      .getPropertyValue(VAR_WHITE)
-      .trim()
-    mixDarkColor = getComputedStyle(
-      document.documentElement
-    )
-      .getPropertyValue(VAR_BLACK)
-      .trim()
+    mixLightColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim()
+    mixDarkColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_BLACK).trim()
   }
 
-  mixLightColor = hexToRGB(
-    normalizationColor(mixLightColor)
-  )
+  mixLightColor = hexToRGB(normalizationColor(mixLightColor))
   mixDarkColor = hexToRGB(normalizationColor(mixDarkColor))
 
   return {
@@ -338,15 +290,10 @@ function genMixColor(
   base = normalizationColor(base)
   const rgbBase = hexToRGB(base)
 
-  const { mixLightColor, mixDarkColor } =
-    getMixColorFromVar(isDark)
+  const { mixLightColor, mixDarkColor } = getMixColorFromVar(isDark)
 
   // 混合色
-  function mix(
-    color: RGB,
-    mixColor: RGB,
-    weight: number
-  ): RGB {
+  function mix(color: RGB, mixColor: RGB, weight: number): RGB {
     return {
       r: color.r * (1 - weight) + mixColor.r * weight,
       g: color.g * (1 - weight) + mixColor.g * weight,
@@ -381,12 +328,4 @@ function genMixColor(
   }
 }
 
-export {
-  genMixColor,
-  rgbToHsl,
-  rgbToHex,
-  hslToRgb,
-  hslToHex,
-  hexToRGB,
-  hexToHsl
-}
+export { genMixColor, rgbToHsl, rgbToHex, hslToRgb, hslToHex, hexToRGB, hexToHsl }

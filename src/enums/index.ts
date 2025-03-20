@@ -15,5 +15,3 @@ export const enum StoreNames {
   SYSTEM = 'SYSTEM',
   LOGIN = 'LOGIN'
 }
-
-

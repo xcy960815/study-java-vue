@@ -5,14 +5,9 @@ import { request } from '@utils/request'
  * @param {LoginRequestVo} requestParams
  * @returns {Promise<ResponseResult<T>>}
  */
-export function login<T extends LoginResponseDto>(
-  requestParams: LoginRequestVo
-) {
+export function login<T extends LoginResponseDto>(requestParams: LoginRequestVo) {
   const url = `/login`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    requestParams
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, requestParams)
 }
 
 /**
@@ -21,9 +16,7 @@ export function login<T extends LoginResponseDto>(
  */
 export function logout<T extends null>() {
   const url = `/logout`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url)
 }
 
 /**
@@ -31,7 +24,5 @@ export function logout<T extends null>() {
  */
 export function getCaptcha<T extends string>() {
   const url = `/captcha`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url
-  )
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }

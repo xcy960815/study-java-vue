@@ -28,11 +28,7 @@ import { loginStore as useLoginStore } from './login'
 //   }
 // }
 
-export {
-  useUserInfoStore,
-  useSystemInfoStore,
-  useLoginStore
-}
+export { useUserInfoStore, useSystemInfoStore, useLoginStore }
 
 const store = createPinia()
 /* 数据持久化 */

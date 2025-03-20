@@ -12,10 +12,7 @@ export function debounce<F extends (...args: any[]) => any>(
 ): (...args: Parameters<F>) => ReturnType<F> {
   let timeoutId: ReturnType<typeof setTimeout> | null
 
-  const debouncedFunction = function (
-    this: ThisParameterType<F>,
-    ...args: Parameters<F>
-  ) {
+  const debouncedFunction = function (this: ThisParameterType<F>, ...args: Parameters<F>) {
     const context = this
 
     if (timeoutId) {
@@ -30,9 +27,7 @@ export function debounce<F extends (...args: any[]) => any>(
     })
   }
 
-  return debouncedFunction as (
-    ...args: Parameters<F>
-  ) => ReturnType<F>
+  return debouncedFunction as (...args: Parameters<F>) => ReturnType<F>
 }
 
 export const initBackground = () => {
@@ -42,9 +37,7 @@ export const initBackground = () => {
    */
   const fontSizeMultiplier = 10
 
-  const setIntervalId = ref<ReturnType<
-    typeof setInterval
-  > | null>(null)
+  const setIntervalId = ref<ReturnType<typeof setInterval> | null>(null)
 
   /**
    * 颜色列表
@@ -70,16 +63,12 @@ export const initBackground = () => {
    * 获取随机颜色
    * @returns {string}
    */
-  const getRandomColor = () =>
-    fontColors[
-      Math.floor(Math.random() * fontColors.length)
-    ]
+  const getRandomColor = () => fontColors[Math.floor(Math.random() * fontColors.length)]
   /**
    * 获取随机字符
    * @returns {string}
    */
-  const getRandomChar = () =>
-    charSet[Math.floor(Math.random() * charSet.length)]
+  const getRandomChar = () => charSet[Math.floor(Math.random() * charSet.length)]
 
   /**
    * 改变颜色透明度
@@ -102,9 +91,7 @@ export const initBackground = () => {
     if (setIntervalId.value) {
       clearInterval(setIntervalId.value)
     }
-    const cvs = document.getElementById(
-      'cvs'
-    ) as HTMLCanvasElement
+    const cvs = document.getElementById('cvs') as HTMLCanvasElement
 
     const width = window.innerWidth * devicePixelRatio
     const height = window.innerHeight * devicePixelRatio
@@ -112,16 +99,12 @@ export const initBackground = () => {
     cvs.width = width
     cvs.height = height
 
-    const ctx = cvs.getContext(
-      '2d'
-    ) as CanvasRenderingContext2D
+    const ctx = cvs.getContext('2d') as CanvasRenderingContext2D
     const fontSize = fontSizeMultiplier * devicePixelRatio
     const columnWidth = fontSize
     const columnCount = Math.floor(width / columnWidth)
 
-    const nextCharIndexInColumn = new Array(
-      columnCount
-    ).fill(0)
+    const nextCharIndexInColumn = new Array(columnCount).fill(0)
 
     const draw = () => {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.1)'
@@ -130,18 +113,11 @@ export const initBackground = () => {
       for (let i = 0; i < columnCount; i++) {
         const randomChar = getRandomChar()
         const xPosition = i * columnWidth
-        const yPosition =
-          (nextCharIndexInColumn[i] + 1) * fontSize
+        const yPosition = (nextCharIndexInColumn[i] + 1) * fontSize
 
-        const opacityFactor =
-          yPosition / height < 0.2
-            ? yPosition / (height * 0.2)
-            : 1
+        const opacityFactor = yPosition / height < 0.2 ? yPosition / (height * 0.2) : 1
 
-        ctx.fillStyle = changeAlpha(
-          getRandomColor(),
-          opacityFactor
-        )
+        ctx.fillStyle = changeAlpha(getRandomColor(), opacityFactor)
 
         ctx.font = `${fontSize}px 'Monaco', monospace`
 

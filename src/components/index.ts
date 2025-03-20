@@ -4,10 +4,9 @@
 import HandleTooBar from './handle-toolbar/index.vue'
 import Icon from './icon/index.vue'
 // import * as ElIcon from '@element-plus/icons-vue'
-import * as IconParkAll from "@icon-park/vue-next";
+import * as IconParkAll from '@icon-park/vue-next'
 
 const { IconProvider, DEFAULT_ICON_CONFIGS, ...IconPark } = IconParkAll
-
 
 /**
  * 统一注册全局组件

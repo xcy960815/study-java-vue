@@ -6,33 +6,23 @@ import { request } from '@utils/request'
  */
 export const getUserInfo = <T extends UserInfoDto>() => {
   const url = `/user/getUserInfo`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url
-  )
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
 
-interface UserListRequestParams
-  extends baseListParams,
-    UserInfoVo {}
+interface UserListRequestParams extends baseListParams, UserInfoVo {}
 /**
  * 获取用户列表请求参数类型
  * @param queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getUserList = <
-  T extends ListResonse<UserInfoDto>
->(
+export const getUserList = <T extends ListResonse<UserInfoDto>>(
   queryFormData: UserListRequestParams
 ): Promise<ResponseResult<T>> => {
-  const { pageSize, pageNum, ...otherQueryFormData } =
-    queryFormData
+  const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `/user/getUserList?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    {
-      params: otherQueryFormData
-    }
-  )
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: otherQueryFormData
+  })
 }
 
 /**
@@ -40,14 +30,9 @@ export const getUserList = <
  * @param {UserInfoVo} params
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const updateUserInfo = <T extends boolean>(
-  params: UserInfoVo
-): Promise<ResponseResult<T>> => {
+export const updateUserInfo = <T extends boolean>(params: UserInfoVo): Promise<ResponseResult<T>> => {
   const url = `/user/updateUserInfo`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    params
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
 
 /**
@@ -55,14 +40,9 @@ export const updateUserInfo = <T extends boolean>(
  * @param params {FormData}
  * @returns {Promise<ResponseResult<string>>}
  */
-export const updateUserAvatar = <T extends string>(
-  params: FormData
-) => {
+export const updateUserAvatar = <T extends string>(params: FormData) => {
   const url = `/user/updateUserAvatar`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    params
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
 
 /**
@@ -70,14 +50,9 @@ export const updateUserAvatar = <T extends string>(
  * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<T>>}
  */
-export const insertUserInfo = <T extends boolean>(
-  params: Partial<UserInfoDto>
-): Promise<ResponseResult<T>> => {
+export const insertUserInfo = <T extends boolean>(params: Partial<UserInfoDto>): Promise<ResponseResult<T>> => {
   const url = `/user/insertUserInfo`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    params
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
 
 /**
@@ -85,14 +60,9 @@ export const insertUserInfo = <T extends boolean>(
  * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const deleteUserInfo = <T extends boolean>(
-  params: UserInfoVo
-): Promise<ResponseResult<T>> => {
+export const deleteUserInfo = <T extends boolean>(params: UserInfoVo): Promise<ResponseResult<T>> => {
   const url = `/user/deleteUserInfoInfo`
-  return request.delete<
-    ResponseResult<T>,
-    ResponseResult<T>
-  >(url, {
+  return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
     data: params
   })
 }
@@ -100,12 +70,7 @@ export const deleteUserInfo = <T extends boolean>(
 /**
  * 修改用户密码
  */
-export const updateUserPassword = async <T extends boolean>(
-  requestParams: UserInfoVo
-) => {
+export const updateUserPassword = async <T extends boolean>(requestParams: UserInfoVo) => {
   const url = `/user/updateUserPassword`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    requestParams
-  )
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, requestParams)
 }

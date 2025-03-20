@@ -6,18 +6,12 @@ interface RequestParams extends baseListParams {}
  * @param {RequestParams} queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export function getAdminUserList<
-  T = Array<AdminUserInfoDto>
->(
+export function getAdminUserList<T = Array<AdminUserInfoDto>>(
   queryFormData: RequestParams
 ): Promise<ResponseResult<T>> {
-  const { pageSize, pageNum, ...otherQueryFormData } =
-    queryFormData
+  const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `/adminUser/getAdminUserList?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(
-    url,
-    {
-      params: otherQueryFormData
-    }
-  )
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: otherQueryFormData
+  })
 }
