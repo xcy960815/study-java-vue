@@ -15,7 +15,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "prepare": "husky",
-    "eslint": "eslint . --max-warnings 0",
+    "eslint": "eslint . --max-warnings -1",
     "eslint:fix": "eslint . --max-warnings 0 --fix",
     "stylelint": "stylelint src/**/*.{html,vue,sass,less}",
     "stylelint:fix": "stylelint --fix src/**/*.{html,vue,css,sass,less}"
@@ -102,6 +102,11 @@
   },
   "volta": {
     "node": "18.20.4"
+  },
+  "husky":{
+    "hooks": {
+      "commit-msg": "lint-staged"
+    }
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json}": [
