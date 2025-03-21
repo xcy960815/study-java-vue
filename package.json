@@ -103,9 +103,9 @@
   "volta": {
     "node": "18.20.4"
   },
-  "husky":{
+  "husky": {
     "hooks": {
-      "commit-msg": "lint-staged"
+      "pre-commit": "npx lint-staged"
     }
   },
   "lint-staged": {

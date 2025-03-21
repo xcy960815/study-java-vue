@@ -7,10 +7,10 @@
       <el-table-column prop="owned_by" label="来源" />
       <el-table-column prop="created" label="注册时间">
         <template #default="{ row }">
-          {{ row.created == 0 ? '未知' : row.created }}
+                        {{ row.created == 0 ? '未知' : row.created }}
         </template>
       </el-table-column>
-      <el-table-column fixed="right" label="操作" width="150">
+      <el-table-column fixed="right"            label="操作" width="150">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleStartChat(row)">开始对话</el-button>
         </template>
