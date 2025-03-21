@@ -1,3 +1,4 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 echo "执行了pre-commit脚本"
-
 npx lint-staged
