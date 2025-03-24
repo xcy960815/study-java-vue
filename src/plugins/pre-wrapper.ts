@@ -1,5 +1,5 @@
 import type MarkdownIt from 'markdown-it'
-
+// import "@assets/style/markdown.scss"
 import PrismJsComponents from 'prismjs/components'
 
 export interface Options {
@@ -58,9 +58,9 @@ const getBaseLanguageName = (nameOrAlias: string, components = PrismJsComponents
   return lang.value
 }
 
-export function preWrapperPlugin(md: MarkdownIt, options: Options) {
-  const fence = md.renderer.rules.fence!
-  md.renderer.rules.fence = (...args) => {
+export function preWrapperPlugin(markdownIt: MarkdownIt, options: Options) {
+  const fence = markdownIt.renderer.rules.fence!
+  markdownIt.renderer.rules.fence = (...args) => {
     const [tokens, idx] = args
     const token = tokens[idx]
 
@@ -68,13 +68,14 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
     token.info = token.info.replace(/\[.*\]/, '')
 
     const active = / active( |$)/.test(token.info) ? ' active' : ''
+
     token.info = token.info.replace(/ active$/, '').replace(/ active /, ' ')
 
     const lang = extractLang(token.info)
 
     const content = fence(...args)
     return `
-      <div class="markdown-code-wrapper flex language-${lang}${getAdaptiveThemeMarker(options)}${active}">
+      <div class="markdown-code-wrapper flex flex-col language-${lang}${getAdaptiveThemeMarker(options)}${active}">
         <div class="markdown-code-header">
           <span class="markdown-code-lang">${getBaseLanguageName(lang)}</span>
           <button class="markdown-code-copy">
@@ -90,6 +91,7 @@ export function preWrapperPlugin(md: MarkdownIt, options: Options) {
 }
 
 export function getAdaptiveThemeMarker(options: Options) {
+  
   return options.hasSingleTheme ? '' : ' xx-adaptive-theme'
 }
 

@@ -1,24 +1,18 @@
 <template>
   <div class="ollama-chat">
-    <ai-chat
-      :role-alias="roleAlias"
-      @completions="completions"
-      @cancel-conversation="cancelConversation"
-      :conversations="conversations"
-      :conversation="conversation"
-    >
+    <ai-chat :role-alias="roleAlias" @completions="completions" @cancel-conversation="cancelConversation"
+      :conversations="conversations" :conversation="conversation">
     </ai-chat>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { renderMarkdownText } from '@plugins/markdown'
 import { ref } from 'vue'
 import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
 import { RoleEnum } from '@enums'
-import { cloneDeep } from 'lodash'
+import { cloneDeep } from "lodash"
 defineOptions({
   name: 'ollama-chat'
 })
@@ -30,7 +24,7 @@ const model = (route.query.model as string) || 'deepseek-r1:14b'
  */
 const roleAlias = ref<Record<AI.Role, string>>({
   user: 'ME',
-  assistant: 'Ollama',
+  assistant: model,
   system: 'System'
 })
 
@@ -58,6 +52,8 @@ const ollamaModel = new OllamaModel({
 
 const parentMessageId = ref('')
 
+
+
 /**
  * 流式会话
  */
@@ -75,11 +71,9 @@ const completions = async (question: string) => {
       model
     },
     onProgress(partialResponse) {
-      partialResponse.content = renderMarkdownText(partialResponse.content)
       conversation.value = cloneDeep(partialResponse)
     }
   }
-
   const response = await ollamaModel.getAnswer(question, questionOption)
   if (!!response.done) {
     conversation.value = null
@@ -101,5 +95,6 @@ const cancelConversation = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 </style>

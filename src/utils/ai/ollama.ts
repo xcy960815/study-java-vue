@@ -1,7 +1,6 @@
 import { Core } from './core'
 import { RoleEnum } from '@enums'
 const MODEL = 'deepseek-chat'
-
 export class Ollama extends Core {
   /**
    * 请求参数
@@ -55,13 +54,13 @@ export class Ollama extends Core {
   public async getAnswer(question: string, options: AI.Gpt.GetAnswerOptions): Promise<AI.Gpt.AssistantConversation> {
     const { onProgress, stream = !!onProgress } = options
     // 构建用户消息
-    const userMessage = this.buildConversation(RoleEnum.User, question, options)
+    const userConversation = this.buildConversation(RoleEnum.User, question, options)
     // 保存用户对话
-    await this.upsertConversation(userMessage)
+    await this.upsertConversation(userConversation)
     // 构建Ai助手消息
-    const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
+    const assistantuConversation = this.buildConversation(RoleEnum.Assistant, '', {
       ...options,
-      messageId: userMessage.messageId
+      messageId: userConversation.messageId
     })
 
     // 包装成一个promise 发起请求
@@ -71,41 +70,43 @@ export class Ollama extends Core {
         if (stream) {
           requestInit.onMessage = (data: string) => {
             if (data === '[DONE]') {
-              assistantMessage.content = assistantMessage.content.trim()
-              assistantMessage.done = true
-              assistantMessage.thinking = false
-              resolve(assistantMessage)
+              assistantuConversation.content = assistantuConversation.content.trim()
+              assistantuConversation.done = true
+              assistantuConversation.thinking = false
+              resolve(assistantuConversation)
             }
             const response: AI.Gpt.Response = JSON.parse(data)
-            assistantMessage.messageId = response.id
-            assistantMessage.thinking = false
+            assistantuConversation.messageId = response.id
+            assistantuConversation.thinking = false
             if (response?.choices?.length) {
               const delta = response.choices[0].delta
               if (delta?.content) {
-                assistantMessage.content += delta.content
+                assistantuConversation.content += delta.content
               }
-              assistantMessage.detail = response
+              assistantuConversation.detail = response
               if (delta?.role) {
-                assistantMessage.role = delta.role
+                assistantuConversation.role = delta.role
               }
-              onProgress?.(assistantMessage)
+              onProgress?.(assistantuConversation)
             }
           }
           await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
         } else {
           // 发送数据请求
           const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
+          console.log("responseresponseresponseresponseresponse", response);
           const data = await response?.json()
           if (data?.id) {
-            assistantMessage.messageId = data.id
+            assistantuConversation.messageId = data.id
           }
           if (data?.choices?.length) {
             const message = data.choices[0].message
-            assistantMessage.content = message?.content || ''
-            assistantMessage.role = message?.role || RoleEnum.Assistant
+            assistantuConversation.content = message?.content || ''
+            assistantuConversation.role = message?.role || RoleEnum.Assistant
           }
-          assistantMessage.detail = data
-          resolve(assistantMessage)
+          assistantuConversation.detail = data
+
+          resolve(assistantuConversation)
         }
       } catch (error) {
         console.error('AI EventStream error', error)

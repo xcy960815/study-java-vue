@@ -25,6 +25,15 @@ export const models = <T extends DeepSeekDto.Models>() => {
 }
 
 /**
+ * balance 接口
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const balance = <T extends DeepSeekDto.Balance>() => {
+  const url = buildRequestUrl('/balance')
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+}
+
+/**
  *
  * @param question
  * @param questionOption

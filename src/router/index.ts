@@ -62,6 +62,7 @@ export const routes: RouteRecordRaw[] = [
         name: 'userInfo',
         component: () => import(`../views/user/info.vue`),
         meta: {
+          hightlight:"/user/list",
           hidden: true,
           title: '用户中心'
         }
@@ -93,6 +94,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/goods-category/info.vue`),
         meta: {
           hidden: true,
+          hightlight:"/goods-category/list",
           title: '商品详情',
           icon: 'DocDetail'
         }
@@ -122,6 +124,7 @@ export const routes: RouteRecordRaw[] = [
         name: 'deepseek-chat',
         component: () => import(`../views/deepseek/chat/index.vue`),
         meta: {
+          hightlight:"/deepseek/models",
           openMore: true,
           keepAlive: true,
           title: '聊天',
@@ -154,6 +157,7 @@ export const routes: RouteRecordRaw[] = [
         path: '/ollama/chat',
         component: () => import(`../views/ollama/chat/index.vue`),
         meta: {
+          hightlight:"/ollama/models",
           openMore: true,
           keepAlive: true,
           hidden: true,

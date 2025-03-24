@@ -1,18 +1,19 @@
 <template>
   <div class="deepseek-chat">
-    <ai-chat
-      @completions="completions"
-      @cancel-conversation="cancelConversation"
-      :conversations="conversations"
-    ></ai-chat>
+    <ai-chat :role-alias="roleAlias" @completions="completions" :conversation="conversation"
+      @cancel-conversation="cancelConversation" :conversations="conversations"></ai-chat>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { OllamaModel } from "@utils/ai"
+import { renderMarkdownText } from '@plugins/markdown'
 import { ref } from 'vue'
-import { deepseekModule } from '@apis'
+// import { deepseekModule } from '@apis'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
+import { RoleEnum } from '@enums'
+import { cloneDeep } from 'lodash'
 defineOptions({
   name: 'deepseek-chat'
 })
@@ -23,10 +24,36 @@ const model = route.query.model as string
 const parentMessageId = ref<string>('')
 
 const conversations = ref<AI.Conversation[]>([])
+/**
+ * 当前会话
+ */
+const conversation = ref<AI.Gpt.AssistantConversation | null>(null)
 
+/**
+ * ollama 模型
+ */
+const ollamaModel = new OllamaModel({
+  apiKey: '',
+  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
+  completionsUrl: '/deepseek/completions',
+  requestParams: {
+    model: model
+  }
+})
+
+/**
+ * 角色别名
+ */
+const roleAlias = ref<Record<AI.Role, string>>({
+  user: 'ME',
+  assistant: 'Ollama',
+  system: 'System'
+})
 const completions = async (question: string) => {
   setTimeout(async () => {
-    conversations.value = await deepseekModule.getAllConversations()
+    conversations.value = await ollamaModel.getAllConversations()
+    const userMessage = conversations.value[conversations.value.length - 1]
+    conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, '', userMessage)
   })
 
   const questionOption: AI.Gpt.GetAnswerOptions = {
@@ -36,19 +63,26 @@ const completions = async (question: string) => {
       model
     },
     onProgress(partialResponse) {
-      conversations.value[conversations.value.length - 1].content = partialResponse.content
+      partialResponse.content = renderMarkdownText(partialResponse.content)
+      conversation.value = cloneDeep(partialResponse)
+      console.log("conversation.value",conversation.value);
+      
     }
   }
 
-  const response = await deepseekModule.completions(question, questionOption)
+  const response = await ollamaModel.getAnswer(question, questionOption)
 
-  parentMessageId.value = response.parentMessageId
+  if (!!response.done) {
+    conversation.value = null
+    conversations.value = await ollamaModel.getAllConversations()
+    parentMessageId.value = response.parentMessageId
+  }
 }
 /**
  * 取消会话
  */
 const cancelConversation = () => {
-  deepseekModule.cancelConversation()
+  ollamaModel.cancelConversation()
 }
 </script>
 <style lang="less" scoped>

@@ -37,7 +37,7 @@ const loadSvg = async () => {
   try {
     const response = await fetch(`src/assets/svg-icons/${props.type}.svg`) // 确保路径正确
     svgContent.value = await response.text()
-    console.log(' svgContent.value', svgContent.value)
+    // console.log(' svgContent.value', svgContent.value)
   } catch (error) {
     console.error(`加载 SVG 失败: ${props.type}`, error)
     svgContent.value = '' // 遇到错误时清空

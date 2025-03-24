@@ -1,6 +1,6 @@
 import MarkdownIt from 'markdown-it'
 
-import hljs from './highlight'
+import vueHighlight from './vue-highlight'
 
 import markdownItHighlight from 'markdown-it-highlightjs'
 
@@ -22,7 +22,7 @@ const markdownIt = new MarkdownIt({
 
 markdownIt
   .use(markdownItHighlight, {
-    hljs
+    vueHighlight
   })
   .use(preWrapperPlugin, {
     hasSingleTheme: true
@@ -51,6 +51,11 @@ const transformMathMarkdown = (markdownText: string) => {
   }, '')
 }
 
+/**
+ * 转义 <think/> 中的 <script/>
+ * @param {string} source 
+ * @returns 
+ */
 const transformThinkMarkdown = (source: string): string => {
   let result = ''
   let buffer = ''
@@ -106,10 +111,14 @@ const transformThinkMarkdown = (source: string): string => {
   return result
 }
 
+
+
+
+
 export const renderMarkdownText = (content: string) => {
   const thinkTransformed = transformThinkMarkdown(content)
   const mathTransformed = transformMathMarkdown(thinkTransformed)
-  console.log('mathTransformed', mathTransformed)
-
   return markdownIt.render(mathTransformed)
 }
+
+

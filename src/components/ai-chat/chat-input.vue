@@ -73,7 +73,7 @@ const emits = defineEmits<{
   (event: 'completions', question: string): void
   (event: 'cancel-conversation'): void
 }>()
-const question = ref<string>('天为什么是蓝色的')
+const question = ref<string>('给我写一段vue3 setup 语法糖的代码')
 
 const buttonDisabled = computed(() => !question.value)
 /**

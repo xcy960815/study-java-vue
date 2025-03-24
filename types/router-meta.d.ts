@@ -13,6 +13,7 @@ declare module 'vue-router' {
   type LocalIconNames = keyof typeof svgIcons
 
   interface RouteMeta {
+    hightlight?: string
     openMore?: boolean
     title?: string
     permission?: string | Array<string>

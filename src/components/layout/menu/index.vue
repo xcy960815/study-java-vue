@@ -21,7 +21,10 @@ const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
 
-const currentRoute = computed(() => route.path)
+const currentRoute = computed(() => {
+  if (!!route.meta.hightlight) return route.meta.hightlight
+  return route.fullPath
+})
 
 const systemInfoStore = useSystemInfoStore()
 

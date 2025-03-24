@@ -1,0 +1,161 @@
+// .markdown-code-wrapper {
+//   --at-apply: 'relative whitespace-initial';
+//   --at-apply: 'bg-#f6f6f7';
+//   --at-apply: 'line-height-24';
+//   --at-apply: 'flex flex-col';
+//   --at-apply: 'my-12px';
+//   --at-apply: rounded-8 overflow-hidden;
+  
+  
+//   .markdown-code-header {
+//     --at-apply: flex justify-between items-center;
+//     --at-apply: 'b-b b-b-solid b-b-#3c3c43:10';
+//   }
+  
+//   .markdown-code-copy {
+//     --at-apply: px-14 py-8 rounded-4;
+//     --at-apply: 'flex items-center justify-center';
+//     --at-apply: 'b-none bg-transparent';
+//     --at-apply: 'c-#808080' cursor-pointer;
+//     --at-apply: transition-all-300 opacity-100 z-1;
+    
+//     .markdown-copy-icon {
+//       --at-apply: text-16 pointer-events-none mr-4;
+//       --at-apply: 'i-ci:copy';
+//     }
+    
+//     .markdown-copy-text {
+//       --at-apply: pointer-events-none;
+
+//       &.default {
+//         display: initial;
+//       }
+
+//       &.done {
+//         display: none;
+//       }
+//     }
+    
+//     &.copied {
+
+//       .markdown-copy-icon {
+//         --at-apply: 'i-ic:baseline-check';
+//       }
+
+//       .markdown-copy-text {
+
+//         &.default {
+//           display: none;
+//         }
+  
+//         &.done {
+//           display: initial;
+//         }
+//       }
+//     }
+//   }
+  
+//   .markdown-code-lang {
+//     // --at-apply: absolute right-8 top-2;
+
+//     --at-apply: pl-14 text-14 font-500 'c-#3c3c43/56';
+//     --at-apply: transition-all-300 opacity-100 z-0;
+//   }
+
+//   pre,
+//   li {
+
+//     code {
+//       --at-apply: 'bg-#f6f6f7';
+//       --at-apply: whitespace-pre py-15;
+//     }
+//   }
+// }
+
+.markdown-code-wrapper {
+  position: relative;
+  white-space: initial;
+  background-color: #f6f6f7;
+  line-height: 24px;
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden;
+
+  .markdown-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(60, 60, 67, 0.1);
+  }
+
+  .markdown-code-copy {
+    padding: 8px 14px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background-color: transparent;
+    color: #808080;
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 1;
+    z-index: 1;
+
+    .markdown-copy-icon {
+      font-size: 16px;
+      pointer-events: none;
+      margin-right: 4px;
+      content: "\f0c5"; // 适用于 FontAwesome 或类似 icon font
+    }
+
+    .markdown-copy-text {
+      pointer-events: none;
+
+      &.default {
+        display: initial;
+      }
+
+      &.done {
+        display: none;
+      }
+    }
+
+    &.copied {
+      .markdown-copy-icon {
+        content: "\f00c"; // 适用于 FontAwesome 复制成功状态
+      }
+
+      .markdown-copy-text {
+        &.default {
+          display: none;
+        }
+
+        &.done {
+          display: initial;
+        }
+      }
+    }
+  }
+
+  .markdown-code-lang {
+    padding-left: 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(60, 60, 67, 0.56);
+    transition: all 0.3s;
+    opacity: 1;
+    z-index: 0;
+  }
+
+  pre,
+  li {
+    code {
+      background-color: #f6f6f7;
+      white-space: pre;
+      padding: 15px 0;
+    }
+  }
+}

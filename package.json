@@ -7,9 +7,11 @@
     "dev": "vite --mode dialy",
     "dev-pre": "vite --mode pre",
     "dev-prod": "vite --mode prod",
+
     "build": "vite build --mode dialy",
     "build-pre": "vite build --mode pre",
     "build-prod": "vite build --mode prod",
+    
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
@@ -85,6 +87,7 @@
     "rollup-plugin-visualizer": "^5.14.0",
     "sass": "1.83.4",
     "stylelint": "^16.16.0",
+    "stylelint-config-recommended-vue": "^1.6.0",
     "stylelint-config-standard": "^37.0.0",
     "stylelint-order": "^6.0.4",
     "tailwindcss": "3.1.8",
@@ -109,9 +112,8 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json}": [
-      "prettier --write",
-      "pnpm run eslint:fix"
+    "src/**/*.{js,jsx,ts,tsx,vue,json}": [
+      "prettier --write"
     ],
     "*.{html,vue,css,sass,less}": [
       "pnpm run stylelint:fix"

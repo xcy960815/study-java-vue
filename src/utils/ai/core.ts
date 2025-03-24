@@ -7,9 +7,9 @@ import { type Options as MarkdownOptions } from 'markdown-it'
 import highlight from 'highlight.js'
 import { RoleEnum } from '@enums'
 
-const BEGINWIDTHKEEPALIVE = ' : keep-alive'
+const KEEPALIVEFLAG = ' : keep-alive'
 
-const BEGINWIDTHDATA = 'data:'
+const DATAPREFIX = 'data:'
 
 /**
  * 基础类 有一些公共方法
@@ -165,7 +165,6 @@ export class Core {
    * @returns {Promise<number>}
    */
   protected getTokenCount(text: string): number {
-    // return await this._gpt3Tokenizer.encode(text).bpe.length
     return encode(text).length
   }
   /** 函数重载 start */
@@ -306,6 +305,7 @@ export class Core {
     const response = (await fetch(url, {
       ...fetchOptions
     })) as AI.AnswerResponse<R>
+    
     if (!response.ok) {
       const errorOption: AI.AiErrorOption = {
         url: response.url,
@@ -337,9 +337,9 @@ export class Core {
       onEvent: (event) => {
         const data = event.data.trim()
         if (data) {
-          if (data.startsWith(BEGINWIDTHDATA) && !data.startsWith(BEGINWIDTHKEEPALIVE)) {
+          if (data.startsWith(DATAPREFIX) && !data.startsWith(KEEPALIVEFLAG)) {
             // 兼容deepseek接口 deepseek 接口返回的数据是以data:开头的 且 有时候会带有 : keep-alive 这两种情况 JSON.parse 解析不了
-            onMessage?.(data.slice(6))
+            onMessage?.(data.slice(DATAPREFIX.length))
           } else {
             // 兼容chatgpt接口
             onMessage?.(data)
