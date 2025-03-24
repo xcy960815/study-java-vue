@@ -4,6 +4,8 @@ import {
   type PreRenderedChunk
 } from 'rollup'
 import { defineConfig, loadEnv } from 'vite'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 import vue from '@vitejs/plugin-vue'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
@@ -214,6 +216,12 @@ export default defineConfig(({ mode }) => {
       }
     },
     css: {
+      postcss: {
+        plugins: [
+          tailwindcss(),
+          autoprefixer()
+        ],
+      },
       preprocessorOptions: {
         scss: {
           api: 'modern-compiler'
@@ -300,3 +308,5 @@ export default defineConfig(({ mode }) => {
     }
   }
 })
+
+

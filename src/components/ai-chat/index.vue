@@ -76,8 +76,6 @@ const getRoleAlias = (role: AI.Role) => {
  * @param {AI.Gpt.AssistantConversation} conversation 会话
  */
 const showThinking = (conversation: AI.Gpt.AssistantConversation) => {
-  console.log("conversation.thinking", conversation.thinking);
-
   return !!conversation.thinking
 }
 </script>

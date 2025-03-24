@@ -72,10 +72,13 @@
 //   }
 // }
 
+// 定义一个color变量
+$background-color: #0d1117;
+
 .markdown-code-wrapper {
   position: relative;
   white-space: initial;
-  background-color: #f6f6f7;
+  background-color: $background-color;
   line-height: 24px;
   display: flex;
   flex-direction: column;
@@ -153,7 +156,7 @@
   pre,
   li {
     code {
-      background-color: #f6f6f7;
+      background-color: $background-color;
       white-space: pre;
       padding: 15px 0;
     }
