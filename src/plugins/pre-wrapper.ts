@@ -1,5 +1,5 @@
 import type MarkdownIt from 'markdown-it'
-// import "@assets/style/markdown.scss"
+
 import PrismJsComponents from 'prismjs/components'
 
 export interface Options {
@@ -77,8 +77,8 @@ export function preWrapperPlugin(markdownIt: MarkdownIt, options: Options) {
     return `
       <div class="markdown-code-wrapper flex flex-col language-${lang}${getAdaptiveThemeMarker(options)}${active}">
         <div class="markdown-code-header">
-          <span class="markdown-code-lang">${getBaseLanguageName(lang)}</span>
-          <button class="markdown-code-copy">
+          <span class="markdown-code-lang text-xs">${getBaseLanguageName(lang)}</span>
+          <button class="markdown-code-copy text-xs">
             <div class="markdown-copy-icon"></div>
             <span class="markdown-copy-text default">复制代码</span>
             <span class="markdown-copy-text done">已复制</span>

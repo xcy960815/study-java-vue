@@ -111,10 +111,6 @@ const transformThinkMarkdown = (source: string): string => {
   return result
 }
 
-
-
-
-
 export const renderMarkdownText = (content: string) => {
   const thinkTransformed = transformThinkMarkdown(content)
   const mathTransformed = transformMathMarkdown(thinkTransformed)

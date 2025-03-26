@@ -1,31 +1,31 @@
 <template>
   <div class="flex items-center cursor-pointer" @click="copyToClipboard()">
     <copy
-      v-show="buttonnStatus === 'copy'"
+      v-show="buttonnStatu === 'copy'"
       :theme="buttonnConfig.theme"
       :size="buttonnConfig.size"
       :fill="buttonnConfig.fill"
     />
     <loading
       class="rotate"
-      v-show="buttonnStatus === 'loading'"
+      v-show="buttonnStatu === 'loading'"
       :theme="buttonnConfig.theme"
       :size="buttonnConfig.size"
       :fill="buttonnConfig.fill"
     />
     <check-one
-      v-show="buttonnStatus === 'success'"
+      v-show="buttonnStatu === 'success'"
       :theme="buttonnConfig.theme"
       :size="buttonnConfig.size"
       :fill="buttonnConfig.fill"
     />
     <close-one
-      v-show="buttonnStatus === 'error'"
+      v-show="buttonnStatu === 'error'"
       :theme="buttonnConfig.theme"
       :size="buttonnConfig.size"
       :fill="buttonnConfig.fill"
     />
-    <span class="text-xs ml-0.5 text-gray-500 leading-none">{{ buttonnStatusTips[buttonnStatus] }}</span>
+    <span class="text-xs ml-0.5 text-gray-500 leading-none">{{ buttonnStatusTips[buttonnStatu] }}</span>
   </div>
 </template>
 <script setup lang="ts">
@@ -59,19 +59,19 @@ const buttonnStatusTips = {
 /**
  * 按钮状态
  */
-const buttonnStatus = ref<'copy' | 'loading' | 'success' | 'error'>('copy')
+const buttonnStatu = ref<'copy' | 'loading' | 'success' | 'error'>('copy')
 
 /**
  * 复制到剪切板
  * @param {string} content 复制内容
  */
 const copyToClipboard = (content: string = porps.content) => {
-  buttonnStatus.value = 'loading'
+  buttonnStatu.value = 'loading'
   navigator.clipboard
     .writeText(content)
-    .then(() => setTimeout(() => (buttonnStatus.value = 'success'), 150))
-    .catch(() => (buttonnStatus.value = 'error'))
-    .finally(() => setTimeout(() => (buttonnStatus.value = 'copy'), 1500))
+    .then(() => setTimeout(() => (buttonnStatu.value = 'success'), 150))
+    .catch(() => (buttonnStatu.value = 'error'))
+    .finally(() => setTimeout(() => (buttonnStatu.value = 'copy'), 1500))
 }
 </script>
 
