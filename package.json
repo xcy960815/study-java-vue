@@ -7,11 +7,9 @@
     "dev": "vite --mode dialy",
     "dev-pre": "vite --mode pre",
     "dev-prod": "vite --mode prod",
-
     "build": "vite build --mode dialy",
     "build-pre": "vite build --mode pre",
     "build-prod": "vite build --mode prod",
-    
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
@@ -44,6 +42,7 @@
     "pinia": "^2.3.0",
     "pinia-plugin-persistedstate": "^4.2.0",
     "prismjs": "^1.29.0",
+    "ua-parser-js": "^2.0.3",
     "use-element-plus-theme": "^0.0.5",
     "uuid": "^11.0.5",
     "vue": "^3.4.29",
