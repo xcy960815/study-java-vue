@@ -90,7 +90,7 @@ const isMacos = computed(() => {
 
   return os.name?.includes?.('macos')
 })
-console.log("isMacos-isMacos",isMacos);
+// console.log("isMacos-isMacos",isMacos);
 
 
 const activeElement = useActiveElement()
