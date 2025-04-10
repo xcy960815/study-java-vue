@@ -1,7 +1,11 @@
 <template>
   <div class="ollama-chat">
-    <ai-chat :role-alias="roleAlias" @completions="completions" @cancel-conversation="cancelConversation"
-      :conversations="conversations" :conversation="conversation">
+    <ai-chat 
+      :role-alias="roleAlias" 
+      @completions="completions" 
+      @cancel-conversation="cancelConversation"
+      :conversations="conversations" 
+      :conversation="conversation">
     </ai-chat>
   </div>
 </template>
@@ -52,8 +56,6 @@ const ollamaModel = new OllamaModel({
 
 const parentMessageId = ref('')
 
-
-
 /**
  * 流式会话
  */
@@ -64,7 +66,7 @@ const completions = async (question: string) => {
     conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, '', userMessage)
   })
 
-  const questionOption: AI.Gpt.GetAnswerOptions = {
+  const questionOption: AI.Gpt.completionsOptions = {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
@@ -74,7 +76,7 @@ const completions = async (question: string) => {
       conversation.value = cloneDeep(partialResponse)
     }
   }
-  const response = await ollamaModel.getAnswer(question, questionOption)
+  const response = await ollamaModel.completions(question, questionOption)
   if (!!response.done) {
     conversation.value = null
     conversations.value = await ollamaModel.getAllConversations()

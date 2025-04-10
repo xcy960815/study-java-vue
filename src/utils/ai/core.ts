@@ -45,7 +45,12 @@ export class Core {
   /* 当前模型的请求地址 */
   private _completionsUrl: string | undefined
 
-  private _markdown: Markdown
+  // private _markdown: Markdown
+
+  /**
+   * 当前正在处理的会话
+   */
+  protected _currentConversation: AI.Gpt.AssistantConversation | null = null;
 
   constructor(options: AI.CoreOptions) {
     const {
@@ -94,28 +99,28 @@ export class Core {
 
     this._completionsUrl = completionsUrl
 
-    this._markdown = new Markdown(this.markdownOptions)
+    // this._markdown = new Markdown(this.markdownOptions)
   }
 
-  private get markdownOptions(): MarkdownOptions {
-    return {
-      html: true,
-      linkify: true,
-      breaks: true,
-      xhtmlOut: true,
-      typographer: true,
-      langPrefix: 'language-',
-      highlight: (content, lang) => {
-        if (lang && highlight.getLanguage(lang)) {
-          try {
-            return '<pre class="hljs"><code>' + highlight.highlight(lang, content, true).value + '</code></pre>'
-          } catch (__) {}
-        }
+  // private get markdownOptions(): MarkdownOptions {
+  //   return {
+  //     html: true,
+  //     linkify: true,
+  //     breaks: true,
+  //     xhtmlOut: true,
+  //     typographer: true,
+  //     langPrefix: 'language-',
+  //     highlight: (content, lang) => {
+  //       if (lang && highlight.getLanguage(lang)) {
+  //         try {
+  //           return '<pre class="hljs"><code>' + highlight.highlight(lang, content, true).value + '</code></pre>'
+  //         } catch (__) {}
+  //       }
 
-        return '<pre class="hljs"><code>' + this._markdown.utils.escapeHtml(content) + '</code></pre>'
-      }
-    }
-  }
+  //       return '<pre class="hljs"><code>' + this._markdown.utils.escapeHtml(content) + '</code></pre>'
+  //     }
+  //   }
+  // }
 
   /**
    * 获取当前 token 支持的模型的请求地址
@@ -169,12 +174,12 @@ export class Core {
   }
   /** 函数重载 start */
 
-  public buildConversation(role: RoleEnum.User, content: string, option: AI.GetAnswerOptions): AI.Conversation
+  public buildConversation(role: RoleEnum.User, content: string, option: AI.completionsOptions): AI.Conversation
 
   public buildConversation(
     role: RoleEnum.Assistant,
     content: string,
-    option: AI.GetAnswerOptions
+    option: AI.completionsOptions
   ): AI.Gpt.AssistantConversation
 
   /** 函数重载 end */
@@ -183,13 +188,13 @@ export class Core {
    * 构建会话消息
    * @param { RoleEnum.User | RoleEnum.Assistant } role
    * @param {string} content
-   * @param { AI.GetAnswerOptions } option
+   * @param { AI.completionsOptions } option
    * @returns { AI.Conversation | AI.Gpt.AssistantConversation}
    */
   public buildConversation(
     role: RoleEnum.User | RoleEnum.Assistant,
     content: string,
-    option: AI.GetAnswerOptions
+    option: AI.completionsOptions
   ): AI.Conversation | AI.Gpt.AssistantConversation {
     if (role === RoleEnum.User) {
       return {
@@ -354,14 +359,14 @@ export class Core {
    * @param {string} content
    * @returns {string}
    */
-  public markdownToHtml(content: string): string {
-    return this._markdown.render(content)
-  }
+  // public markdownToHtml(content: string): string {
+  //   return this._markdown.render(content)
+  // }
 
   /**
    * 清空promise
    */
-  protected clearablePromise<V extends Object>(inputPromise: PromiseLike<V>, options: AI.ClearablePromiseOptions) {
+  protected clearablePromise<V extends Object>(inputPromise: PromiseLike<V>, options: AI.ClearablePromiseOptions):Promise<V> {
     const { milliseconds, message } = options
     let timer: ReturnType<typeof setTimeout> | undefined
     const wrappedPromise = new Promise<V>((resolve, reject) => {
@@ -374,9 +379,9 @@ export class Core {
         timer = setTimeout.call(
           undefined,
           () => {
-            // 终止请求
-            this._abortController.abort()
             const errorMessage = message ?? `Promise timed out after ${milliseconds} milliseconds`
+            // 终止请求
+            this._abortController.abort(errorMessage)
             const timeoutError = new AiError(errorMessage)
             reject(timeoutError)
           },
@@ -403,11 +408,23 @@ export class Core {
   }
   /**
    * 取消对话
-   * @param {string}reson
-   * @returns {void}
+   * @param {string} reason 取消原因
+   * @returns {Promise<void>}
    */
-  public cancelConversation(reson?: string) {
-    this._abortController.abort(reson)
+  public async cancelConversation(reason?: string): Promise<void> {
+    // 如果有当前活跃的会话，先保存
+    if (this._currentConversation) {
+      const conversation = this._currentConversation;
+      conversation.done = false;
+      conversation.thinking = false;
+      await this.upsertConversation(conversation);
+      this._currentConversation = null;
+    }
+    
+    // 终止请求
+    this._abortController.abort(reason);
+    
+    this._abortController = new AbortController();
   }
   /**
    *

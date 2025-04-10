@@ -22,10 +22,10 @@ export class Ollama extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {AI.Gpt.GetAnswerOptions} options
+   * @param {AI.Gpt.completionsOptions} options
    * @returns {Promise<AI.FetchRequestInit>}
    */
-  private async _getFetchRequestInit(question: string, options: AI.Gpt.GetAnswerOptions): Promise<AI.FetchRequestInit> {
+  private async _getFetchRequestInit(question: string, options: AI.Gpt.completionsOptions): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
     // 获取用户和gpt历史对话记录
     const { messages, maxTokens } = await this._getConversationHistory(question, options)
@@ -37,102 +37,124 @@ export class Ollama extends Core {
       max_tokens: maxTokens
     }
 
-    return {
+    const fetchRequestOption: AI.FetchRequestInit = {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
       signal: this._abortController.signal
     }
+
+
+    return fetchRequestOption
   }
 
-  /**
-   * 获取答案
-   * @param {string} question
-   * @param {AI.Gpt.GetAnswerOptions} options
-   * @returns {Promise<AI.Gpt.AssistantConversation>}
-   */
-  public async getAnswer(question: string, options: AI.Gpt.GetAnswerOptions): Promise<AI.Gpt.AssistantConversation> {
-    const { onProgress, stream = !!onProgress } = options
-    // 构建用户消息
-    const userConversation = this.buildConversation(RoleEnum.User, question, options)
-    // 保存用户对话
-    await this.upsertConversation(userConversation)
-    // 构建Ai助手消息
-    const assistantuConversation = this.buildConversation(RoleEnum.Assistant, '', {
+  public async completions(question: string, options: AI.Gpt.completionsOptions): Promise<AI.Gpt.AssistantConversation> {
+    const userConversation = this.buildConversation(RoleEnum.User, question, options);
+    await this.upsertConversation(userConversation);
+
+    this._currentConversation = this.buildConversation(RoleEnum.Assistant, '', {
       ...options,
       messageId: userConversation.messageId
-    })
+    });
 
-    // 包装成一个promise 发起请求
-    const responseP = new Promise<AI.Gpt.AssistantConversation>(async (resolve, reject) => {
-      try {
-        const requestInit = await this._getFetchRequestInit(question, options)
-        if (stream) {
-          requestInit.onMessage = (data: string) => {
-            if (data === '[DONE]') {
-              assistantuConversation.content = assistantuConversation.content.trim()
-              assistantuConversation.done = true
-              assistantuConversation.thinking = false
-              resolve(assistantuConversation)
-            }
-            const response: AI.Gpt.Response = JSON.parse(data)
-            assistantuConversation.messageId = response.id
-            assistantuConversation.thinking = false
-            if (response?.choices?.length) {
-              const delta = response.choices[0].delta
-              if (delta?.content) {
-                assistantuConversation.content += delta.content
-              }
-              assistantuConversation.detail = response
-              if (delta?.role) {
-                assistantuConversation.role = delta.role
-              }
-              onProgress?.(assistantuConversation)
-            }
-          }
-          await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
-        } else {
-          // 发送数据请求
-          const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
-          console.log("responseresponseresponseresponseresponse", response);
-          const data = await response?.json()
-          if (data?.id) {
-            assistantuConversation.messageId = data.id
-          }
-          if (data?.choices?.length) {
-            const message = data.choices[0].message
-            assistantuConversation.content = message?.content || ''
-            assistantuConversation.role = message?.role || RoleEnum.Assistant
-          }
-          assistantuConversation.detail = data
+    const conversationPromise = this._handleAnswerRequest(question, options)
+      .then(async (conversation) => {
+        await this.upsertConversation(conversation);
+        conversation.parentMessageId = conversation.messageId;
+        return conversation;
+      }).catch((error) => {
+        this._currentConversation = null;
+        throw error;
+      });;
 
-          resolve(assistantuConversation)
-        }
-      } catch (error) {
-        console.error('AI EventStream error', error)
-        return reject(error)
-      }
-    }).then(async (conversation) => {
-      return this.upsertConversation(conversation).then(() => {
-        conversation.parentMessageId = conversation.messageId
-        return conversation
-      })
-    })
-    // .finally(() => {
-    //   console.log('finally');
-
-    // })
-    // TODO 用户手动取消之后保留会话
-    return this.clearablePromise(responseP, {
+    return this.clearablePromise<AI.Gpt.AssistantConversation>(conversationPromise, {
       milliseconds: this._milliseconds,
       message: ``
-    })
+    });
+  }
+
+  private async _handleAnswerRequest(
+    question: string,
+    options: AI.Gpt.completionsOptions,
+  ): Promise<AI.Gpt.AssistantConversation> {
+    const { stream = !!options.onProgress } = options;
+    const requestInit = await this._getFetchRequestInit(question, options);
+
+    return stream
+      ? this._handleStreamResponse(requestInit, options.onProgress)
+      : this._handleNonStreamResponse(requestInit);
+  }
+
+  private async _handleStreamResponse(
+    requestInit: AI.FetchRequestInit,
+    onProgress?: AI.Gpt.completionsOptions["onProgress"]
+  ): Promise<AI.Gpt.AssistantConversation> {
+    return new Promise<AI.Gpt.AssistantConversation>((resolve, reject) => {
+      requestInit.onMessage = (data: string) => {
+        this._processStreamData(data, resolve, onProgress);
+      };
+      this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject);
+    });
+  }
+
+  private _processStreamData(
+    data: string,
+    resolve: (value: AI.Gpt.AssistantConversation) => void,
+    onProgress?: AI.Gpt.completionsOptions["onProgress"]
+  ): void {
+    if (data === '[DONE]') {
+      this._currentConversation!.content = this._currentConversation!.content.trim();
+      this._currentConversation!.done = true;
+      this._currentConversation!.thinking = false;
+      resolve(this._currentConversation!);
+      return;
+    }
+
+    const response: AI.Gpt.Response = JSON.parse(data);
+    this._updateConversationFromResponse(response);
+    onProgress?.(this._currentConversation!);
+  }
+
+  private async _handleNonStreamResponse(
+    requestInit: AI.FetchRequestInit,
+  ): Promise<AI.Gpt.AssistantConversation> {
+    const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit);
+    const data = await response?.json();
+
+    if (data) {
+      this._updateConversationFromResponse(data);
+    }
+
+    return this._currentConversation!;
+  }
+
+  private _updateConversationFromResponse(
+    response: AI.Gpt.Response,
+  ): void {
+    if (response?.id) {
+      this._currentConversation!.messageId = response.id;
+    }
+
+    if (response?.choices?.length) {
+      const choice = response.choices[0];
+      const messageOrDelta = 'message' in choice ? choice.message : choice.delta;
+
+      if (messageOrDelta?.content) {
+        this._currentConversation!.content += messageOrDelta.content || '';
+      }
+      if (messageOrDelta?.role) {
+        this._currentConversation!.role = messageOrDelta.role;
+      }
+    }
+
+    this._currentConversation!.detail = response;
+    this._currentConversation!.thinking = false;
   }
 
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<AI.Gpt.GetAnswerOptions>} options
+   * @param {Required<AI.Gpt.completionsOptions>} options
    * @returns {Promise<{
    * messages: AI.Gpt.RequestMessage[]
    * text:string
@@ -140,7 +162,7 @@ export class Ollama extends Core {
    */
   private async _getConversationHistory(
     text: string,
-    options: AI.Gpt.GetAnswerOptions
+    options: AI.Gpt.completionsOptions
   ): Promise<{
     messages: Array<AI.Gpt.RequestMessage>
     maxTokens: number

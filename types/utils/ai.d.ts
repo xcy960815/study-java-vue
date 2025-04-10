@@ -89,6 +89,9 @@ declare namespace AI {
     usage?: ResponseUsage
   }
 
+
+  export type OnProgress<A> = (partialResponse: A) => void
+
   /**
    * 公共请求参数
    */
@@ -173,7 +176,7 @@ declare namespace AI {
   /**
    * 公共发送消息选项
    */
-  export interface GetAnswerOptions {
+  export interface completionsOptions {
     parentMessageId?: string
     messageId?: string
     stream?: boolean
@@ -198,8 +201,7 @@ declare namespace AI {
     /**
      * 请求参数
      */
-    export interface RequestParams
-      extends AI.RequestParams {
+    export interface RequestParams extends AI.RequestParams {
       messages: Array<RequestMessage>
     }
 
@@ -227,8 +229,8 @@ declare namespace AI {
       detail?: Response | null
     }
 
-    export interface GetAnswerOptions extends AI.GetAnswerOptions {
-      onProgress?: (partialResponse: AssistantConversation) => void
+    export interface completionsOptions extends AI.completionsOptions {
+      onProgress?: OnProgress<AssistantConversation>
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
     export interface GptCoreOptions extends CoreOptions {
@@ -243,11 +245,10 @@ declare namespace AI {
     /**
      * 发送的消息选项
      */
-    export interface GetAnswerOptions
-      extends AI.GetAnswerOptions {
+    export interface completionsOptions extends AI.completionsOptions {
       systemPromptPrefix?: string
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
-      onProgress?: (partialResponse: AssistantConversation) => void
+      onProgress?: OnProgress<AssistantConversation>
     }
 
     /**

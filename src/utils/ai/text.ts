@@ -48,12 +48,12 @@ export class Text extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {AI.Gpt.GetAnswerOptions} options
+   * @param {AI.Gpt.completionsOptions} options
    * @returns {Promise<AI.FetchRequestInit>}
    */
   private async _getFetchRequestInit(
     question: string,
-    options: AI.Text.GetAnswerOptions
+    options: AI.Text.completionsOptions
   ): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = onProgress ? true : false, requestParams } = options
     // 获取用户和gpt历史对话记录
@@ -77,10 +77,10 @@ export class Text extends Core {
   /**
    * 发送请求到OpenAI
    * @param {string} text
-   * @param {AI.Text.GetAnswerOptions} options
+   * @param {AI.Text.completionsOptions} options
    * @returns {Promise<AI.Text.AssistantConversation>}
    */
-  public async getAnswer(text: string, options: AI.Text.GetAnswerOptions): Promise<AI.Text.AssistantConversation> {
+  public async completions(text: string, options: AI.Text.completionsOptions): Promise<AI.Text.AssistantConversation> {
     const { onProgress, stream = onProgress ? true : false, requestParams } = options
     // 构建用户消息
     const userMessage = this.buildConversation(RoleEnum.User, text, options)
@@ -157,7 +157,7 @@ export class Text extends Core {
    */
   private async _getConversationHistory(
     message: string,
-    options: AI.Text.GetAnswerOptions
+    options: AI.Text.completionsOptions
   ): Promise<{
     prompt: string
     maxTokens: number

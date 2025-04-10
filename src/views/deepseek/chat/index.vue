@@ -56,7 +56,7 @@ const completions = async (question: string) => {
     conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, '', userMessage)
   })
 
-  const questionOption: AI.Gpt.GetAnswerOptions = {
+  const questionOption: AI.Gpt.completionsOptions = {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
@@ -70,7 +70,7 @@ const completions = async (question: string) => {
     }
   }
 
-  const response = await ollamaModel.getAnswer(question, questionOption)
+  const response = await ollamaModel.completions(question, questionOption)
 
   if (!!response.done) {
     conversation.value = null

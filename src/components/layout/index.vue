@@ -4,7 +4,7 @@
     <el-container class="layout-view-container flex-1 flex flex-col">
       <layout-header></layout-header>
       <!-- 历史记录 -->
-      <layout-history></layout-history>
+      <!-- <layout-history></layout-history> -->
       <el-main class="layout-main-container flex-1 p-1.5">
         <!-- https://element-plus.org/zh-CN/guide/i18n.html -->
         <el-config-provider :locale="locale">
