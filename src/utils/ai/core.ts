@@ -1,10 +1,6 @@
 import { createParser, type EventSourceParser } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
-// import Gpt3Tokenizer from 'gpt3-tokenizer'
 import { encode } from 'gpt-tokenizer'
-import Markdown from 'markdown-it'
-import { type Options as MarkdownOptions } from 'markdown-it'
-import highlight from 'highlight.js'
 import { RoleEnum } from '@enums'
 
 const KEEPALIVEFLAG = ' : keep-alive'
@@ -36,16 +32,10 @@ export class Core {
   protected _systemMessage: string
   /** 取消fetch请求控制器 */
   protected _abortController: AbortController
-  /** 用于计算token */
-  // protected _gpt3Tokenizer: Gpt3Tokenizer
   /** 超时时间 */
   protected _milliseconds: number
-  /** 是否开启markdown转html */
-  // protected _markdown2Html: boolean
   /* 当前模型的请求地址 */
   private _completionsUrl: string | undefined
-
-  // private _markdown: Markdown
 
   /**
    * 当前正在处理的会话
@@ -64,7 +54,6 @@ export class Core {
       systemMessage,
       milliseconds,
       completionsUrl
-      // markdown2Html
     } = options
 
     this._apiKey = apiKey ?? ''
@@ -83,10 +72,6 @@ export class Core {
 
     this._messageStore = new Map<string, AI.Conversation>()
 
-    // this._gpt3Tokenizer = new Gpt3Tokenizer({
-    //   type: 'gpt3'
-    // })
-
     this._systemMessage =
       systemMessage ??
       `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`
@@ -95,32 +80,8 @@ export class Core {
 
     this._milliseconds = milliseconds ?? 1000 * 60
 
-    // this._markdown2Html = markdown2Html ?? false
-
     this._completionsUrl = completionsUrl
-
-    // this._markdown = new Markdown(this.markdownOptions)
   }
-
-  // private get markdownOptions(): MarkdownOptions {
-  //   return {
-  //     html: true,
-  //     linkify: true,
-  //     breaks: true,
-  //     xhtmlOut: true,
-  //     typographer: true,
-  //     langPrefix: 'language-',
-  //     highlight: (content, lang) => {
-  //       if (lang && highlight.getLanguage(lang)) {
-  //         try {
-  //           return '<pre class="hljs"><code>' + highlight.highlight(lang, content, true).value + '</code></pre>'
-  //         } catch (__) {}
-  //       }
-
-  //       return '<pre class="hljs"><code>' + this._markdown.utils.escapeHtml(content) + '</code></pre>'
-  //     }
-  //   }
-  // }
 
   /**
    * 获取当前 token 支持的模型的请求地址
@@ -174,12 +135,12 @@ export class Core {
   }
   /** 函数重载 start */
 
-  public buildConversation(role: RoleEnum.User, content: string, option: AI.completionsOptions): AI.Conversation
+  public buildConversation(role: RoleEnum.User, content: string, option: AI.CompletionsOptions): AI.Conversation
 
   public buildConversation(
     role: RoleEnum.Assistant,
     content: string,
-    option: AI.completionsOptions
+    option: AI.CompletionsOptions
   ): AI.Gpt.AssistantConversation
 
   /** 函数重载 end */
@@ -188,13 +149,13 @@ export class Core {
    * 构建会话消息
    * @param { RoleEnum.User | RoleEnum.Assistant } role
    * @param {string} content
-   * @param { AI.completionsOptions } option
+   * @param { AI.CompletionsOptions } option
    * @returns { AI.Conversation | AI.Gpt.AssistantConversation}
    */
   public buildConversation(
     role: RoleEnum.User | RoleEnum.Assistant,
     content: string,
-    option: AI.completionsOptions
+    option: AI.CompletionsOptions
   ): AI.Conversation | AI.Gpt.AssistantConversation {
     if (role === RoleEnum.User) {
       return {
@@ -312,14 +273,14 @@ export class Core {
     })) as AI.AnswerResponse<R>
     
     if (!response.ok) {
-      const errorOption: AI.AiErrorOption = {
+      const aiErrorOption: AI.AiErrorOption = {
         url: response.url,
         status: response.status,
         statusText: response.statusText
       }
       const { error } = JSON.parse(await response.text())
 
-      throw new AiError(error.message, errorOption)
+      throw new AiError(error.message, aiErrorOption)
     }
     /* 如果没有 onMessage 回调函数，直接返回 response */
     if (!onMessage) {
@@ -353,15 +314,6 @@ export class Core {
       }
     })
   }
-
-  /**
-   * 解析markdown语法装换成html语法
-   * @param {string} content
-   * @returns {string}
-   */
-  // public markdownToHtml(content: string): string {
-  //   return this._markdown.render(content)
-  // }
 
   /**
    * 清空promise
@@ -438,9 +390,7 @@ export class Core {
     return this._fetchSSE(this.modelsUrl, requestInit)
   }
 }
-/**
- * ChatGPT 错误类
- */
+
 export class AiError extends Error {
   name: string
   status?: number

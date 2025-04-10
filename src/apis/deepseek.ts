@@ -39,7 +39,7 @@ export const balance = <T extends DeepSeekDto.Balance>() => {
  * @param questionOption
  * @returns
  */
-export const completions = async (question: string, questionOption: AI.Gpt.completionsOptions) => {
+export const completions = async (question: string, questionOption: AI.Gpt.CompletionsOptions) => {
   const response = await gpt.completions(question, questionOption)
   return response
 }

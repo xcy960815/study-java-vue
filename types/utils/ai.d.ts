@@ -176,7 +176,7 @@ declare namespace AI {
   /**
    * 公共发送消息选项
    */
-  export interface completionsOptions {
+  export interface CompletionsOptions {
     parentMessageId?: string
     messageId?: string
     stream?: boolean
@@ -229,7 +229,7 @@ declare namespace AI {
       detail?: Response | null
     }
 
-    export interface completionsOptions extends AI.completionsOptions {
+    export interface CompletionsOptions extends AI.CompletionsOptions {
       onProgress?: OnProgress<AssistantConversation>
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
@@ -245,7 +245,7 @@ declare namespace AI {
     /**
      * 发送的消息选项
      */
-    export interface completionsOptions extends AI.completionsOptions {
+    export interface CompletionsOptions extends AI.CompletionsOptions {
       systemPromptPrefix?: string
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
       onProgress?: OnProgress<AssistantConversation>

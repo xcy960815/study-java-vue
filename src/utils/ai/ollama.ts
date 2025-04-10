@@ -22,10 +22,10 @@ export class Ollama extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {AI.Gpt.completionsOptions} options
+   * @param {AI.Gpt.CompletionsOptions} options
    * @returns {Promise<AI.FetchRequestInit>}
    */
-  private async _getFetchRequestInit(question: string, options: AI.Gpt.completionsOptions): Promise<AI.FetchRequestInit> {
+  private async _getFetchRequestInit(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
     // 获取用户和gpt历史对话记录
     const { messages, maxTokens } = await this._getConversationHistory(question, options)
@@ -48,7 +48,7 @@ export class Ollama extends Core {
     return fetchRequestOption
   }
 
-  public async completions(question: string, options: AI.Gpt.completionsOptions): Promise<AI.Gpt.AssistantConversation> {
+  public async completions(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.Gpt.AssistantConversation> {
     const userConversation = this.buildConversation(RoleEnum.User, question, options);
     await this.upsertConversation(userConversation);
 
@@ -75,7 +75,7 @@ export class Ollama extends Core {
 
   private async _handleAnswerRequest(
     question: string,
-    options: AI.Gpt.completionsOptions,
+    options: AI.Gpt.CompletionsOptions,
   ): Promise<AI.Gpt.AssistantConversation> {
     const { stream = !!options.onProgress } = options;
     const requestInit = await this._getFetchRequestInit(question, options);
@@ -87,7 +87,7 @@ export class Ollama extends Core {
 
   private async _handleStreamResponse(
     requestInit: AI.FetchRequestInit,
-    onProgress?: AI.Gpt.completionsOptions["onProgress"]
+    onProgress?: AI.Gpt.CompletionsOptions["onProgress"]
   ): Promise<AI.Gpt.AssistantConversation> {
     return new Promise<AI.Gpt.AssistantConversation>((resolve, reject) => {
       requestInit.onMessage = (data: string) => {
@@ -100,7 +100,7 @@ export class Ollama extends Core {
   private _processStreamData(
     data: string,
     resolve: (value: AI.Gpt.AssistantConversation) => void,
-    onProgress?: AI.Gpt.completionsOptions["onProgress"]
+    onProgress?: AI.Gpt.CompletionsOptions["onProgress"]
   ): void {
     if (data === '[DONE]') {
       this._currentConversation!.content = this._currentConversation!.content.trim();
@@ -154,7 +154,7 @@ export class Ollama extends Core {
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<AI.Gpt.completionsOptions>} options
+   * @param {Required<AI.Gpt.CompletionsOptions>} options
    * @returns {Promise<{
    * messages: AI.Gpt.RequestMessage[]
    * text:string
@@ -162,7 +162,7 @@ export class Ollama extends Core {
    */
   private async _getConversationHistory(
     text: string,
-    options: AI.Gpt.completionsOptions
+    options: AI.Gpt.CompletionsOptions
   ): Promise<{
     messages: Array<AI.Gpt.RequestMessage>
     maxTokens: number

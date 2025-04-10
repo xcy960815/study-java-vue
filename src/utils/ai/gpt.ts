@@ -24,10 +24,10 @@ export class Gpt extends Core {
   /**
    * 构建fetch公共请求参数
    * @param {string} question
-   * @param {AI.Gpt.completionsOptions} options
+   * @param {AI.Gpt.CompletionsOptions} options
    * @returns {Promise<AI.FetchRequestInit>}
    */
-  private async _getFetchRequestInit(question: string, options: AI.Gpt.completionsOptions): Promise<AI.FetchRequestInit> {
+  private async _getFetchRequestInit(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
 
     /* 获取用户和gpt历史对话记录 */
@@ -52,10 +52,10 @@ export class Gpt extends Core {
   /**
    * 获取答案
    * @param {string} question
-   * @param {AI.Gpt.completionsOptions} options
+   * @param {AI.Gpt.CompletionsOptions} options
    * @returns {Promise<AI.Gpt.AssistantConversation>}
    */
-  public async completions(question: string, options: AI.Gpt.completionsOptions): Promise<AI.Gpt.AssistantConversation> {
+  public async completions(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.Gpt.AssistantConversation> {
     const { onProgress, stream = !!onProgress } = options
     // 构建用户消息
     const userMessage = this.buildConversation(RoleEnum.User, question, options)
@@ -128,12 +128,12 @@ export class Gpt extends Core {
   /**
    * 获取会话消息历史
    * @param {string} text
-   * @param {Required<AI.Gpt.completionsOptions>} options
+   * @param {Required<AI.Gpt.CompletionsOptions>} options
    * @returns {Promise<{ messages: AI.Gpt.RequestMessage[]; }>}
    */
   private async _getConversationHistory(
     text: string,
-    options: AI.Gpt.completionsOptions
+    options: AI.Gpt.CompletionsOptions
   ): Promise<{
     messages: Array<AI.Gpt.RequestMessage>
     maxTokens: number
