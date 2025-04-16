@@ -1,11 +1,11 @@
 #!/bin/bash
 
-echo "🚀 使用 pnpm 安装 ESLint、Prettier、Husky、Commitlint 等工具 (修正版)..."
+echo "🚀 一站式配置 ESLint + Prettier + Husky + Commitlint..."
 
-# 清理旧版 Husky 配置
+# ------------------------- 清理旧配置 -------------------------
 rm -rf .husky 2>/dev/null
 
-# 安装核心依赖（指定 ESLint 9+ 和最新 Husky）
+# ------------------------- 安装依赖 -------------------------
 pnpm add -D \
   eslint@latest \
   prettier \
@@ -20,7 +20,8 @@ pnpm add -D \
   commitizen@latest \
   cz-customizable@latest
 
-# 添加配置文件（与之前相同）
+# ------------------------- 配置文件生成 -------------------------
+# Prettier 配置
 cat > .prettierrc << EOF
 {
   "semi": false,
@@ -31,7 +32,8 @@ cat > .prettierrc << EOF
 }
 EOF
 
-cat > .eslintrc.cjs << 'EOF'
+# ESLint 配置
+cat > .eslintrc.cjs << EOF
 module.exports = {
   root: true,
   env: {
@@ -50,12 +52,21 @@ module.exports = {
 }
 EOF
 
+# Commitlint 配置（增强类型校验）
 cat > commitlint.config.js << EOF
 module.exports = {
   extends: ['@commitlint/config-conventional'],
+  rules: {
+    'type-enum': [
+      2,
+      'always',
+      ['feat', 'fix', 'docs', 'style', 'refactor', 'test', 'chore']
+    ]
+  }
 }
 EOF
 
+# Commitizen 配置
 cat > .cz-config.js << EOF
 module.exports = {
   types: [
@@ -69,26 +80,24 @@ module.exports = {
   ],
   messages: {
     type: '选择提交类型:',
-    subject: '简短描述:\n'
+    subject: '简短描述（必填）:\n'
   }
 }
 EOF
 
-# 配置 package.json
+# ------------------------- 配置 package.json -------------------------
 pnpm pkg set "lint-staged.*.{js,ts,vue}"="[\"eslint --fix\", \"prettier --write\"]"
 pnpm pkg set scripts.lint-staged="lint-staged"
 pnpm pkg set scripts.prepare="husky install"
 pnpm pkg set config.commitizen.path="cz-customizable"
 
-# 初始化 Husky（新版方式）
+# ------------------------- 初始化 Husky -------------------------
 pnpm husky install
 pnpm husky add .husky/pre-commit "pnpm lint-staged"
 pnpm husky add .husky/commit-msg "pnpm exec commitlint --edit \$1"
-
-# 设置钩子文件权限
 chmod +x .husky/*
 
-# 其他配置
+# ------------------------- 编辑器配置 -------------------------
 cat > .editorconfig << EOF
 root = true
 [*]
@@ -113,7 +122,8 @@ cat > .vscode/settings.json << EOF
 }
 EOF
 
-echo "✅ 所有配置已完成！验证步骤："
-echo "1. 测试 commitlint: echo 'feat: test' | pnpm exec commitlint"
-echo "2. 测试 lint-staged: touch test.js && git add test.js && pnpm lint-staged"
-echo "3. 使用 npx cz 提交代码"
+# ------------------------- 验证提示 -------------------------
+echo "✅ 配置完成！请运行以下命令测试："
+echo "1. 测试提交校验：echo 'invalid: test' | pnpm exec commitlint" 
+echo "2. 测试 lint-staged：touch test.js && git add test.js && git commit -m 'chore: test lint-staged'"
+echo "3. 使用规范提交：npx cz"

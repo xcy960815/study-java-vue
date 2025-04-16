@@ -10,6 +10,6 @@ module.exports = {
   ],
   messages: {
     type: '选择提交类型:',
-    subject: '简短描述:\n'
+    subject: '简短描述（必填）:\n'
   }
 }
