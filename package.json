@@ -91,7 +91,8 @@
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "prettier --write"
+      "prettier --write",
+      "git add"
     ]
   },
   "config": {
