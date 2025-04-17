@@ -92,8 +92,7 @@
   "lint-staged": {
     "*.{js,ts,vue}": [
       "prettier --write"
-    ],
-    "ignore": ["*.timestamp-*"]
+    ]
   },
   "config": {
     "cz-customizable": {
