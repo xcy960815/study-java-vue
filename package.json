@@ -88,13 +88,14 @@
     "node": "18.20.4"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": [
+    "*.{js,ts,vue,json,tsx}": [
       "prettier --write"
-    ]
+    ],
+    "verbose": true
   },
   "config": {
-    "commitizen": {
-      "path": "cz-customizable"
+    "cz-customizable": {
+      "config": ".cz-config.cjs"
     }
   }
 }
