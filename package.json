@@ -93,8 +93,7 @@
     "*.{js,ts,vue}": [
       "prettier --write"
     ],
-    "ignore": ["*.timestamp-*"],
-    "allowEmpty": true
+    "ignore": ["*.timestamp-*"]
   },
   "config": {
     "cz-customizable": {
