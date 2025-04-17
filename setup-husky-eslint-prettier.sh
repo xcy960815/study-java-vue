@@ -92,10 +92,9 @@ pnpm pkg set scripts.prepare="husky install"
 pnpm pkg set config.commitizen.path="cz-customizable"
 
 # ------------------------- 初始化 Husky -------------------------
-pnpm husky install
-pnpm husky add .husky/pre-commit "pnpm lint-staged"
-pnpm husky add .husky/commit-msg "pnpm exec commitlint --edit \$1"
-chmod +x .husky/*
+npx husky install
+npx husky add .husky/pre-commit "pnpm lint-staged"
+npx husky add .husky/commit-msg "pnpm exec commitlint --edit \$1"
 
 # ------------------------- 编辑器配置 -------------------------
 cat > .editorconfig << EOF
