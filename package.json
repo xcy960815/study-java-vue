@@ -90,7 +90,6 @@
     "node": "18.20.4"
   },
   "lint-staged": {
-    "verbose": true,
     "*.{js,ts,vue,json,tsx}": [
       "prettier --write"
     ]
