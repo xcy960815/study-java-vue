@@ -14,7 +14,6 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "lint-staged": "lint-staged",
     "prepare": "husky",
     "format": "pretty-quick --staged"
   },
@@ -68,7 +67,6 @@
     "cz-customizable": "^7.4.0",
     "jsdom": "^24.1.0",
     "less": "^4.2.0",
-    "lint-staged": "^15.5.1",
     "postcss": "^8.5.1",
     "prettier": "^3.5.3",
     "pretty-quick": "^4.1.1",
@@ -90,14 +88,5 @@
   },
   "volta": {
     "node": "18.20.4"
-  },
-  "lint-staged": {
-    "*.{js,ts,vue}": [
-      "pretty-quick --staged"
-    ]
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged",
-    "commit-msg": "npx commitlint --edit"
   }
 }
