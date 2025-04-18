@@ -11,6 +11,7 @@ import router from '@/router'
 import { registerGlobalComponents } from './components'
 const app = createApp(App)
 app
+
   // .use(ElementPlus)
   .use(registerGlobalComponents)
   .use(store)
