@@ -1,12 +1,17 @@
 <template>
   <div class="deepseek-chat">
-    <ai-chat :role-alias="roleAlias" @completions="completions" :conversation="conversation"
-      @cancel-conversation="cancelConversation" :conversations="conversations"></ai-chat>
+    <ai-chat
+      :role-alias="roleAlias"
+      @completions="completions"
+      :conversation="conversation"
+      @cancel-conversation="cancelConversation"
+      :conversations="conversations"
+    ></ai-chat>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { OllamaModel } from "@utils/ai"
+import { OllamaModel } from '@utils/ai'
 import { renderMarkdownText } from '@plugins/markdown'
 import { ref } from 'vue'
 // import { deepseekModule } from '@apis'
@@ -15,7 +20,7 @@ import AiChat from '@components/ai-chat/index.vue'
 import { RoleEnum } from '@enums'
 import { cloneDeep } from 'lodash'
 defineOptions({
-  name: 'deepseek-chat'
+  name: 'deepseek-chat',
 })
 
 const route = useRoute()
@@ -37,8 +42,8 @@ const ollamaModel = new OllamaModel({
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: '/deepseek/completions',
   requestParams: {
-    model: model
-  }
+    model: model,
+  },
 })
 
 /**
@@ -47,7 +52,7 @@ const ollamaModel = new OllamaModel({
 const roleAlias = ref<Record<AI.Role, string>>({
   user: 'ME',
   assistant: 'Ollama',
-  system: 'System'
+  system: 'System',
 })
 const completions = async (question: string) => {
   setTimeout(async () => {
@@ -60,14 +65,13 @@ const completions = async (question: string) => {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
-      model
+      model,
     },
     onProgress(partialResponse) {
       partialResponse.content = renderMarkdownText(partialResponse.content)
       conversation.value = cloneDeep(partialResponse)
-      console.log("conversation.value",conversation.value);
-      
-    }
+      console.log('conversation.value', conversation.value)
+    },
   }
 
   const response = await ollamaModel.completions(question, questionOption)
