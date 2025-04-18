@@ -15,7 +15,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint-staged": "lint-staged",
-    "format": "pretty-quick --staged"
+    "format": "pretty-quick --staged",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
@@ -75,6 +76,7 @@
     "rollup-plugin-visualizer": "^5.14.0",
     "sass": "1.83.4",
     "signale": "^1.4.0",
+    "simple-git-hooks": "^2.12.1",
     "tailwindcss": "3.1.8",
     "typescript": "~5.4.0",
     "unplugin-auto-import": "^19.0.0",
