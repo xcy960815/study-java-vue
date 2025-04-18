@@ -92,8 +92,7 @@
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "pretty-quick --staged",
-      "git add"
+      "pretty-quick --staged"
     ]
   },
   "simple-git-hooks": {
