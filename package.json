@@ -15,8 +15,7 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint-staged": "lint-staged",
-    "format": "pretty-quick --staged",
-    "prepare": "simple-git-hooks"
+    "prepare": "husky"
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",
@@ -100,10 +99,5 @@
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",
     "commit-msg": "npx commitlint --edit"
-  },
-  "config": {
-    "cz-customizable": {
-      "config": ".cz-config.cjs"
-    }
   }
 }
