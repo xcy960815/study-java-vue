@@ -93,7 +93,7 @@
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "prettier --write"
+      "pretty-quick --staged"
     ]
   },
   "simple-git-hooks": {
