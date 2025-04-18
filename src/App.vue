@@ -7,7 +7,7 @@
         
         
         
-        :is="Component" :key="routerViewKey" />
+    :is="Component" :key="routerViewKey" />
       </keep-alive>
     </transition>
   </router-view>
