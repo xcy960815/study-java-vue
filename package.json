@@ -14,7 +14,7 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
-    "prepare": "husky",
+    "prepare": "npx husky init .husky && chmod +x .husky/*",
     "format": "pretty-quick --staged"
   },
   "dependencies": {
@@ -88,5 +88,10 @@
   },
   "volta": {
     "node": "18.20.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    }
   }
 }
