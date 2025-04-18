@@ -15,7 +15,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",
     "lint-staged": "lint-staged",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "pretty-quick --staged"
   },
   "dependencies": {
     "@element-plus/icons": "^0.0.11",

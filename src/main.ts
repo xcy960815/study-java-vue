@@ -7,6 +7,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import 'virtual:svg-icons-register'
 import store from './store'
+
 import router from '@/router'
 import { registerGlobalComponents } from './components'
 const app = createApp(App)
@@ -15,5 +16,6 @@ app
   // .use(ElementPlus)
   .use(registerGlobalComponents)
   .use(store)
+
   .use(router)
   .mount('#app')
