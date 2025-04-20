@@ -1,8 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-import {
-  type PreRenderedAsset,
-  type PreRenderedChunk
-} from 'rollup'
+import { type PreRenderedAsset, type PreRenderedChunk } from 'rollup'
 import { defineConfig, loadEnv } from 'vite'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
@@ -22,47 +19,29 @@ import { visualizer } from 'rollup-plugin-visualizer'
  */
 export default defineConfig(({ mode }) => {
   /** 端口号 */
-  const VITE_PORT = parseInt(
-    loadEnv(mode, './env/').VITE_PORT
-  )
+  const VITE_PORT = parseInt(loadEnv(mode, './env/').VITE_PORT)
 
   /** 后端接口 */
-  const VITE_API_SERVER_DOMAIN = loadEnv(
-    mode,
-    './env/'
-  ).VITE_API_SERVER_DOMAIN
+  const VITE_API_SERVER_DOMAIN = loadEnv(mode, './env/').VITE_API_SERVER_DOMAIN
 
   /** 后端接口前缀 */
-  const VITE_API_SERVER_DOMAIN_PREFIX = loadEnv(
-    mode,
-    './env/'
-  ).VITE_API_SERVER_DOMAIN_PREFIX
+  const VITE_API_SERVER_DOMAIN_PREFIX = loadEnv(mode, './env/').VITE_API_SERVER_DOMAIN_PREFIX
 
   /** 前端代理接口前缀 */
-  const VITE_API_DOMAIN_PREFIX = loadEnv(
-    mode,
-    './env/'
-  ).VITE_API_DOMAIN_PREFIX
+  const VITE_API_DOMAIN_PREFIX = loadEnv(mode, './env/').VITE_API_DOMAIN_PREFIX
 
   /** 前端搭理接口前缀正则 */
-  const VITE_API_DOMAIN_PREFIX_REG = new RegExp(
-    `^${VITE_API_DOMAIN_PREFIX}`
-  )
+  const VITE_API_DOMAIN_PREFIX_REG = new RegExp(`^${VITE_API_DOMAIN_PREFIX}`)
 
   /** 静态资源地址 */
-  const VITE_BASE_URL = loadEnv(
-    mode,
-    './env/'
-  ).VITE_BASE_URL
+  const VITE_BASE_URL = loadEnv(mode, './env/').VITE_BASE_URL
 
   /** Html tab title */
-  const VITE_APP_TITLE = loadEnv(
-    mode,
-    './env/'
-  ).VITE_APP_TITLE
+  const VITE_APP_TITLE = loadEnv(mode, './env/').VITE_APP_TITLE
 
   return {
-    base: VITE_BASE_URL,
+    // base: VITE_BASE_URL,
+    base: './',
     envDir: './env', // 环境变量目录 若不设置会在 import.meta.env 中取不到变量
     build: {
       chunkSizeWarningLimit: 1024, // 将警告体积变成1MB
@@ -90,11 +69,11 @@ export default defineConfig(({ mode }) => {
                 // gpt3-tokenizer 单独打包
                 return 'gpt3-tokenizer'
               }
-              if (id.includes("katex")) {
+              if (id.includes('katex')) {
                 // katex 单独打包
                 return 'katex'
               }
-              if (id.includes("highlight")) {
+              if (id.includes('highlight')) {
                 // highlight 单独打包
                 return 'highlight'
               }
@@ -119,10 +98,8 @@ export default defineConfig(({ mode }) => {
           chunkFileNames(chunkInfo: PreRenderedChunk) {
             const facadeModuleId = chunkInfo.facadeModuleId
             if (facadeModuleId) {
-              const facadeModuleIds =
-                facadeModuleId.split('/')
-              const parentname =
-                facadeModuleIds[facadeModuleIds.length - 2]
+              const facadeModuleIds = facadeModuleId.split('/')
+              const parentname = facadeModuleIds[facadeModuleIds.length - 2]
               return `assets/js/${parentname}-[name]-[hash].js`
             }
             return `assets/js/[name]-[hash].js`
@@ -130,41 +107,22 @@ export default defineConfig(({ mode }) => {
           // 静态资源输出配置
           assetFileNames(assetInfo: PreRenderedAsset) {
             const name = assetInfo.name
-            const originalFileName =
-              assetInfo.originalFileName
-            const imgSuffixs = [
-              '.png',
-              '.jpg',
-              '.jpeg',
-              '.gif',
-              '.svg',
-              '.webp'
-            ]
+            const originalFileName = assetInfo.originalFileName
+            const imgSuffixs = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp']
             if (originalFileName) {
-              const originalFileNames =
-                originalFileName.split('/')
-              const parentname =
-                originalFileNames[
-                originalFileNames.length - 2
-                ]
+              const originalFileNames = originalFileName.split('/')
+              const parentname = originalFileNames[originalFileNames.length - 2]
               // css文件单独输出到css文件夹
               if (name?.endsWith('.css')) {
-                return `assets/css/${parentname ? parentname + '-' : ''
-                  }[name]-[hash].css`
+                return `assets/css/${parentname ? parentname + '-' : ''}[name]-[hash].css`
               }
               // 图片文件单独输出到img文件夹
-              else if (
-                imgSuffixs.some((ext) =>
-                  name?.endsWith(ext)
-                )
-              ) {
-                return `assets/img/${parentname ? parentname + '-' : ''
-                  }[name}]-[hash].[ext]`
+              else if (imgSuffixs.some((ext) => name?.endsWith(ext))) {
+                return `assets/img/${parentname ? parentname + '-' : ''}[name]-[hash].[ext]`
               }
               // 其他资源输出到assets文件夹
               else {
-                return `assets/${parentname ? parentname + '-' : ''
-                  }[name]-[hash].[ext]`
+                return `assets/${parentname ? parentname + '-' : ''}[name]-[hash].[ext]`
               }
             } else {
               // css文件单独输出到css文件夹
@@ -172,21 +130,17 @@ export default defineConfig(({ mode }) => {
                 return `assets/css/[name]-[hash].css`
               }
               // 图片文件单独输出到img文件夹
-              else if (
-                imgSuffixs.some((ext) =>
-                  name?.endsWith(ext)
-                )
-              ) {
-                return `assets/img/[name}]-[hash].[ext]`
+              else if (imgSuffixs.some((ext) => name?.endsWith(ext))) {
+                return `assets/img/[name]-[hash].[ext]`
               }
               // 其他资源输出到assets文件夹
               else {
                 return `assets/[name]-[hash].[ext]`
               }
             }
-          }
-        }
-      }
+          },
+        },
+      },
     },
     logLevel: 'info',
     server: {
@@ -201,33 +155,24 @@ export default defineConfig(({ mode }) => {
           // 该配置会将真是的代理地址显示在 network 自定义请求头中
           bypass(req, res, options) {
             const proxyURL =
-              new URL(
-                options.rewrite!(req.url || '') || '',
-                options.target as string
-              )?.href || ''
+              new URL(options.rewrite!(req.url || '') || '', options.target as string)?.href || ''
             res.setHeader('x-req-proxyURL', proxyURL) // 将真实请求地址设置到响应头中
           },
           rewrite: (path) =>
-            path.replace(
-              VITE_API_DOMAIN_PREFIX_REG,
-              VITE_API_SERVER_DOMAIN_PREFIX
-            )
-        }
-      }
+            path.replace(VITE_API_DOMAIN_PREFIX_REG, VITE_API_SERVER_DOMAIN_PREFIX),
+        },
+      },
     },
     css: {
       postcss: {
-        plugins: [
-          tailwindcss(),
-          autoprefixer()
-        ],
+        plugins: [tailwindcss(), autoprefixer()],
       },
       preprocessorOptions: {
         scss: {
-          api: 'modern-compiler'
+          api: 'modern-compiler',
           // additionalData: `@use "@assets/style/element/theme.scss" as *;`
-        }
-      }
+        },
+      },
     },
     plugins: [
       vue(),
@@ -236,77 +181,52 @@ export default defineConfig(({ mode }) => {
         inject: {
           data: {
             VITE_APP_TITLE,
-            VITE_BASE_URL
-          }
-        }
+            VITE_BASE_URL,
+          },
+        },
       }),
       AutoImport({
         resolvers: [
           ElementPlusResolver({
             // importStyle: 'sass'
-          })
-        ]
+          }),
+        ],
       }),
       Components({
         resolvers: [
           ElementPlusResolver({
             // importStyle: 'sass'
-          })
-        ]
+          }),
+        ],
       }),
       ElementPlus({
-        useSource: true
+        useSource: true,
       }),
       // 注册所有的svg文件生成svg雪碧图
       createSvgIconsPlugin({
-        iconDirs: [
-          path.resolve(
-            process.cwd(),
-            'src/assets/svg-icons'
-          )
-        ], // icon存放的目录
+        iconDirs: [path.resolve(process.cwd(), 'src/assets/svg-icons')], // icon存放的目录
         symbolId: 'icon-[name]', // symbol的id
         inject: 'body-last', // 插入的位置
-        customDomId: '__svg__icons__dom__' // svg的id
+        customDomId: '__svg__icons__dom__', // svg的id
       }),
       // 打包体积分析
       visualizer({
         // open: true,
-        filename: 'visualizer.html' //分析图生成的文件名
-      })
+        filename: 'visualizer.html', //分析图生成的文件名
+      }),
     ],
     resolve: {
       alias: {
-        '@': fileURLToPath(
-          new URL('./src', import.meta.url)
-        ),
-        '@utils': fileURLToPath(
-          new URL('./src/utils', import.meta.url)
-        ),
-        '@assets': fileURLToPath(
-          new URL('./src/assets', import.meta.url)
-        ),
-        '@apis': fileURLToPath(
-          new URL('./src/apis', import.meta.url)
-        ),
-        '@store': fileURLToPath(
-          new URL('./src/store', import.meta.url)
-        ),
-        '@components': fileURLToPath(
-          new URL('./src/components', import.meta.url)
-        ),
-        '@router': fileURLToPath(
-          new URL('./src/router', import.meta.url)
-        ),
-        '@enums': fileURLToPath(
-          new URL('./src/enums', import.meta.url)
-        ),
-        '@plugins': fileURLToPath(
-          new URL('./src/plugins', import.meta.url)
-        )
-      }
-    }
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@utils': fileURLToPath(new URL('./src/utils', import.meta.url)),
+        '@assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
+        '@apis': fileURLToPath(new URL('./src/apis', import.meta.url)),
+        '@store': fileURLToPath(new URL('./src/store', import.meta.url)),
+        '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+        '@router': fileURLToPath(new URL('./src/router', import.meta.url)),
+        '@enums': fileURLToPath(new URL('./src/enums', import.meta.url)),
+        '@plugins': fileURLToPath(new URL('./src/plugins', import.meta.url)),
+      },
+    },
   }
 })
-
-
