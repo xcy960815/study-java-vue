@@ -18,30 +18,19 @@ import { visualizer } from 'rollup-plugin-visualizer'
  * @link https://vitejs.dev/config/
  */
 export default defineConfig(({ mode }) => {
-  /** 端口号 */
-  const VITE_PORT = parseInt(loadEnv(mode, './env/').VITE_PORT)
-
-  /** 后端接口 */
-  const VITE_API_SERVER_DOMAIN = loadEnv(mode, './env/').VITE_API_SERVER_DOMAIN
-
-  /** 后端接口前缀 */
-  const VITE_API_SERVER_DOMAIN_PREFIX = loadEnv(mode, './env/').VITE_API_SERVER_DOMAIN_PREFIX
-
-  /** 前端代理接口前缀 */
-  const VITE_API_DOMAIN_PREFIX = loadEnv(mode, './env/').VITE_API_DOMAIN_PREFIX
-
+  const {
+    VITE_PORT /** 端口号 */,
+    VITE_APP_TITLE /** 项目名称 */,
+    VITE_BASE_URL /** 项目名称 */,
+    VITE_API_DOMAIN_PREFIX,
+    VITE_API_SERVER_DOMAIN,
+    VITE_API_SERVER_DOMAIN_PREFIX,
+  } = loadEnv(mode, './env/')
   /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(`^${VITE_API_DOMAIN_PREFIX}`)
 
-  /** 静态资源地址 */
-  const VITE_BASE_URL = loadEnv(mode, './env/').VITE_BASE_URL
-
-  /** Html tab title */
-  const VITE_APP_TITLE = loadEnv(mode, './env/').VITE_APP_TITLE
-
   return {
-    // base: VITE_BASE_URL,
-    base: './',
+    base: VITE_BASE_URL,
     envDir: './env', // 环境变量目录 若不设置会在 import.meta.env 中取不到变量
     build: {
       chunkSizeWarningLimit: 1024, // 将警告体积变成1MB
@@ -120,9 +109,9 @@ export default defineConfig(({ mode }) => {
               else if (imgSuffixs.some((ext) => name?.endsWith(ext))) {
                 return `assets/img/${parentname ? parentname + '-' : ''}[name]-[hash].[ext]`
               }
-              // 其他资源输出到assets文件夹
+              // 其他资源输出到assets/other文件夹
               else {
-                return `assets/${parentname ? parentname + '-' : ''}[name]-[hash].[ext]`
+                return `assets/other/${parentname ? parentname + '-' : ''}[name]-[hash].[ext]`
               }
             } else {
               // css文件单独输出到css文件夹
@@ -135,7 +124,7 @@ export default defineConfig(({ mode }) => {
               }
               // 其他资源输出到assets文件夹
               else {
-                return `assets/[name]-[hash].[ext]`
+                return `assets/other/[name]-[hash].[ext]`
               }
             }
           },
@@ -146,7 +135,7 @@ export default defineConfig(({ mode }) => {
     server: {
       // host: '0.0.0.0', // 确保服务监听所有网络接口
       host: true,
-      port: VITE_PORT,
+      port: parseInt(VITE_PORT),
       proxy: {
         [VITE_API_DOMAIN_PREFIX]: {
           target: VITE_API_SERVER_DOMAIN,
