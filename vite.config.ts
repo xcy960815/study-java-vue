@@ -21,10 +21,10 @@ export default defineConfig(({ mode }) => {
   const {
     VITE_PORT /** 端口号 */,
     VITE_APP_TITLE /** 项目名称 */,
-    VITE_BASE_URL /** 项目名称 */,
-    VITE_API_DOMAIN_PREFIX,
-    VITE_API_SERVER_DOMAIN,
-    VITE_API_SERVER_DOMAIN_PREFIX,
+    VITE_BASE_URL /** 项目文件目录 */,
+    VITE_API_DOMAIN_PREFIX /** 接口代理前缀 */,
+    VITE_API_SERVER_DOMAIN /** 后端接口地址 */,
+    VITE_API_SERVER_DOMAIN_PREFIX /** 后端接口 API 前缀 */,
   } = loadEnv(mode, './env/')
   /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(`^${VITE_API_DOMAIN_PREFIX}`)
