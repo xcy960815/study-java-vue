@@ -26,7 +26,7 @@ export const setToken = async (token: string) => {
     return await cookieStore.set({
       name: TOKENNAME,
       value: token,
-      path: VITE_BASE_URL
+      // path: VITE_BASE_URL
     })
   } else {
     return localStorage.setItem(TOKENNAME, token)
@@ -41,7 +41,7 @@ export const removeToken = async () => {
   if (hasCookieStore()) {
     return await cookieStore.delete({
       name: TOKENNAME,
-      path: VITE_BASE_URL
+      // path: VITE_BASE_URL
     })
   } else {
     return localStorage.removeItem(TOKENNAME)

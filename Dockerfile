@@ -7,13 +7,17 @@ WORKDIR /study-java-web
 # 拷贝项目文件
 COPY . .
 
-# 删除本地 node_modules 和锁文件，避免宿主机依赖污染
+# 安装pnpm
+# RUN npm install pnpm -g
+
 RUN rm -rf node_modules package-lock.json
 
 # 安装依赖
+# RUN pnpm install
 RUN npm install
 
 # 构建生产环境包
+# RUN pnpm run build-prod
 RUN npm run build-prod
 
 
@@ -33,11 +37,10 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html && mkdir -p /usr/share/nginx/html
 
 # 拷贝构建结果
-COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html/study-java-web
+COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html
 
 # 启动 nginx
 CMD ["nginx", "-g", "daemon off;"]
-
 
 # 构建镜像命令（带 BuildKit）
 # DOCKER_BUILDKIT=1 docker build -t xcy960815/study-java-web:1.0 .
