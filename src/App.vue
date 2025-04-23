@@ -25,19 +25,7 @@ const routerViewKey = ref(route.fullPath)
 
 const { initTheme } = setSystemTheme()
 
-const getCaptcha = async () => {
-  const result = await fetch(
-    import.meta.env.VITE_API_SERVER_DOMAIN +
-      import.meta.env.VITE_API_SERVER_DOMAIN_PREFIX +
-      '/captcha'
-  )
-  console.log(await result.json())
-}
 onMounted(() => {
-  // getCaptcha()
-  // console.log(import.meta.env.VITE_API_SERVER_DOMAIN)
-  // console.log(import.meta.env.VITE_API_SERVER_DOMAIN_PREFIX);
-
   initTheme()
 })
 </script>
