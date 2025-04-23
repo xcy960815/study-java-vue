@@ -8,17 +8,17 @@ WORKDIR /study-java-web
 COPY . .
 
 # 安装pnpm
-# RUN npm install pnpm -g
+RUN npm install pnpm -g
 
-RUN rm -rf node_modules package-lock.json
+RUN rm -rf node_modules package-lock.json dist
 
 # 安装依赖
-# RUN pnpm install
-RUN npm install
+RUN pnpm install
+# RUN npm install
 
 # 构建生产环境包
-# RUN pnpm run build-prod
-RUN npm run build-prod
+RUN pnpm run build-prod
+# RUN npm run build-prod
 
 
 # 第二阶段：用 nginx 运行构建好的前端
