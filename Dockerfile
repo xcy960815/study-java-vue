@@ -1,5 +1,6 @@
 # 第一阶段：node 镜像打包前端
-FROM node:18 AS frontend-builder
+# 使用多平台支持的 node 镜像
+FROM --platform=$BUILDPLATFORM node:18 AS frontend-builder
 
 # 设置工作目录
 WORKDIR /study-java-web
@@ -14,15 +15,13 @@ RUN rm -rf node_modules package-lock.json dist
 
 # 安装依赖
 RUN pnpm install
-# RUN npm install
 
 # 构建生产环境包
 RUN pnpm run build-prod
-# RUN npm run build-prod
-
 
 # 第二阶段：用 nginx 运行构建好的前端
-FROM nginx:1.21
+# 使用多平台支持的 nginx 镜像
+FROM --platform=$TARGETPLATFORM nginx:1.21
 
 # 容器监听端口
 EXPOSE 80
@@ -42,7 +41,11 @@ COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html
 # 启动 nginx
 CMD ["nginx", "-g", "daemon off;"]
 
-# 构建镜像命令（带 BuildKit）
-# DOCKER_BUILDKIT=1 docker build -t xcy960815/study-java-web:1.0 .
-# 运行容器
-# docker run --name study-java-web-container -dp 1234:80 xcy960815/study-java-web:1.0
+# 1. 创建并启用 buildx 构建器
+# docker buildx create --use
+#
+# 2. 构建并推送多平台镜像
+# docker buildx build --platform linux/amd64,linux/arm64 -t xcy960815/study-java-web:1.0 --push .
+#
+# 3. 运行容器（根据平台自动选择对应镜像）
+# docker run --name study-java-web-container -dp 12315:80 xcy960815/study-java-web:1.0
