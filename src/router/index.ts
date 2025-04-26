@@ -4,6 +4,10 @@ import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import { getToken } from '@utils/token'
 import { changeTabIco } from '@/utils/system-style'
+// import MathLearning from '../views/math-learning/index.vue'
+// import MathBasic from '../views/math-learning/basic.vue'
+// import MathPractice from '../views/math-learning/practice.vue'
+// import MathWrongQuestions from '../views/math-learning/wrong-questions.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -11,8 +15,8 @@ export const routes: RouteRecordRaw[] = [
     name: 'home',
     redirect: '/login',
     meta: {
-      hidden: true
-    }
+      hidden: true,
+    },
   },
   {
     path: '/login',
@@ -21,8 +25,8 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '登录',
       hidden: true,
-      icon: 'Login'
-    }
+      icon: 'Login',
+    },
   },
   {
     path: '/password',
@@ -31,11 +35,11 @@ export const routes: RouteRecordRaw[] = [
     meta: {
       title: '密码',
       hidden: true,
-      icon: 'password'
+      icon: 'password',
     },
     props: {
-      content: defineAsyncComponent(() => import(`../views/password/index.vue`)) // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
-    }
+      content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
+    },
   },
   {
     path: '/user',
@@ -43,7 +47,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: '用户',
-      icon: 'User'
+      icon: 'User',
     },
     children: [
       {
@@ -54,20 +58,20 @@ export const routes: RouteRecordRaw[] = [
           // icon: 'ListView',
           icon: 'other',
           keepAlive: true,
-          title: '用户列表'
-        }
+          title: '用户列表',
+        },
       },
       {
         path: '/user/info',
         name: 'userInfo',
         component: () => import(`../views/user/info.vue`),
         meta: {
-          hightlight:"/user/list",
+          hightlight: '/user/list',
           hidden: true,
-          title: '用户中心'
-        }
-      }
-    ]
+          title: '用户中心',
+        },
+      },
+    ],
   },
   {
     path: '/goods-category',
@@ -75,7 +79,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: '商品',
-      icon: 'Commodity'
+      icon: 'Commodity',
     },
     children: [
       {
@@ -85,8 +89,8 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '商品列表',
           keepAlive: true,
-          icon: 'ListView'
-        }
+          icon: 'ListView',
+        },
       },
       {
         path: '/goods-category/info',
@@ -94,12 +98,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/goods-category/info.vue`),
         meta: {
           hidden: true,
-          hightlight:"/goods-category/list",
+          hightlight: '/goods-category/list',
           title: '商品详情',
-          icon: 'DocDetail'
-        }
-      }
-    ]
+          icon: 'DocDetail',
+        },
+      },
+    ],
   },
   {
     path: '/deepseek',
@@ -107,7 +111,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: 'deepseek',
-      icon: 'Brain'
+      icon: 'Brain',
     },
     children: [
       {
@@ -116,23 +120,23 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/deepseek/models/index.vue`),
         meta: {
           title: '模型列表',
-          icon: 'ListView'
-        }
+          icon: 'ListView',
+        },
       },
       {
         path: '/deepseek/chat',
         name: 'deepseek-chat',
         component: () => import(`../views/deepseek/chat/index.vue`),
         meta: {
-          hightlight:"/deepseek/models",
+          hightlight: '/deepseek/models',
           openMore: true,
           keepAlive: true,
           title: '聊天',
           hidden: true,
-          icon: 'Intercom'
-        }
-      }
-    ]
+          icon: 'Intercom',
+        },
+      },
+    ],
   },
   {
     path: '/ollama',
@@ -140,7 +144,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: 'ollama',
-      icon: 'Brain'
+      icon: 'Brain',
     },
     children: [
       {
@@ -149,23 +153,23 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/ollama/models/index.vue`),
         meta: {
           title: '模型列表',
-          icon: 'ListView'
-        }
+          icon: 'ListView',
+        },
       },
       {
         name: 'ollama-chat',
         path: '/ollama/chat',
         component: () => import(`../views/ollama/chat/index.vue`),
         meta: {
-          hightlight:"/ollama/models",
+          hightlight: '/ollama/models',
           openMore: true,
           keepAlive: true,
           hidden: true,
           title: '会话',
-          icon: 'Intercom'
-        }
-      }
-    ]
+          icon: 'Intercom',
+        },
+      },
+    ],
   },
   {
     path: '/admin-user',
@@ -173,7 +177,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: '超级管理员',
-      icon: 'DataUser'
+      icon: 'DataUser',
     },
     children: [
       {
@@ -182,10 +186,10 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/admin-user/list.vue`),
         meta: {
           title: '超级管理员列表',
-          icon: 'ListView'
-        }
-      }
-    ]
+          icon: 'ListView',
+        },
+      },
+    ],
   },
   {
     path: '/upload',
@@ -193,7 +197,7 @@ export const routes: RouteRecordRaw[] = [
     component: () => import(`../components/layout/index.vue`),
     meta: {
       title: '文件上传',
-      icon: 'InboxUploadR'
+      icon: 'InboxUploadR',
     },
     children: [
       {
@@ -202,8 +206,8 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/file-upload/file-upload.vue`),
         meta: {
           title: '文件上传',
-          icon: 'Upload'
-        }
+          icon: 'Upload',
+        },
       },
       {
         path: '/upload/large-file',
@@ -211,21 +215,59 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/file-upload/large-file-upload.vue`),
         meta: {
           title: '大文件切片上传',
-          icon: 'UploadThree'
-        }
-      }
-    ]
+          icon: 'UploadThree',
+        },
+      },
+    ],
+  },
+  {
+    path: '/math-learning',
+    name: 'MathLearning',
+    component: () => import(`../components/layout/index.vue`),
+    meta: {
+      title: '数学学习',
+      icon: 'Formula',
+    },
+    children: [
+      {
+        path: '/math-learning/basic',
+        name: 'MathBasic',
+        component: () => import('../views/math-learning/basic.vue'),
+        meta: {
+          title: '基础学习',
+          icon: 'BookOne',
+        },
+      },
+      {
+        path: '/math-learning/practice',
+        name: 'MathPractice',
+        component: () => import('../views/math-learning/practice.vue'),
+        meta: {
+          title: '练习',
+          icon: 'Write',
+        },
+      },
+      {
+        path: '/math-learning/wrong-questions',
+        name: 'MathWrongQuestions',
+        component: () => import('../views/math-learning/wrong-questions.vue'),
+        meta: {
+          title: '错题本',
+          icon: 'CloseOne',
+        },
+      },
+    ],
   },
   {
     path: '/*',
-    redirect: '/'
-  }
+    redirect: '/',
+  },
 ]
 
 const router = createRouter({
   history: createWebHashHistory(), // hash 模式
   // history: createWebHistory(),  // history 模式
-  routes
+  routes,
 })
 
 /*************** 统一管理通用路由跳转 *****************/
@@ -239,8 +281,8 @@ eventEmitter.on('token-invalid', () => {
   router.replace({
     path: '/login',
     query: {
-      redirect
-    }
+      redirect,
+    },
   })
 })
 /**
@@ -250,7 +292,7 @@ eventEmitter.on('login', () => {
   const redirect = router.currentRoute.value.query.redirect as string
   console.log('登录', redirect)
   router.replace({
-    path: redirect || '/user/list'
+    path: redirect || '/user/list',
   })
 })
 
@@ -263,8 +305,8 @@ eventEmitter.on('logout', () => {
   router.replace({
     path: '/login',
     query: {
-      redirect
-    }
+      redirect,
+    },
   })
 })
 
