@@ -4,10 +4,6 @@ import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import { getToken } from '@utils/token'
 import { changeTabIco } from '@/utils/system-style'
-// import MathLearning from '../views/math-learning/index.vue'
-// import MathBasic from '../views/math-learning/basic.vue'
-// import MathPractice from '../views/math-learning/practice.vue'
-// import MathWrongQuestions from '../views/math-learning/wrong-questions.vue'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -216,44 +212,6 @@ export const routes: RouteRecordRaw[] = [
         meta: {
           title: '大文件切片上传',
           icon: 'UploadThree',
-        },
-      },
-    ],
-  },
-  {
-    path: '/math-learning',
-    name: 'MathLearning',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '数学学习',
-      icon: 'Formula',
-    },
-    children: [
-      {
-        path: '/math-learning/basic',
-        name: 'MathBasic',
-        component: () => import('../views/math-learning/basic.vue'),
-        meta: {
-          title: '基础学习',
-          icon: 'BookOne',
-        },
-      },
-      {
-        path: '/math-learning/practice',
-        name: 'MathPractice',
-        component: () => import('../views/math-learning/practice.vue'),
-        meta: {
-          title: '练习',
-          icon: 'Write',
-        },
-      },
-      {
-        path: '/math-learning/wrong-questions',
-        name: 'MathWrongQuestions',
-        component: () => import('../views/math-learning/wrong-questions.vue'),
-        meta: {
-          title: '错题本',
-          icon: 'CloseOne',
         },
       },
     ],

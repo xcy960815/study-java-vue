@@ -1,5 +1,5 @@
 @import './base.css';
-@import "./naive-variables.scss";
+@import './naive-variables.scss';
 
 /* index.css(入口文件中引入该入口样式文件) */
 @tailwind base;

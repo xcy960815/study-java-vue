@@ -13,5 +13,3 @@ export * as ollamaModule from './ollama'
 export * as deepseekModule from './deepseek'
 
 export * as uploadModule from './upload'
-
-export * from './math'
