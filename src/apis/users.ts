@@ -10,6 +10,7 @@ export const getUserInfo = <T extends UserInfoDto>() => {
 }
 
 interface UserListRequestParams extends baseListParams, UserInfoVo {}
+
 /**
  * 获取用户列表请求参数类型
  * @param queryFormData
@@ -21,7 +22,7 @@ export const getUserList = <T extends ListResonse<UserInfoDto>>(
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `/user/getUserList?pageSize=${pageSize}&pageNum=${pageNum}`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
-    params: otherQueryFormData
+    params: otherQueryFormData,
   })
 }
 
@@ -30,7 +31,9 @@ export const getUserList = <T extends ListResonse<UserInfoDto>>(
  * @param {UserInfoVo} params
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const updateUserInfo = <T extends boolean>(params: UserInfoVo): Promise<ResponseResult<T>> => {
+export const updateUserInfo = <T extends boolean>(
+  params: UserInfoVo
+): Promise<ResponseResult<T>> => {
   const url = `/user/updateUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
@@ -50,7 +53,9 @@ export const updateUserAvatar = <T extends string>(params: FormData) => {
  * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<T>>}
  */
-export const insertUserInfo = <T extends boolean>(params: Partial<UserInfoDto>): Promise<ResponseResult<T>> => {
+export const insertUserInfo = <T extends boolean>(
+  params: Partial<UserInfoDto>
+): Promise<ResponseResult<T>> => {
   const url = `/user/insertUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
@@ -60,10 +65,12 @@ export const insertUserInfo = <T extends boolean>(params: Partial<UserInfoDto>):
  * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const deleteUserInfo = <T extends boolean>(params: UserInfoVo): Promise<ResponseResult<T>> => {
+export const deleteUserInfo = <T extends boolean>(
+  params: UserInfoVo
+): Promise<ResponseResult<T>> => {
   const url = `/user/deleteUserInfoInfo`
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
-    data: params
+    data: params,
   })
 }
 
