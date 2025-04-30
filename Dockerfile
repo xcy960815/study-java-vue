@@ -1,6 +1,7 @@
 # 第一阶段：node 镜像打包前端
 # 使用多平台支持的 node 镜像
-FROM --platform=$BUILDPLATFORM node:18 AS frontend-builder
+# FROM --platform=$BUILDPLATFORM node:18 AS frontend-builder
+FROM node:18 AS frontend-builder
 
 # 设置工作目录
 WORKDIR /study-java-web
@@ -21,7 +22,8 @@ RUN pnpm run build-prod
 
 # 第二阶段：用 nginx 运行构建好的前端
 # 使用多平台支持的 nginx 镜像
-FROM --platform=$TARGETPLATFORM nginx:1.21
+# FROM --platform=$TARGETPLATFORM nginx:1.21
+FROM nginx:1.21
 
 # 容器监听端口
 EXPOSE 80
@@ -41,6 +43,9 @@ COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html
 # 启动 nginx
 CMD ["nginx", "-g", "daemon off;"]
 
+# 常规构建指令
+# docker build -t xcy960815/study-java-web:1.x .
+# 
 # 1. 创建并启用 buildx 构建器
 # docker buildx create --use
 #

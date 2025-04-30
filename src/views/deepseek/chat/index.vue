@@ -24,6 +24,7 @@ defineOptions({
 })
 
 const route = useRoute()
+
 const model = route.query.model as string
 
 const parentMessageId = ref<string>('')
@@ -54,6 +55,11 @@ const roleAlias = ref<Record<AI.Role, string>>({
   assistant: 'Ollama',
   system: 'System',
 })
+
+/**
+ * 流式会话
+ * @param {string} question
+ */
 const completions = async (question: string) => {
   setTimeout(async () => {
     conversations.value = await ollamaModel.getAllConversations()
@@ -68,9 +74,7 @@ const completions = async (question: string) => {
       model,
     },
     onProgress(partialResponse) {
-      partialResponse.content = renderMarkdownText(partialResponse.content)
       conversation.value = cloneDeep(partialResponse)
-      console.log('conversation.value', conversation.value)
     },
   }
 
