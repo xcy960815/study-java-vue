@@ -15,17 +15,15 @@ module.exports = {
         'chore', // 构建过程或辅助工具的变动
         'revert', // 回滚
         'build', // 构建相关
-        'ci', // CI配置相关
-        'wip', // 开发中
       ],
     ],
     'type-case': [0],
     'type-empty': [0],
     'scope-empty': [0],
     'scope-case': [0],
-    'subject-full-stop': [0, 'never'],
-    'subject-case': [0, 'never'],
-    'header-max-length': [0, 'always', 72],
+    'subject-full-stop': [0],
+    'subject-case': [0],
+    'header-max-length': [0],
     'header-trim': [2, 'always'],
     'subject-empty': [2, 'never'],
   },
