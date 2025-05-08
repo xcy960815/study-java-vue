@@ -11,23 +11,29 @@ const CHUNK_SIZE = 10 * 1024 * 1024 // 10 MB 每片
  * @param {FormData} formData
  * @returns {Promise<ResponseResult<T>>}
  */
-export const uploadFile = <T extends string>(formData: FormData, onUploadProgress: OnUploadProgress) => {
+export const uploadFile = <T extends string>(
+  formData: FormData,
+  onUploadProgress: OnUploadProgress
+) => {
   return request.post<ResponseResult<T>, ResponseResult<T>>('/uploadFile', formData, {
     headers: {
-      'Content-Type': 'multipart/form-data'
+      'Content-Type': 'multipart/form-data',
     },
     // 显示上传进度
-    onUploadProgress
+    onUploadProgress,
   })
 }
 
 /**
  * 大文件切片上传
  * @param {File} file
- * @param {OnUploadProgress} onUploadProgress
- * @returns {Promise<ResponseResult<T>>}
+ * @param {(chunkIndex: number, percent: number) => void} onChunkProgress
+ * @returns {Promise<void>}
  */
-export const uploadLargeFile = async <T extends string>(file: UploadRawFile, onUploadProgress: OnUploadProgress) => {
+export const uploadLargeFile = async <T extends string>(
+  file: UploadRawFile,
+  onChunkProgress: (chunkIndex: number, percent: number) => void
+) => {
   const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
   for (let i = 0; i < totalChunks; i++) {
     const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
@@ -36,12 +42,14 @@ export const uploadLargeFile = async <T extends string>(file: UploadRawFile, onU
     formData.append('fileName', file.name)
     formData.append('chunkIndex', i.toString())
     formData.append('totalChunks', totalChunks.toString())
-    request.post<ResponseResult<T>, ResponseResult<T>>('/uploadLargeFile', formData, {
+    await request.post(`/uploadLargeFile`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
       },
-      // 显示上传进度
-      onUploadProgress
+      onUploadProgress: (progressEvent) => {
+        const percent = Math.floor((progressEvent.loaded * 100) / progressEvent.total!)
+        onChunkProgress(i, percent)
+      },
     })
   }
 }

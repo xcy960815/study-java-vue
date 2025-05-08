@@ -13,7 +13,23 @@ type HSL = {
   l: number
 }
 
-type HEX_VALUE = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+type HEX_VALUE =
+  | '0'
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | 'A'
+  | 'B'
+  | 'C'
+  | 'D'
+  | 'E'
+  | 'F'
 
 // 组合字符串类型枚举的数量太多了，没办法限定了直接string
 // type HEX =
@@ -50,15 +66,20 @@ const HEX_MAP: Record<HEX_VALUE, number> = {
   C: 12,
   D: 13,
   E: 14,
-  F: 15
+  F: 15,
 }
 
 // 归一化处理，统一返回 HEX 类型的颜色值
 function normalizationColor(color: string): HEX {
+  if (!color) {
+    return '#000000'
+  }
+
   const prefix = /^(#|hsl|rgb|rgba)/i.exec(color)?.[1]
 
   if (!prefix) {
-    throw new TypeError('color is invalid.')
+    console.error('Invalid color format:', color)
+    return '#000000'
   }
 
   const colorVal = color.replace(prefix, '').trim()
@@ -79,34 +100,45 @@ function normalizationColor(color: string): HEX {
     } else if (len === 3) {
       return val.split('').reduce((pre, cur) => `${pre}${cur + cur}`, '#')
     } else {
-      throw new TypeError('hex color is invalid.')
+      console.error('Invalid hex color:', val)
+      return '#000000'
     }
   }
 
   function fixHslVal(val: string) {
-    const hslVal = val
-      .substring(1, val.length - 1)
-      .split(',')
-      .map((v) => parseInt(v.trim()))
-    return hslToHex({
-      h: hslVal[0],
-      s: hslVal[1],
-      l: hslVal[2]
-    })
+    try {
+      const hslVal = val
+        .substring(1, val.length - 1)
+        .split(',')
+        .map((v) => parseInt(v.trim()))
+      return hslToHex({
+        h: hslVal[0],
+        s: hslVal[1],
+        l: hslVal[2],
+      })
+    } catch (error) {
+      console.error('Invalid HSL color:', val)
+      return '#000000'
+    }
   }
 
   function fixRgbVal(val: string) {
-    const rgb = val
-      .substring(1, val.length - 1)
-      .split(',')
-      .map((v) => parseInt(v.trim()))
+    try {
+      const rgb = val
+        .substring(1, val.length - 1)
+        .split(',')
+        .map((v) => parseInt(v.trim()))
 
-    // 舍弃掉alphe
-    return rgbToHex({
-      r: rgb[0],
-      g: rgb[1],
-      b: rgb[2]
-    })
+      // 舍弃掉alpha
+      return rgbToHex({
+        r: rgb[0],
+        g: rgb[1],
+        b: rgb[2],
+      })
+    } catch (error) {
+      console.error('Invalid RGB color:', val)
+      return '#000000'
+    }
   }
 }
 
@@ -122,7 +154,7 @@ function rgbToHsl(rgb: RGB): HSL {
   const hsl = {
     h: 0,
     s: 0,
-    l: 0
+    l: 0,
   }
 
   // 计算rgb基数 ∈ [0, 1]
@@ -199,7 +231,7 @@ function hslToRgb(hsl: HSL): RGB {
   return {
     r: Number(computedRgb(Cr).toFixed(0)),
     g: Number(computedRgb(Cg).toFixed(0)),
-    b: Number(computedRgb(Cb).toFixed(0))
+    b: Number(computedRgb(Cb).toFixed(0)),
   }
 }
 
@@ -209,10 +241,27 @@ function hslToRgb(hsl: HSL): RGB {
  * @returns RGB
  */
 function hexToRGB(hex: HEX): RGB {
+  // 确保颜色值是大写
   hex = hex.toUpperCase()
+
+  // 移除可能存在的透明度部分
+  if (hex.length === 9) {
+    hex = hex.substring(0, 7)
+  }
+
+  // 处理3位颜色值
+  if (hex.length === 4) {
+    hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3]
+  }
+
   const hexRegExp = /^#([0-9A-F]{6})$/
   if (!hexRegExp.test(hex)) {
-    throw new Error('请传入合法的16进制颜色值，eg: #FF0000')
+    console.error('Invalid hex color:', hex)
+    return {
+      r: 0,
+      g: 0,
+      b: 0,
+    }
   }
 
   const hexValArr = (hexRegExp.exec(hex)?.[1] || '000000').split('') as Array<HEX_VALUE>
@@ -220,7 +269,7 @@ function hexToRGB(hex: HEX): RGB {
   return {
     r: HEX_MAP[hexValArr[0]] * 16 + HEX_MAP[hexValArr[1]],
     g: HEX_MAP[hexValArr[2]] * 16 + HEX_MAP[hexValArr[3]],
-    b: HEX_MAP[hexValArr[4]] * 16 + HEX_MAP[hexValArr[5]]
+    b: HEX_MAP[hexValArr[4]] * 16 + HEX_MAP[hexValArr[5]],
   }
 }
 
@@ -261,19 +310,24 @@ function getMixColorFromVar(isDark?: boolean) {
   let mixLightColor, mixDarkColor
 
   if (isDark) {
-    mixLightColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_BG).trim()
-    mixDarkColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim()
+    mixLightColor =
+      getComputedStyle(document.documentElement).getPropertyValue(VAR_BG).trim() || '#141414'
+    mixDarkColor =
+      getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim() || '#ffffff'
   } else {
-    mixLightColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim()
-    mixDarkColor = getComputedStyle(document.documentElement).getPropertyValue(VAR_BLACK).trim()
+    mixLightColor =
+      getComputedStyle(document.documentElement).getPropertyValue(VAR_WHITE).trim() || '#ffffff'
+    mixDarkColor =
+      getComputedStyle(document.documentElement).getPropertyValue(VAR_BLACK).trim() || '#000000'
   }
 
-  mixLightColor = hexToRGB(normalizationColor(mixLightColor))
-  mixDarkColor = hexToRGB(normalizationColor(mixDarkColor))
+  // 确保颜色值是有效的16进制格式
+  mixLightColor = normalizationColor(mixLightColor)
+  mixDarkColor = normalizationColor(mixDarkColor)
 
   return {
-    mixLightColor,
-    mixDarkColor
+    mixLightColor: hexToRGB(mixLightColor),
+    mixDarkColor: hexToRGB(mixDarkColor),
   }
 }
 
@@ -295,9 +349,9 @@ function genMixColor(
   // 混合色
   function mix(color: RGB, mixColor: RGB, weight: number): RGB {
     return {
-      r: color.r * (1 - weight) + mixColor.r * weight,
-      g: color.g * (1 - weight) + mixColor.g * weight,
-      b: color.b * (1 - weight) + mixColor.b * weight
+      r: Math.round(color.r * (1 - weight) + mixColor.r * weight),
+      g: Math.round(color.g * (1 - weight) + mixColor.g * weight),
+      b: Math.round(color.b * (1 - weight) + mixColor.b * weight),
     }
   }
 
@@ -312,7 +366,7 @@ function genMixColor(
       6: rgbToHex(mix(rgbBase, mixDarkColor, 0.6)),
       7: rgbToHex(mix(rgbBase, mixDarkColor, 0.7)),
       8: rgbToHex(mix(rgbBase, mixDarkColor, 0.8)),
-      9: rgbToHex(mix(rgbBase, mixDarkColor, 0.9))
+      9: rgbToHex(mix(rgbBase, mixDarkColor, 0.9)),
     },
     light: {
       1: rgbToHex(mix(rgbBase, mixLightColor, 0.1)),
@@ -323,8 +377,8 @@ function genMixColor(
       6: rgbToHex(mix(rgbBase, mixLightColor, 0.6)),
       7: rgbToHex(mix(rgbBase, mixLightColor, 0.7)),
       8: rgbToHex(mix(rgbBase, mixLightColor, 0.8)),
-      9: rgbToHex(mix(rgbBase, mixLightColor, 0.9))
-    }
+      9: rgbToHex(mix(rgbBase, mixLightColor, 0.9)),
+    },
   }
 }
 

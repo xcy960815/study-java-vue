@@ -3,7 +3,7 @@ import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 import { eventEmitter } from '@/utils/event-emits'
 import { getToken } from '@utils/token'
-import { changeTabIco } from '@/utils/system-style'
+import { changeTabIcon } from '@/utils/system-style'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -293,7 +293,7 @@ eventEmitter.on('logout', () => {
 
 // 全局路由守卫
 router.beforeEach(async (to, _from, next) => {
-  changeTabIco(to)
+  changeTabIcon(to)
   const token = await getToken()
   if (to.path === '/login') {
     if (token) {

@@ -13,7 +13,7 @@
 import { useSystemInfoStore } from '@store'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { setSystemTheme } from '@/utils/system-style'
+import { useSystemTheme } from '@/utils/system-style'
 
 const route = useRoute()
 
@@ -23,7 +23,7 @@ const keepLiveList = computed(() => systemInfoStore.getKeepLiveList)
 
 const routerViewKey = ref(route.fullPath)
 
-const { initTheme } = setSystemTheme()
+const { initTheme } = useSystemTheme()
 
 onMounted(() => {
   initTheme()

@@ -2,9 +2,14 @@ import { Core } from './core'
 import { RoleEnum } from '@enums'
 
 const MODEL = 'deepseek-chat'
+
+/**
+ * GPT 聊天模型适配器
+ * 负责与 GPT 模型进行对话请求、流式处理、历史消息拼接等
+ */
 export class Gpt extends Core {
   /**
-   * 请求参数
+   * 请求参数（不包含 messages、n、stream）
    */
   private readonly _requestParams: Partial<Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>>
 
@@ -12,126 +17,179 @@ export class Gpt extends Core {
     const { requestParams, ...coreOptions } = options
     super(coreOptions)
     this._requestParams = {
-      model: MODEL, // 默认的model
-      temperature: 0.8, // 默认的temperature (随机性)
-      top_p: 1, // 默认的top_p
-      presence_penalty: 1, // 默认的presence_penalty
-      // 用户配置的参数
-      ...requestParams
+      model: MODEL,
+      temperature: 0.8,
+      top_p: 1,
+      presence_penalty: 1,
+      ...requestParams,
     }
   }
 
   /**
-   * 构建fetch公共请求参数
-   * @param {string} question
-   * @param {AI.Gpt.CompletionsOptions} options
-   * @returns {Promise<AI.FetchRequestInit>}
+   * 构建 fetch 请求参数
    */
-  private async _getFetchRequestInit(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.FetchRequestInit> {
+  private async buildFetchRequestInit(
+    question: string,
+    options: AI.Gpt.CompletionsOptions
+  ): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
-
-    /* 获取用户和gpt历史对话记录 */
-    const { messages, maxTokens } = await this._getConversationHistory(question, options)
-    /* 创建请求体 */
-    const body = {
-      ...this._requestParams,
-      ...requestParams,
-      messages,
-      stream,
-      max_tokens: maxTokens
-    }
+    const { messages, maxTokens } = await this.getConversationHistory(question, options)
 
     return {
       method: 'POST',
       headers: this.headers,
-      body: JSON.stringify(body),
-      signal: this._abortController.signal
+      body: JSON.stringify({
+        ...this._requestParams,
+        ...requestParams,
+        messages,
+        stream,
+        max_tokens: maxTokens,
+      }),
+      signal: this._abortController.signal,
     }
   }
 
   /**
-   * 获取答案
-   * @param {string} question
-   * @param {AI.Gpt.CompletionsOptions} options
-   * @returns {Promise<AI.Gpt.AssistantConversation>}
+   * 主对话入口
    */
-  public async completions(question: string, options: AI.Gpt.CompletionsOptions): Promise<AI.Gpt.AssistantConversation> {
+  public async completions(
+    question: string,
+    options: AI.Gpt.CompletionsOptions
+  ): Promise<AI.Gpt.AssistantConversation> {
     const { onProgress, stream = !!onProgress } = options
-    // 构建用户消息
+
+    // 构建并保存用户消息
     const userMessage = this.buildConversation(RoleEnum.User, question, options)
-    // 保存用户对话
     await this.upsertConversation(userMessage)
-    // 构建Ai助手消息
+
+    // 构建并保存助手消息
     const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
       ...options,
-      messageId: userMessage.messageId
+      messageId: userMessage.messageId,
     })
-    // 保存Ai助手消息
     await this.upsertConversation(assistantMessage)
-    // 包装成一个promise 发起请求
-    const responsePromise = new Promise<AI.Gpt.AssistantConversation>(async (resolve, reject) => {
-      try {
-        const requestInit = await this._getFetchRequestInit(question, options)
-        if (stream) {
-          requestInit.onMessage = (data: string) => {
-            if (data === '[DONE]') {
-              assistantMessage.content = assistantMessage.content.trim()
-              return resolve(assistantMessage)
-            }
-            const response: AI.Gpt.Response = JSON.parse(data)
-            assistantMessage.messageId = response.id
-            if (response?.choices?.length) {
-              const delta = response.choices[0].delta
-              if (delta?.content) {
-                assistantMessage.content += delta.content
-              }
-              assistantMessage.detail = response
-              if (delta?.role) {
-                assistantMessage.role = delta.role
-              }
-              onProgress?.(assistantMessage)
-            }
-          }
-          await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
-        } else {
-          // 发送数据请求
-          const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
-          const data = await response?.json()
-          if (data?.id) {
-            assistantMessage.messageId = data.id
-          }
-          if (data?.choices?.length) {
-            const message = data.choices[0].message
-            assistantMessage.content = message?.content || ''
-            assistantMessage.role = message?.role || 'assistant'
-          }
-          assistantMessage.detail = data
-          resolve(assistantMessage)
-        }
-      } catch (error) {
-        console.error('AI EventStream error', error)
-        return reject(error)
-      }
-    }).then(async (conversation) => {
-      return this.upsertConversation(conversation).then(() => {
+
+    // 处理响应
+    const conversationPromise = this.handleAnswerRequest(assistantMessage, options)
+      .then(async (conversation) => {
+        await this.upsertConversation(conversation)
         conversation.parentMessageId = conversation.messageId
         return conversation
       })
-    })
+      .catch((error) => {
+        console.error('AI EventStream error:', error)
+        throw error
+      })
 
-    return this.clearablePromise(responsePromise, {
+    return this.clearablePromise(conversationPromise, {
       milliseconds: this._milliseconds,
-      message: ``
+      message: '',
     })
   }
 
   /**
-   * 获取会话消息历史
-   * @param {string} text
-   * @param {Required<AI.Gpt.CompletionsOptions>} options
-   * @returns {Promise<{ messages: AI.Gpt.RequestMessage[]; }>}
+   * 处理回答请求（流式/非流式）
    */
-  private async _getConversationHistory(
+  private async handleAnswerRequest(
+    assistantMessage: AI.Gpt.AssistantConversation,
+    options: AI.Gpt.CompletionsOptions
+  ): Promise<AI.Gpt.AssistantConversation> {
+    const { onProgress, stream = !!onProgress } = options
+    const requestInit = await this.buildFetchRequestInit(assistantMessage.content, options)
+
+    if (stream) {
+      return this.handleStreamResponse(assistantMessage, requestInit, onProgress)
+    }
+    return this.handleNonStreamResponse(assistantMessage, requestInit)
+  }
+
+  /**
+   * 处理流式响应
+   */
+  private async handleStreamResponse(
+    assistantMessage: AI.Gpt.AssistantConversation,
+    requestInit: AI.FetchRequestInit,
+    onProgress?: AI.Gpt.CompletionsOptions['onProgress']
+  ): Promise<AI.Gpt.AssistantConversation> {
+    return new Promise<AI.Gpt.AssistantConversation>((resolve, reject) => {
+      requestInit.onMessage = (data: string) => {
+        this.processStreamData(assistantMessage, data, resolve, onProgress)
+      }
+      this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
+    })
+  }
+
+  /**
+   * 处理流式数据
+   */
+  private processStreamData(
+    assistantMessage: AI.Gpt.AssistantConversation,
+    data: string,
+    resolve: (value: AI.Gpt.AssistantConversation) => void,
+    onProgress?: AI.Gpt.CompletionsOptions['onProgress']
+  ): void {
+    if (data.trim() === '[DONE]') {
+      assistantMessage.content = assistantMessage.content.trim()
+      assistantMessage.done = true
+      assistantMessage.thinking = false
+      resolve(assistantMessage)
+      return
+    }
+
+    try {
+      const response: AI.Gpt.Response = JSON.parse(data)
+      this.updateConversationFromResponse(assistantMessage, response)
+      onProgress?.(assistantMessage)
+    } catch (error) {
+      if (data.trim() !== '[DONE]') {
+        console.error('Failed to parse stream data:', error, 'Raw data:', data)
+      }
+    }
+  }
+
+  /**
+   * 处理非流式响应
+   */
+  private async handleNonStreamResponse(
+    assistantMessage: AI.Gpt.AssistantConversation,
+    requestInit: AI.FetchRequestInit
+  ): Promise<AI.Gpt.AssistantConversation> {
+    const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
+    const data = await response?.json()
+    if (data) {
+      this.updateConversationFromResponse(assistantMessage, data)
+    }
+    return assistantMessage
+  }
+
+  /**
+   * 根据响应更新会话内容
+   */
+  private updateConversationFromResponse(
+    assistantMessage: AI.Gpt.AssistantConversation,
+    response: AI.Gpt.Response
+  ): void {
+    if (response?.id) {
+      assistantMessage.messageId = response.id
+    }
+    if (response?.choices?.length) {
+      const choice = response.choices[0]
+      const messageOrDelta = 'message' in choice ? choice.message : choice.delta
+      if (messageOrDelta?.content) {
+        assistantMessage.content += messageOrDelta.content
+      }
+      if (messageOrDelta?.role) {
+        assistantMessage.role = messageOrDelta.role
+      }
+    }
+    assistantMessage.detail = response
+    assistantMessage.thinking = false
+  }
+
+  /**
+   * 获取会话消息历史
+   */
+  private async getConversationHistory(
     text: string,
     options: AI.Gpt.CompletionsOptions
   ): Promise<{
@@ -140,61 +198,46 @@ export class Gpt extends Core {
   }> {
     const { systemMessage } = options
     const maxTokenCount = this._maxModelTokens - this._maxResponseTokens
-    // 上次的会话id
     let parentMessageId = options.parentMessageId
 
-    // 当前系统和用户消息
     const messages: Array<AI.Gpt.RequestMessage> = [
       {
-        role: 'system',
-        content: systemMessage || this._systemMessage
+        role: RoleEnum.System,
+        content: systemMessage || this._systemMessage,
       },
-      // 用户当前的问题
       {
-        role: 'user',
-        content: text
-      }
+        role: RoleEnum.User,
+        content: text,
+      },
     ]
 
     let tokenCount = 0
     let prompt = ''
 
     while (this._withContent) {
-      // 计算
       messages.forEach((item) => {
         prompt += item.role
         prompt += item.content
       })
 
-      tokenCount = await this.getTokenCount(prompt)
-
-      // 当前 prompt token 数量大于最大 token 数量时，不再向上查找
-      if (prompt && tokenCount > maxTokenCount) {
-        break
-      }
-      if (!parentMessageId) {
-        break
-      }
+      tokenCount = this.getTokenCount(prompt)
+      if (prompt && tokenCount > maxTokenCount) break
+      if (!parentMessageId) break
 
       const parentMessage = await this.getConversation(parentMessageId)
+      if (!parentMessage) break
 
-      if (!parentMessage) {
-        break
-      }
-
-      const historyConversation = {
+      messages.splice(1, 0, {
         role: parentMessage.role,
-        content: parentMessage.content
-      }
-      // 插入会话消息
-      messages.splice(1, 0, historyConversation)
-
-      // 上次对话id
+        content: parentMessage.content,
+      })
       parentMessageId = parentMessage.parentMessageId
     }
 
-    const maxTokens = Math.max(1, Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens))
-
+    const maxTokens = Math.max(
+      1,
+      Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens)
+    )
     return { messages, maxTokens }
   }
 }

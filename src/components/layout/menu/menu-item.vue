@@ -1,5 +1,5 @@
 <template>
-  <template v-for="menuItem in menuData">
+  <template v-for="menuItem in menuData" :key="menuItem.path">
     <el-sub-menu v-if="hasSubMenu(menuItem)" :index="menuItem.path">
       <template #title>
         <icon v-if="menuItem.meta?.icon" :name="menuItem.meta?.icon" class="icon"></icon>
@@ -9,7 +9,7 @@
       </template>
       <menu-item :menu-data="menuItem.children"></menu-item>
     </el-sub-menu>
-    <el-menu-item v-else :index="menuItem.path">
+    <el-menu-item v-else :index="menuItem.path" @click="handleMenuClick(menuItem)">
       <icon v-if="menuItem.meta?.icon" :name="menuItem.meta?.icon" class="icon"></icon>
       <!-- 占位符 -->
       <span class="icon" v-else></span>
@@ -20,27 +20,38 @@
 
 <script lang="ts" setup>
 import { computed, type PropType } from 'vue'
-import { type RouteRecordRaw } from 'vue-router'
+import { type RouteRecordRaw, useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const props = defineProps({
   menuData: {
     type: Object as PropType<Array<RouteRecordRaw>>,
     default: () => {
       return []
-    }
-  }
+    },
+  },
 })
 
 const menuData = computed(() => {
   return props.menuData
 })
+
 const hasSubMenu = (menuItem: RouteRecordRaw) => {
   return menuItem.children && menuItem.children.length
 }
 
+const handleMenuClick = (menuItem: RouteRecordRaw) => {
+  if (menuItem.path) {
+    router.push(menuItem.path)
+  }
+}
+
 defineOptions({
-  name: 'MenuItem'
+  name: 'MenuItem',
 })
 </script>
+
 <style lang="less" scoped>
 .el-menu-item,
 .el-sub-menu__title {

@@ -40,15 +40,13 @@
 import { computed, onMounted, ref } from 'vue'
 import { useUserInfoStore, useSystemInfoStore, useLoginStore } from '@store'
 import { useRouter } from 'vue-router'
-import { setStyleProperty, LAYOUTSIDECONTAINERWIDTHKEY } from '@/utils/system-style'
+import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
 import Theme from './themen.vue'
-const router = useRouter()
 
+const router = useRouter()
 const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
-
 const systemInfoStore = useSystemInfoStore()
-
 const openMenuFlag = computed(() => systemInfoStore.getOpenMenuFlag)
 
 /**
@@ -57,10 +55,10 @@ const openMenuFlag = computed(() => systemInfoStore.getOpenMenuFlag)
 const toggleClick = () => {
   systemInfoStore.reversalOpenMenuFlag()
   if (openMenuFlag.value) {
-    const history_width = localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) || '300px'
-    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
+    const history_width = localStorage.getItem(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH) || '300px'
+    setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, history_width)
   } else {
-    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
+    setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, '64px')
   }
 }
 
@@ -84,6 +82,7 @@ onMounted(() => {
   userInfoStore.getUserInfo()
 })
 </script>
+
 <style lang="less" scoped>
 .layout-header-container {
   height: 50px;
@@ -91,6 +90,9 @@ onMounted(() => {
   align-items: center;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
   justify-content: space-between;
+  background-color: var(--el-bg-color);
+  border-bottom: 1px solid var(--el-border-color-light);
+  padding: 0 16px;
 
   .left-panel {
     display: flex;
@@ -98,7 +100,12 @@ onMounted(() => {
 
     .hamburger {
       cursor: pointer;
-      // transition: transform 0.3s;
+      transition: transform 0.3s;
+      color: var(--el-text-color-primary);
+
+      &:hover {
+        color: var(--el-color-primary);
+      }
     }
 
     .hamburger.is-active {
@@ -109,13 +116,33 @@ onMounted(() => {
   .right-panel {
     display: flex;
     align-items: center;
+    gap: 16px;
 
     .user-info {
       display: flex;
       align-items: center;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: var(--el-color-primary-light-9);
+      }
 
       .user-avatar {
-        margin-right: 10px;
+        margin-right: 8px;
+        border: 2px solid var(--el-border-color-light);
+        transition: border-color 0.3s;
+
+        &:hover {
+          border-color: var(--el-color-primary);
+        }
+      }
+
+      .user-name {
+        color: var(--el-text-color-primary);
+        font-size: 14px;
       }
     }
   }

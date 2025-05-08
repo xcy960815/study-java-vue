@@ -12,21 +12,23 @@ import { genMixColor } from './generate-color'
 import { useDark } from '@vueuse/core'
 
 /**
- * 侧边栏宽度key
+ * CSS 变量键名
  */
-export const LAYOUTSIDECONTAINERWIDTHKEY = '--layout-side-container-width'
+export const CSS_VARIABLES = {
+  LAYOUT_SIDE_CONTAINER_WIDTH: '--layout-side-container-width',
+} as const
 
 /**
- * 系统主题key
+ * 本地存储键名
  */
-const SYSTEMTHEMECOLORKEY = 'system-theme-color'
+const STORAGE_KEYS = {
+  SYSTEM_THEME_COLOR: 'system-theme-color',
+} as const
 
-// 设置css变量
-export function setStyleProperty(propName: string, value: string) {
-  document.documentElement.style.setProperty(propName, value)
-}
-
-export type Theme = {
+/**
+ * 主题配置类型
+ */
+export interface Theme {
   colors: {
     primary?: string
     info?: string
@@ -35,115 +37,130 @@ export type Theme = {
     danger?: string
   }
 }
+
 /**
- * 设置系统主题
- * @returns
+ * 默认主题配置
  */
-export const setSystemTheme = () => {
+const DEFAULT_THEME: Theme = {
+  colors: {
+    primary: '#409EFF',
+    info: '#909399',
+    warning: '#E6A23C',
+    danger: '#F56C6C',
+    success: '#67C23A',
+  },
+}
+
+/**
+ * 设置 CSS 变量
+ */
+export function setStyleProperty(propName: string, value: string): void {
+  document.documentElement.style.setProperty(propName, value)
+}
+
+/**
+ * 系统主题管理
+ */
+export const useSystemTheme = () => {
   const isDark = useDark()
-  // 默认主题
-  const defaultThemeConfig: Theme = {
-    colors: {
-      primary: '#409EFF',
-      info: '#eeeeee',
-      warning: '#fbbd23',
-      danger: '#f87272',
-      success: '#36d399'
-    }
-  }
-
-  const getTheme = (): Theme => {
-    const theme = localStorage.getItem(SYSTEMTHEMECOLORKEY)
-    return theme ? JSON.parse(theme) : defaultThemeConfig
-  }
-
   const themeConfig = reactive<Theme>(Object.assign({}, getTheme()))
-
   const themeDialogVisible = ref(false)
+  const themeFormRef = ref<FormInstance>()
 
-  function updateBrandExtendColorsVar(color: string, name: string) {
+  /**
+   * 获取主题配置
+   */
+  function getTheme(): Theme {
+    const theme = localStorage.getItem(STORAGE_KEYS.SYSTEM_THEME_COLOR)
+    return theme ? JSON.parse(theme) : DEFAULT_THEME
+  }
+
+  /**
+   * 更新品牌扩展颜色变量
+   */
+  function updateBrandExtendColorsVar(color: string, name: string): void {
     const { DEFAULT, dark, light } = genMixColor(color, isDark.value)
 
-    // 每种主题色由浅到深分为五个阶梯以供开发者使用。
-    setStyleProperty(`--${name}-lighter-color`, light[5])
-    setStyleProperty(`--${name}-light-color`, light[3])
-    setStyleProperty(`--${name}-color`, DEFAULT)
-    setStyleProperty(`--${name}-deep-color`, dark[2])
-    setStyleProperty(`--${name}-deeper-color`, dark[4])
-    // elementPlus主题色更新
-    setStyleProperty(`--el-color-${name}`, DEFAULT)
-    setStyleProperty(`--el-color-${name}-dark-2`, dark[2])
-    setStyleProperty(`--el-color-${name}-light-3`, light[3])
-    setStyleProperty(`--el-color-${name}-light-5`, light[5])
-    setStyleProperty(`--el-color-${name}-light-7`, light[7])
-    setStyleProperty(`--el-color-${name}-light-8`, light[8])
-    setStyleProperty(`--el-color-${name}-light-9`, light[9])
+    // 设置主题色变量
+    const colorVars = {
+      [`--${name}-lighter-color`]: light[5],
+      [`--${name}-light-color`]: light[3],
+      [`--${name}-color`]: DEFAULT,
+      [`--${name}-deep-color`]: dark[2],
+      [`--${name}-deeper-color`]: dark[4],
+      [`--el-color-${name}`]: DEFAULT,
+      [`--el-color-${name}-dark-2`]: dark[2],
+      [`--el-color-${name}-light-3`]: light[3],
+      [`--el-color-${name}-light-5`]: light[5],
+      [`--el-color-${name}-light-7`]: light[7],
+      [`--el-color-${name}-light-8`]: light[8],
+      [`--el-color-${name}-light-9`]: light[9],
+    }
+
+    Object.entries(colorVars).forEach(([key, value]) => {
+      setStyleProperty(key, value)
+    })
   }
 
   /**
    * 更新主题色变量
-   * @param param0 {Theme}
    */
-  function updateThemeColorVar({ colors }: Theme) {
-    // 遍历当前主题色，生成混合色，并更新到css变量（tailwind + elementPlus）
-    for (const brand in colors) {
-      updateBrandExtendColorsVar(colors[brand as keyof Theme['colors']] as string, brand)
-    }
+  function updateThemeColorVar({ colors }: Theme): void {
+    Object.entries(colors).forEach(([brand, color]) => {
+      if (color) {
+        updateBrandExtendColorsVar(color, brand)
+      }
+    })
   }
 
   /**
    * 设置主题
-   * @param data {Theme}
    */
-  const setTheme = (data: Theme = defaultThemeConfig) => {
+  function setTheme(data: Theme = DEFAULT_THEME): void {
     const oldTheme = getTheme()
+    const newTheme = merge(oldTheme, data)
 
-    // 将传入配置与旧的主题合并，以填补缺省的值
-    data = merge(oldTheme, data || {})
-
-    // 将缓存到浏览器
-    localStorage.setItem(SYSTEMTHEMECOLORKEY, JSON.stringify(data))
-
-    // 将主题更新到css变量中，使之生效
-    updateThemeColorVar(data)
+    localStorage.setItem(STORAGE_KEYS.SYSTEM_THEME_COLOR, JSON.stringify(newTheme))
+    updateThemeColorVar(newTheme)
   }
 
   /**
    * 初始化主题
    */
-  const initTheme = () => {
-    const theme = getTheme()
-    setTheme(theme)
+  function initTheme(): void {
+    setTheme(getTheme())
   }
+
   /**
-   * 切换主题
+   * 确认主题更改
    */
-  const handleConfirmTheme = () => {
+  function handleConfirmTheme(): void {
     setTheme(themeConfig)
-    // 本地保存
-    localStorage.setItem(SYSTEMTHEMECOLORKEY, JSON.stringify(themeConfig))
+    localStorage.setItem(STORAGE_KEYS.SYSTEM_THEME_COLOR, JSON.stringify(themeConfig))
     themeDialogVisible.value = false
   }
 
-  const themeFormRef = ref<FormInstance>()
   /**
-   * 切换主题色
+   * 打开主题设置对话框
    */
-  const handleClickChangeThemeColor = () => {
+  function handleClickChangeThemeColor(): void {
     themeDialogVisible.value = true
     nextTick(() => {
       themeFormRef.value?.resetFields()
     })
   }
 
-  const handleClickChangeTheme = () => {
+  /**
+   * 切换暗黑模式
+   */
+  function handleClickChangeTheme(): void {
     isDark.value = !isDark.value
   }
 
   /**
-   * 重置主题
+   * 重置主题设置
    */
-  const resetTheme = () => {
+  function resetTheme(): void {
     themeFormRef.value?.resetFields()
   }
 
@@ -156,49 +173,49 @@ export const setSystemTheme = () => {
     handleClickChangeTheme,
     themeDialogVisible,
     themeFormRef,
-    resetTheme
+    resetTheme,
   }
 }
 
 /**
- * 修改浏览器tab的title
- * @param title {sting}
+ * 修改浏览器标签页标题
  */
-export const changeTabTile = (title: string) => {
+export const changeTabTitle = (title: string): void => {
   document.title = title
 }
 
 /**
- * 修改浏览器tab的icon
- * @param iconPath {string}
+ * 设置浏览器标签页图标
  */
-export const setTabIco = (iconPath: string) => {
+export const setTabIcon = (iconPath: string): void => {
   if (!iconPath) return
+
   let linkElement = document.querySelector<HTMLLinkElement>("link[rel*='icon']")
   if (!linkElement) {
     linkElement = document.createElement('link')
     document.head.appendChild(linkElement)
   }
-  linkElement.type = 'image/x-icon'
-  linkElement.rel = 'shortcut icon'
-  linkElement.href = iconPath
+
+  Object.assign(linkElement, {
+    type: 'image/x-icon',
+    rel: 'shortcut icon',
+    href: iconPath,
+  })
 }
 
-// const icos = import.meta.glob<{ default: string }>(
-//   '../assets/svg-icons/*.svg',
-//   { eager: true }
-// )
-
 /**
- * 修改页面tab的ico
- * @param to {RouteLocationNormalizedGeneric}
+ * 根据路由更新标签页图标
  */
-export const changeTabIco = (to: RouteLocationNormalizedGeneric) => {
+export const changeTabIcon = (to: RouteLocationNormalizedGeneric): void => {
   const icon = iconPark[to.meta.icon as keyof typeof iconPark] || iconPark.System
-  const size = 16 // 图标大小
+  const size = 16
   const vnode = createVNode(icon, { theme: 'outline', size, fill: '#333' })
   const container = document.createElement('div')
+
   render(vnode, container)
-  const svg = container.querySelector<SVGElement>('svg')!
-  setTabIco(svg2bese64(svg))
+
+  const svg = container.querySelector<SVGElement>('svg')
+  if (svg) {
+    setTabIcon(svg2bese64(svg))
+  }
 }

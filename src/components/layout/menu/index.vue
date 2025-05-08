@@ -4,7 +4,7 @@
     <div class="layout-side-view">
       <!-- text-color="#fff" -->
       <!-- active-text-color="#fff" -->
-      <el-menu class="layout-menu-view" :collapse="isCollapse" router :default-active="currentRoute">
+      <el-menu class="layout-menu-view" :collapse="isCollapse" :default-active="currentRoute">
         <menu-item :menu-data="menuData"></menu-item>
       </el-menu>
       <div id="drap-meuline" class="drap-meuline"></div>
@@ -12,7 +12,7 @@
   </el-aside>
 </template>
 <script lang="ts" setup>
-import { setStyleProperty, LAYOUTSIDECONTAINERWIDTHKEY } from '@/utils/system-style'
+import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
 import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted, ref } from 'vue'
@@ -53,11 +53,11 @@ const menuData = computed(() => {
  * 初始化左侧菜单宽度
  */
 const initLayoutSideContainerWidth = () => {
-  const history_width = localStorage.getItem(LAYOUTSIDECONTAINERWIDTHKEY) || '300px'
+  const history_width = localStorage.getItem(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH) || '300px'
   if (!isCollapse.value) {
-    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, history_width)
+    setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, history_width)
   } else {
-    setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, '64px')
+    setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, '64px')
   }
 }
 const initDrap = () => {
@@ -78,17 +78,20 @@ const initDrap = () => {
       left_width = left_width < min_width ? min_width : left_width
       left_width = left_width > max_width ? max_width : left_width
       if (!isCollapse.value) {
-        setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, left_width + 'px')
+        setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, left_width + 'px')
       }
     }
     document.onmouseup = () => {
       document.onmousemove = null
       document.onmouseup = null
       if (sidebarContainer.offsetWidth <= 64) {
-        setStyleProperty(LAYOUTSIDECONTAINERWIDTHKEY, 64 + 'px')
+        setStyleProperty(CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH, '64px')
         systemInfoStore.setOpenMenuFlag(false)
       } else {
-        localStorage.setItem('--layout-side-container-width', sidebarContainer.offsetWidth + 'px')
+        localStorage.setItem(
+          CSS_VARIABLES.LAYOUT_SIDE_CONTAINER_WIDTH,
+          sidebarContainer.offsetWidth + 'px'
+        )
       }
     }
   }
@@ -101,10 +104,12 @@ onMounted(() => {
 <style lang="less" scoped>
 .layout-side-container {
   transition: width 0.3s;
-  width: var(--layout-side-container-width); // TODO
+  width: var(--layout-side-container-width);
+  height: 100%;
+  background-color: var(--el-bg-color);
+  border-right: 1px solid var(--el-border-color-light);
 
   .layout-side-title {
-    background-color: rgb(2, 93, 126);
     height: 50px;
     font-weight: 600;
     font-size: 16px;
@@ -116,13 +121,15 @@ onMounted(() => {
       sans-serif;
     text-align: center;
     line-height: 50px;
-    color: #ffffff;
+    color: var(--el-text-color-primary);
+    background-color: var(--el-bg-color);
+    border-bottom: 1px solid var(--el-border-color-light);
   }
 
   .layout-side-view {
     display: flex;
-    height: 100%;
-    background-color: rgb(2, 93, 126);
+    height: calc(100% - 50px);
+    background-color: var(--el-bg-color);
     transition: width 0.3s;
     position: relative;
     width: 100%;
@@ -130,25 +137,46 @@ onMounted(() => {
     .drap-meuline {
       width: 4px;
       height: 100%;
-      background-color: rgb(2, 93, 126);
+      background-color: var(--el-border-color-lighter);
       cursor: e-resize;
       position: absolute;
       right: 0;
       z-index: 99;
-    }
+      transition: all 0.3s ease;
+      opacity: 0.6;
 
-    // .drap-meuline:hover {
-    //   background-color: rgb(154, 45, 160);
-    // }
+      &:hover {
+        background-color: var(--el-color-primary);
+        opacity: 1;
+        width: 6px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      }
+    }
 
     .el-menu--horizontal {
       --el-menu-horizontal-height: 100px;
     }
 
     .layout-menu-view {
-      background-color: rgb(2, 93, 126);
+      background-color: var(--el-bg-color);
       width: 100%;
       border: 0 !important;
+
+      :deep(.el-menu) {
+        border-right: none;
+      }
+
+      :deep(.el-menu-item),
+      :deep(.el-sub-menu__title) {
+        &:hover {
+          background-color: var(--el-color-primary-light-9);
+        }
+
+        &.is-active {
+          background-color: var(--el-color-primary-light-8);
+          color: var(--el-color-primary);
+        }
+      }
     }
   }
 }

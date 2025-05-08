@@ -1,90 +1,78 @@
 <template>
-  <div class="file-upload">
-    <!-- 普通文件上传 带上传进度 -->
+  <div class="large-file-upload">
     <el-upload
-      class="file-uploader"
+      class="large-file-uploader"
+      drag
       :http-request="handleUploadFile"
       action="#"
       :show-file-list="false"
-      :before-upload="beforeBeforeUpload"
+      :before-upload="beforeUpload"
     >
-      <el-icon class="file-uploader-icon">
+      <el-icon class="large-file-uploader-icon">
         <Plus />
       </el-icon>
+      <div class="el-upload__text">点击或拖拽文件到此处上传</div>
     </el-upload>
+    <!-- 分片进度条 -->
+    <el-dialog
+      v-model="progressDialogVisible"
+      title="分片上传进度"
+      :close-on-click-modal="false"
+      :show-close="false"
+      width="400px"
+    >
+      <div v-for="(percent, idx) in chunkProgressArr" :key="idx" style="margin-bottom: 12px">
+        <div>分片 {{ idx + 1 }}</div>
+        <el-progress :percentage="percent" :color="progressColors" :show-text="true" />
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { h, ref, nextTick, onMounted } from 'vue'
-import {
-  ElMessage,
-  type UploadRawFile,
-  type UploadRequestOptions,
-  type IElMessageBox,
-  ElMessageBox,
-  ElProgress
-} from 'element-plus'
+import { ref, nextTick } from 'vue'
+import { type UploadProps, type UploadRequestOptions, ElMessage, ElProgress } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { uploadModule } from '@apis'
 
-/**
- * 上传前的拦截
- * @param {UploadRawFile} rawFile 上传文件
- */
-const beforeBeforeUpload = (rawFile: UploadRawFile) => {
-  // if (rawFile.size / 1024 / 1024 > 2) {
-  //     ElMessage.error('文件大小不能超过 2MB!')
-  //     return false
-  // }
-  return true
-}
-
-const colors = [
+const progressColors = [
   { color: '#f56c6c', percentage: 20 },
   { color: '#e6a23c', percentage: 40 },
   { color: '#5cb87a', percentage: 60 },
   { color: '#1989fa', percentage: 80 },
-  { color: '#6f7ad3', percentage: 100 }
+  { color: '#6f7ad3', percentage: 100 },
 ]
-/**
- * 上传文件
- * @param {UploadRequestOptions} options
- */
+
+const progressDialogVisible = ref(false)
+const chunkProgressArr = ref<number[]>([])
+
+const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => true
+
 const handleUploadFile = async ({ file }: UploadRequestOptions) => {
-  const progress = ref(0)
-  // 创建进度条组件
-  ElMessageBox({
-    title: '上传进度',
-    showCancelButton: false,
-    showConfirmButton: false,
-    showClose: false,
-    customClass: 'file-uploader_messageBox',
-    message: () =>
-      h(ElProgress, {
-        type: 'dashboard',
-        color: colors,
-        percentage: progress.value
-      })
+  progressDialogVisible.value = true
+  chunkProgressArr.value = []
+
+  // 先获取总分片数
+  const totalChunks = Math.ceil(file.size / (10 * 1024 * 1024))
+  chunkProgressArr.value = Array(totalChunks).fill(0)
+
+  await uploadModule.uploadLargeFile(file, (chunkIndex, percent) => {
+    chunkProgressArr.value[chunkIndex] = percent
   })
-  const formData = new FormData()
-  formData.append('file', file)
-  const result = await uploadModule.uploadFile(formData, async (progressEvent) => {
-    const percent = Math.floor((progressEvent.loaded * 100) / progressEvent.total!)
-    progress.value = percent
-    await nextTick()
-    if (progress.value === 100) {
-      ElMessageBox.close()
+
+  // 检查所有分片都100%后再提示
+  const checkAllDone = () => chunkProgressArr.value.every((p) => p === 100)
+  const waitAllDone = async () => {
+    while (!checkAllDone()) {
+      await new Promise((r) => setTimeout(r, 100))
     }
-  })
-
-  if (result.code === 200) {
-    ElMessage.success('上传成功')
   }
+  await waitAllDone()
+  progressDialogVisible.value = false
+  ElMessage.success('全部分片上传完成')
 }
-
-onMounted(() => {})
 </script>
+
 <style lang="less">
 .file-uploader_messageBox {
   .el-message-box__content {
@@ -95,6 +83,7 @@ onMounted(() => {})
   }
 }
 </style>
+
 <style lang="less" scoped>
 :deep(.file-uploader .el-upload) {
   border: 1px dashed var(--el-border-color);
