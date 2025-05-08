@@ -166,18 +166,17 @@ const fetchMenuList = async () => {
     ...queryFormData,
   })
   if (result.code === 200) {
-    menuListInfo.tableData = result.data
-    menuListInfo.total = result.data.length
+    menuListInfo.tableData = result.data.data
+    menuListInfo.total = result.data.total
     // 更新菜单树数据
-    menuTreeData.value = result.data.filter((item: StudyJavaSysMenuDto) => item.menuType === 0)
+    // menuTreeData.value = result.data.filter((item: StudyJavaSysMenuDto) => item.menuType === 0)
   }
 }
 
 const addOrEditMenuFormRef = ref<FormInstance>()
 
-const addOrEditMenuFormData = reactive<
-  Omit<StudyJavaSysMenuDto, 'menuId' | 'createTime' | 'updateTime'>
->({
+const addOrEditMenuFormData = reactive<StudyJavaSysMenuVo>({
+  menuId: 0,
   parentId: 0,
   menuName: '',
   path: '',

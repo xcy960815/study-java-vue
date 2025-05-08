@@ -14,7 +14,6 @@ if ! echo "$COMMIT_MSG" | grep -qE '^(feat|fix|docs|style|refactor|perf|test|bui
   echo "  type(scope): subject"
   echo ""
   echo "例如："
-  echo "  feat(math): 添加数学练习功能"
   echo "  fix(user): 修复登录问题"
   echo ""
   echo "type 可选值："
