@@ -4,7 +4,13 @@
     <el-form ref="loginFormRef" :model="loginFormData" :rules="loginFormRules" class="login-form">
       <h3 class="login-title">{{ viteAppTitle }}</h3>
       <el-form-item prop="username">
-        <el-input v-model="loginFormData.username" type="text" auto-complete="off" size="large" placeholder="账号">
+        <el-input
+          v-model="loginFormData.username"
+          type="text"
+          auto-complete="off"
+          size="large"
+          placeholder="账号"
+        >
           <template #prefix>
             <el-icon class="el-input__icon">
               <User />
@@ -56,7 +62,9 @@
         </el-image>
       </el-form-item>
       <!-- 记住密码 -->
-      <el-checkbox class="remember-checkbox mb-[25px]" v-model="loginFormData.rememberMe">记住密码</el-checkbox>
+      <el-checkbox class="remember-checkbox mb-[25px]" v-model="loginFormData.rememberMe"
+        >记住密码</el-checkbox
+      >
       <el-form-item style="width: 100%">
         <el-button
           :disabled="loginButtonDisabled"
@@ -78,7 +86,7 @@
 import { useLoginStore } from '@/store'
 import type { FormRules, FormInstance } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
-import { Lock, User, View } from '@element-plus/icons-vue'
+import { Lock, User, View, Hide } from '@element-plus/icons-vue'
 import { encryptByRsa } from '@utils/encryption'
 import MD5 from 'MD5'
 import { initBackground } from './background'
@@ -94,7 +102,7 @@ const loginFormData = reactive<LoginRequestVo>({
   username: '13700002703',
   password: '123456',
   captcha: '',
-  rememberMe: false
+  rememberMe: false,
 })
 
 const passwordInputType = ref('password')
@@ -122,23 +130,23 @@ const loginFormRules: FormRules<LoginRequestVo> = {
     {
       required: true,
       message: '请输入用户名',
-      trigger: ['blur', 'change']
-    }
+      trigger: ['blur', 'change'],
+    },
   ],
   password: [
     {
       required: true,
       message: '请输入密码',
-      trigger: ['blur', 'change']
-    }
+      trigger: ['blur', 'change'],
+    },
   ],
   captcha: [
     {
       required: true,
       message: '请输入验证码',
-      trigger: ['blur', 'change']
-    }
-  ]
+      trigger: ['blur', 'change'],
+    },
+  ],
 }
 
 const loginStore = useLoginStore()
