@@ -217,6 +217,27 @@ export const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/system',
+    name: 'system',
+    component: () => import(`../components/layout/index.vue`),
+    meta: {
+      title: '系统管理',
+      icon: 'Setting',
+    },
+    children: [
+      {
+        path: '/system/menu',
+        name: 'system-menu',
+        component: () => import(`../views/system/menu/index.vue`),
+        meta: {
+          title: '菜单管理',
+          icon: 'ApplicationMenu',
+          keepAlive: true,
+        },
+      },
+    ],
+  },
+  {
     path: '/*',
     redirect: '/',
   },

@@ -1,11 +1,16 @@
 <template>
-  <div class="sys-menu">
+  <div class="system-menu">
     <el-form :model="queryFormData" label-width="auto" inline v-show="showSearch">
       <el-form-item label="菜单名称">
         <el-input v-model="queryFormData.menuName" placeholder="菜单名称" @change="fetchMenuList" />
       </el-form-item>
       <el-form-item label="菜单类型">
-        <el-select v-model="queryFormData.menuType" placeholder="菜单类型" @change="fetchMenuList">
+        <el-select
+          v-model="queryFormData.menuType"
+          style="width: 200px"
+          placeholder="菜单类型"
+          @change="fetchMenuList"
+        >
           <el-option label="目录" :value="0" />
           <el-option label="菜单" :value="1" />
           <el-option label="按钮" :value="2" />
@@ -130,8 +135,11 @@ const queryFormData = reactive({
 })
 
 const showSearch = ref(true)
+
 const addOrEditMenuDialogTitle = ref('')
+
 const addOrEditMenuDialogVisible = ref(false)
+
 const menuTreeData = ref<StudyJavaSysMenuDto[]>([])
 
 const menuListInfo = reactive<MenuListInfo>({
@@ -277,7 +285,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.sys-menu {
-  padding: 20px;
+.system-menu {
+  position: relative;
 }
 </style>

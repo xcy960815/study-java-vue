@@ -9,7 +9,7 @@ declare type ResponseResult<T = any> = {
   message: string
 }
 
-declare interface ListResonse<D extends Object> {
-  data: D[]
+declare interface ListResponseResult<D extends Object> {
+  data: Array<D>
   total: number
 }

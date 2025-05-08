@@ -192,6 +192,9 @@ importers:
       unplugin-vue-components:
         specifier: ^28.4.1
         version: 28.5.0(@babel/parser@7.27.0)(@nuxt/kit@3.16.2)(vue@3.5.13(typescript@5.4.5))
+      unplugin-vue-inspector:
+        specifier: ^2.3.1
+        version: 2.3.1(vite@5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0))
       vite:
         specifier: ^5.3.1
         version: 5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0)
@@ -4399,6 +4402,13 @@ packages:
         optional: true
       '@nuxt/kit':
         optional: true
+
+  unplugin-vue-inspector@2.3.1:
+    resolution: {integrity: sha512-eFnJjS546hvEy0RKem4pss7lEzwyivYWgsoaERyGtt6BOE54VPmSnDSy/ZpX5fUHyau35cV2b4UIwIc/qYtuUA==}
+
+  unplugin@1.16.1:
+    resolution: {integrity: sha512-4/u/j4FrCKdi17jaxuJA0jClGxB1AvU2hw/IuayPc4ay1XGaJs/rbb4v5WKwAjNifjmXK9PIFyuPiaK8azyR9w==}
+    engines: {node: '>=14.0.0'}
 
   unplugin@2.3.2:
     resolution: {integrity: sha512-3n7YA46rROb3zSj8fFxtxC/PqoyvYQ0llwz9wtUPUutr9ig09C8gGo5CWCwHrUzlqC1LLR43kxp5vEIyH1ac1w==}
@@ -9259,6 +9269,20 @@ snapshots:
       '@nuxt/kit': 3.16.2
     transitivePeerDependencies:
       - supports-color
+
+  unplugin-vue-inspector@2.3.1(vite@5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0)):
+    dependencies:
+      kolorist: 1.8.0
+      unplugin: 1.16.1
+      vite-plugin-vue-inspector: 5.3.1(vite@5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0))
+    transitivePeerDependencies:
+      - supports-color
+      - vite
+
+  unplugin@1.16.1:
+    dependencies:
+      acorn: 8.14.1
+      webpack-virtual-modules: 0.6.2
 
   unplugin@2.3.2:
     dependencies:

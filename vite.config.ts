@@ -4,7 +4,8 @@ import { defineConfig, loadEnv } from 'vite'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import vue from '@vitejs/plugin-vue'
-// import vueDevTools from 'vite-plugin-vue-devtools'
+import vueDevTools from 'vite-plugin-vue-devtools'
+import VueInspector from 'unplugin-vue-inspector/vite'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -165,7 +166,7 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       vue(),
-      // vueDevTools(),
+      vueDevTools(),
       createHtmlPlugin({
         inject: {
           data: {
@@ -202,6 +203,10 @@ export default defineConfig(({ mode }) => {
       visualizer({
         // open: true,
         filename: 'visualizer.html', //分析图生成的文件名
+      }),
+      VueInspector({
+        toggleButtonVisibility: 'always', // 总是显示右下角按钮
+        // 可选：自定义快捷键/端口/编辑器等
       }),
     ],
     resolve: {

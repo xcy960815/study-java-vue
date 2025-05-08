@@ -16,7 +16,7 @@ interface UserListRequestParams extends baseListParams, UserInfoVo {}
  * @param queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getUserList = <T extends ListResonse<UserInfoDto>>(
+export const getUserList = <T extends ListResponseResult<UserInfoDto>>(
   queryFormData: UserListRequestParams
 ): Promise<ResponseResult<T>> => {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData

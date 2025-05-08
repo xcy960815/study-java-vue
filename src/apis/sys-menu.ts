@@ -2,31 +2,23 @@ import { request } from '@utils/request'
 /**
  * 获取菜单列表
  * @param {baseListParams} queryFormData
- * @returns {Promise<ResponseResult<Array<StudyJavaSysMenuVo>>>}
+ * @returns {Promise<ResponseResult<ListResponseResult<StudyJavaSysMenuDto>>>}
  */
-export function getMenuList(
-  queryFormData: baseListParams & {
-    menuName?: string
-    menuType?: number
-    parentId?: number
-  }
-): Promise<ResponseResult<Array<StudyJavaSysMenuVo>>> {
-  const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
-  const url = `/studyJavaSysMenu/list?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.get<
-    ResponseResult<Array<StudyJavaSysMenuVo>>,
-    ResponseResult<Array<StudyJavaSysMenuVo>>
-  >(url, {
-    params: otherQueryFormData,
+export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuDto>>(
+  queryFormData: baseListParams
+): Promise<ResponseResult<T>> {
+  const url = `/studyJavaSysMenu/list`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: queryFormData,
   })
 }
 
 /**
  * 更新菜单信息
- * @param {StudyJavaSysMenuDto} menuInfo
+ * @param {StudyJavaSysMenuVo} menuInfo
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+export function updateMenu(menuInfo: StudyJavaSysMenuVo): Promise<ResponseResult<boolean>> {
   const url = `/studyJavaSysMenu`
   return request.put<ResponseResult<boolean>, ResponseResult<boolean>>(url, menuInfo)
 }
