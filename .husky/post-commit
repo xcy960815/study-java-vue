@@ -1,6 +1,10 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+#!/bin/sh
+
+# 检查是否是 amend 提交
+if [ -n "$(git log -1 --pretty=%B | grep '\[skip changelog\]')" ]; then
+  exit 0
+fi
 
 pnpm run changelog
 git add CHANGELOG.md
-git commit --amend --no-edit 
+git commit --amend -m "$(git log -1 --pretty=%B) [skip changelog]" 
