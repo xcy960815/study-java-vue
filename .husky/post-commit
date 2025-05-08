@@ -1,10 +1,16 @@
-#!/bin/sh
+# #!/bin/sh
 
-# 检查是否是 amend 提交
-if [ -n "$(git log -1 --pretty=%B | grep '\[skip changelog\]')" ]; then
-  exit 0
-fi
+# # 检查是否是 amend 提交（通过检查 commit message 中是否包含 [skip changelog] 标记）
+# if [ -n "$(git log -1 --pretty=%B | grep '\[skip changelog\]')" ]; then
+#   exit 0
+# fi
 
-pnpm run changelog
-git add CHANGELOG.md
-git commit --amend -m "$(git log -1 --pretty=%B) [skip changelog]" 
+# # 生成 changelog
+# pnpm run changelog
+
+# # 将生成的 changelog 添加到暂存区
+# git add CHANGELOG.md
+
+# # 使用 --amend 修改最后一次提交，添加 [skip changelog] 标记以避免循环
+# # --no-edit 表示保持原有的 commit message 不变
+# git commit --amend -m "$(git log -1 --pretty=%B) [skip changelog]" 

@@ -1,6 +1,0 @@
-{
-  "path": "cz-customizable",
-  "config": {
-    "config": "./.cz-config.cjs"
-  }
-} 
