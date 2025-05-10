@@ -1,5 +1,4 @@
 <template>
-  <div id="app1"></div>
   <router-view v-slot="{ Component }">
     <transition name="fade-transform" mode="out-in">
       <keep-alive include="userList">
