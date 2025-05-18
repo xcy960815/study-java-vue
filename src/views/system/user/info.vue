@@ -21,7 +21,11 @@
       />
     </el-form-item> -->
     <el-form-item label="个性签名" prop="introduceSign">
-      <el-input v-model="userInfoFormData.introduceSign" type="textarea" placeholder="请输入个性签名" />
+      <el-input
+        v-model="userInfoFormData.introduceSign"
+        type="textarea"
+        placeholder="请输入个性签名"
+      />
     </el-form-item>
     <el-form-item label="地址" prop="address">
       <el-input v-model="userInfoFormData.address" type="textarea" placeholder="请输入住址" />
@@ -34,7 +38,11 @@
         :show-file-list="false"
         :before-upload="handleBeforeAvatarUpload"
       >
-        <img v-if="userInfoFormData.avatar" :src="userInfoFormData.avatar" class="avatar-uploader-img" />
+        <img
+          v-if="userInfoFormData.avatar"
+          :src="userInfoFormData.avatar"
+          class="avatar-uploader-img"
+        />
         <el-icon v-else class="avatar-uploader-icon">
           <Plus />
         </el-icon>
@@ -91,7 +99,7 @@ const userInfoFormData = reactive<UserInfoDto>({
   /**
    * 头像 （base64）
    */
-  avatar: ''
+  avatar: '',
 })
 
 const userInfoFormRules = reactive<FormRules<Partial<UserInfoDto>>>({})
@@ -115,7 +123,7 @@ const saveUserInfo = async () => {
   if (result.code === 200) {
     ElMessage({
       message: '保存成功',
-      type: 'success'
+      type: 'success',
     })
   }
 }

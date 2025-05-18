@@ -37,38 +37,7 @@ export const routes: RouteRecordRaw[] = [
       content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
     },
   },
-  {
-    path: '/user',
-    name: 'user',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '用户',
-      icon: 'User',
-    },
-    children: [
-      {
-        path: '/user/list',
-        name: 'userList',
-        component: () => import(`../views/user/list.vue`),
-        meta: {
-          // icon: 'ListView',
-          icon: 'other',
-          keepAlive: true,
-          title: '用户列表',
-        },
-      },
-      {
-        path: '/user/info',
-        name: 'userInfo',
-        component: () => import(`../views/user/info.vue`),
-        meta: {
-          hightlight: '/user/list',
-          hidden: true,
-          title: '用户中心',
-        },
-      },
-    ],
-  },
+
   {
     path: '/goods-category',
     name: 'goods-category',
@@ -235,11 +204,41 @@ export const routes: RouteRecordRaw[] = [
           keepAlive: true,
         },
       },
+      {
+        path: '/system/user/list',
+        name: 'systemUserList',
+        component: () => import(`../views/system/user/list.vue`),
+        meta: {
+          // icon: 'ListView',
+          icon: 'other',
+          keepAlive: true,
+          title: '用户列表',
+        },
+      },
+      {
+        path: '/system/user/info',
+        name: 'systemUserInfo',
+        component: () => import(`../views/system/user/info.vue`),
+        meta: {
+          hightlight: '/system/user/list',
+          hidden: true,
+          title: '用户中心',
+        },
+      },
     ],
   },
   {
-    path: '/*',
-    redirect: '/',
+    path: '/404',
+    name: 'not-found',
+    component: () => import(`../views/error/404.vue`),
+    meta: {
+      title: '404',
+      hidden: true,
+    },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404',
   },
 ]
 

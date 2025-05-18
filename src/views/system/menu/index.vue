@@ -112,7 +112,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref, nextTick } from 'vue'
-import { getMenuList, addMenu, updateMenu, deleteMenu } from '@apis/sys-menu'
+import { getMenuList, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
