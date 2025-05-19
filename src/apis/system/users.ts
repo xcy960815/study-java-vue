@@ -4,19 +4,19 @@ import { request } from '@utils/request'
  * 获取当前登录用户信息
  * @returns {ResponseResult<UserInfoDto>}
  */
-export const getUserInfo = <T extends UserInfoDto>() => {
+export const getUserInfo = <T extends UserInfoVo>() => {
   const url = `/user/getUserInfo`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
 
-interface UserListRequestParams extends baseListParams, UserInfoVo {}
+interface UserListRequestParams extends baseListDto, UserInfoVo {}
 
 /**
  * 获取用户列表请求参数类型
  * @param queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getUserList = <T extends ListResponseResult<UserInfoDto>>(
+export const getUserList = <T extends ListResponseResult<UserInfoVo>>(
   queryFormData: UserListRequestParams
 ): Promise<ResponseResult<T>> => {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
@@ -50,11 +50,11 @@ export const updateUserAvatar = <T extends string>(params: FormData) => {
 
 /**
  * 创建用户信息
- * @param params {Partial<UserInfoDto>}
+ * @param params {UserInfoDto}
  * @returns {Promise<ResponseResult<T>>}
  */
 export const insertUserInfo = <T extends boolean>(
-  params: Partial<UserInfoDto>
+  params: UserInfoDto
 ): Promise<ResponseResult<T>> => {
   const url = `/user/insertUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
@@ -66,7 +66,7 @@ export const insertUserInfo = <T extends boolean>(
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export const deleteUserInfo = <T extends boolean>(
-  params: UserInfoVo
+  params: UserInfoDto
 ): Promise<ResponseResult<T>> => {
   const url = `/user/deleteUserInfoInfo`
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
@@ -77,7 +77,7 @@ export const deleteUserInfo = <T extends boolean>(
 /**
  * 修改用户密码
  */
-export const updateUserPassword = async <T extends boolean>(requestParams: UserInfoVo) => {
+export const updateUserPassword = async <T extends boolean>(requestParams: UserInfoDto) => {
   const url = `/user/updateUserPassword`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, requestParams)
 }

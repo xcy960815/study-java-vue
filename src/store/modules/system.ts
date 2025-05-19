@@ -12,7 +12,7 @@ export const systemInfoStore = defineStore<
     return {
       openMenuFlag: true,
       historyList: [],
-      keepLiveList: []
+      keepLiveList: [],
     }
   },
   getters: {
@@ -24,7 +24,7 @@ export const systemInfoStore = defineStore<
     },
     getHistoryList(state) {
       return state.historyList
-    }
+    },
   },
   actions: {
     reversalOpenMenuFlag() {
@@ -41,7 +41,10 @@ export const systemInfoStore = defineStore<
      * @param {RouteLocationNormalizedLoadedGeneric} keepLiveItem
      */
     addKeepLiveItem(keepLiveItem) {
-      if (!!keepLiveItem.meta.keepAlive && !this.keepLiveList.includes(keepLiveItem.name as string)) {
+      if (
+        !!keepLiveItem.meta.keepAlive &&
+        !this.keepLiveList.includes(keepLiveItem.name as string)
+      ) {
         this.keepLiveList.push(keepLiveItem.name as string)
       }
     },
@@ -55,11 +58,15 @@ export const systemInfoStore = defineStore<
     addHistoryItem(historyItem) {
       // 登录页面不需要记录
       if (historyItem.path === '/login') return
-      const currenHistoryItem = this.historyList.find((item) => item.fullPath === historyItem.fullPath)
+      const currenHistoryItem = this.historyList.find(
+        (item) => item.fullPath === historyItem.fullPath
+      )
       // console.log("this.historyList", JSON.parse(JSON.stringify(this.historyList)));
       // if(historyItem.openMore) return
       if (!!currenHistoryItem) {
-        const currenHistoryIndex = this.historyList.findIndex((item) => item.fullPath === currenHistoryItem.fullPath)
+        const currenHistoryIndex = this.historyList.findIndex(
+          (item) => item.fullPath === currenHistoryItem.fullPath
+        )
         this.historyList.splice(currenHistoryIndex, 1, historyItem)
       } else {
         this.historyList.push(historyItem)
@@ -70,7 +77,9 @@ export const systemInfoStore = defineStore<
      * @param {RouteLocationNormalizedLoadedGeneric} historyItem
      */
     removeHistoryItem(historyItem) {
-      const historyIndex = this.historyList.findIndex((item) => item.fullPath === historyItem.fullPath)
+      const historyIndex = this.historyList.findIndex(
+        (item) => item.fullPath === historyItem.fullPath
+      )
       if (historyIndex !== -1) {
         this.historyList.splice(historyIndex, 1)
       }
@@ -82,7 +91,7 @@ export const systemInfoStore = defineStore<
       } else if (!!preHistoryItem) {
         router.push(preHistoryItem)
       }
-    }
+    },
   },
-  persist: true
+  persist: true,
 })

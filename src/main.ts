@@ -7,8 +7,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import 'virtual:svg-icons-register'
 import store from './store'
-
 import router from '@/router'
+import '@plugins/redirect'
 import { registerGlobalComponents } from './components'
 const app = createApp(App)
 app

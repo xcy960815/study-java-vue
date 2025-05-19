@@ -4,7 +4,7 @@
       <div class="error-code">404</div>
       <div class="error-desc">页面不存在</div>
       <div class="error-info">抱歉，您访问的页面不存在或已被删除</div>
-      <el-button type="primary" @click="goHome" class="back-btn">返回首页</el-button>
+      <el-button type="primary" @click="goHome">返回首页</el-button>
     </div>
     <div class="illustration">
       <img src="@/assets/images/404.svg" alt="404图片" class="error-img" />
@@ -58,11 +58,6 @@ const goHome = () => {
   font-size: 16px;
   color: #606266;
   margin-bottom: 30px;
-}
-
-.back-btn {
-  padding: 12px 25px;
-  font-size: 16px;
 }
 
 .illustration {

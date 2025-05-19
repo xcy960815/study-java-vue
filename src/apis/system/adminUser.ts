@@ -1,12 +1,12 @@
 import { request } from '@utils/request'
 
-interface RequestParams extends baseListParams {}
+interface RequestParams extends baseListDto {}
 /**
  * 获取超级管理员列表
  * @param {RequestParams} queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export function getAdminUserList<T = Array<AdminUserInfoDto>>(
+export function getAdminUserList<T = Array<AdminUserInfoVo>>(
   queryFormData: RequestParams
 ): Promise<ResponseResult<T>> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData

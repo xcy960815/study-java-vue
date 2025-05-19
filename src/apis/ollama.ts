@@ -6,20 +6,20 @@ const buildRequestUrl = (url: string) => `/ollama${url}`
  * generate 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const generate = <T extends OllamaDto.Generate>(generateVo: OllamaVo.Generate) => {
+export const generate = <T extends OllamaVo.Generate>(generateDto: OllamaDto.Generate) => {
   const url = buildRequestUrl('/generate')
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, generateVo)
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, generateDto)
 }
 
 /**
  * generateStream 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const generateStream = async (generateStreamVo: OllamaVo.Generate) => {
+export const generateStream = async (generateStreamDto: OllamaDto.Generate) => {
   const url = 'http://localhost:8082/dev-api/ollama/generateStream'
   const response = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify(generateStreamVo)
+    body: JSON.stringify(generateStreamDto),
   })
 }
 
@@ -27,7 +27,7 @@ export const generateStream = async (generateStreamVo: OllamaVo.Generate) => {
  * version 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const version = <T extends OllamaDto.Version>() => {
+export const version = <T extends OllamaVo.Version>() => {
   const url = buildRequestUrl('/version')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
@@ -36,7 +36,7 @@ export const version = <T extends OllamaDto.Version>() => {
  * models 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const models = <T extends OllamaDto.Models>() => {
+export const models = <T extends OllamaVo.Models>() => {
   const url = buildRequestUrl('/models')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
@@ -45,7 +45,7 @@ export const models = <T extends OllamaDto.Models>() => {
  * ps 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const ps = <T extends OllamaDto.Ps>() => {
+export const ps = <T extends OllamaVo.Ps>() => {
   const url = buildRequestUrl('/ps')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
@@ -54,7 +54,7 @@ export const ps = <T extends OllamaDto.Ps>() => {
  * tags 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const tags = <T extends OllamaDto.Tags>() => {
+export const tags = <T extends OllamaVo.Tags>() => {
   const url = buildRequestUrl('/tags')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
@@ -63,9 +63,9 @@ export const tags = <T extends OllamaDto.Tags>() => {
  * delete 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const deleteModel = <T extends boolean>(deleteModelVo: OllamaVo.DeleteModelVo) => {
+export const deleteModel = <T extends boolean>(deleteModelDto: OllamaDto.DeleteModelVo) => {
   const url = buildRequestUrl('/delete')
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
-    data: deleteModelVo
+    data: deleteModelDto,
   })
 }

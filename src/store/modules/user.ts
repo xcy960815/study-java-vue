@@ -11,7 +11,7 @@ export const userInfoStore = defineStore(StoreNames.USER, {
       introduceSign: '',
       loginName: '',
       nickName: '',
-      avatar: ''
+      avatar: '',
     }
   },
   getters: {},
@@ -30,7 +30,7 @@ export const userInfoStore = defineStore(StoreNames.USER, {
         this.nickName = result.data.nickName
         this.avatar = result.data.avatar
       }
-    }
-  }
+    },
+  },
   // persist: true
 })

@@ -4,7 +4,7 @@ import { Gpt } from '@utils/ai'
 const gpt = new Gpt({
   completionsUrl: '/deepseek/completions',
   //   apiKey: '',
-  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX
+  apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   // markdown2Html: true
 })
 
@@ -19,7 +19,7 @@ const buildRequestUrl = (url: string) => `/deepseek${url}`
  * models 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const models = <T extends DeepSeekDto.Models>() => {
+export const models = <T extends DeepSeekVo.Models>() => {
   const url = buildRequestUrl('/models')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
@@ -28,7 +28,7 @@ export const models = <T extends DeepSeekDto.Models>() => {
  * balance 接口
  * @returns {Promise<ResponseResult<T>>}
  */
-export const balance = <T extends DeepSeekDto.Balance>() => {
+export const balance = <T extends DeepSeekVo.Balance>() => {
   const url = buildRequestUrl('/balance')
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }

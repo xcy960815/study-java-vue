@@ -98,7 +98,7 @@ const viteAppTitle = import.meta.env.VITE_APP_TITLE
 
 const logining = ref(false)
 
-const loginFormData = reactive<LoginRequestVo>({
+const loginFormData = reactive<LoginRequestDto>({
   username: '13700002703',
   password: '123456',
   captcha: '',
@@ -125,7 +125,7 @@ const handleClickPasswordIcon = () => {
 
 const loginFormRef = ref<FormInstance>()
 
-const loginFormRules: FormRules<LoginRequestVo> = {
+const loginFormRules: FormRules<LoginRequestDto> = {
   username: [
     {
       required: true,

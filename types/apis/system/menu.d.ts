@@ -1,4 +1,7 @@
-declare interface StudyJavaSysMenuDto {
+/**
+ * 后端返回的菜单信息
+ */
+declare interface StudyJavaSysMenuVo {
   /**
    * 菜单ID
    */
@@ -55,5 +58,13 @@ declare interface StudyJavaSysMenuDto {
   updateTime: string
 }
 
-declare interface StudyJavaSysMenuVo
-  extends Omit<StudyJavaSysMenuDto, 'createTime' | 'updateTime'> {}
+/**
+ * 前端请求的菜单信息
+ */
+declare interface StudyJavaSysMenuDto
+  extends Omit<StudyJavaSysMenuVo, 'createTime' | 'updateTime'> {
+  /**
+   * 菜单ID
+   */
+  menuId?: number
+}

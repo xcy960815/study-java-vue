@@ -10,6 +10,10 @@ interface EventMap {
   logout: []
 }
 
+export const HOME_PATH = '/system/user/list'
+export const LOGIN_PATH = '/login'
+export const WHITELIST_PATHS = [HOME_PATH, LOGIN_PATH]
+
 // 自定义事件发射器类
 class CustomEventEmitter {
   private listeners: Map<EventNames, Set<(...args: any[]) => void>> = new Map()

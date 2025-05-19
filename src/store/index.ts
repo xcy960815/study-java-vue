@@ -2,11 +2,11 @@ import { createPinia } from 'pinia'
 
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate' //引入持久化插件
 
-import { userInfoStore as useUserInfoStore } from './user'
+import { userInfoStore as useUserInfoStore } from './modules/user'
 
-import { systemInfoStore as useSystemInfoStore } from './system'
+import { systemInfoStore as useSystemInfoStore } from './modules/system'
 
-import { loginStore as useLoginStore } from './login'
+import { loginStore as useLoginStore } from './modules/login'
 
 // @link https://github.com/vitejs/vite/issues/9599#issuecomment-1209333753
 // type PiniaStore = {

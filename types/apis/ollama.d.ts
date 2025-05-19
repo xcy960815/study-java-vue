@@ -1,7 +1,7 @@
 /**
  * Ollama 模块声明
  */
-declare namespace OllamaDto {
+declare namespace OllamaVo {
   /**
    * generate 接口返回参数
    */
@@ -150,7 +150,7 @@ declare namespace OllamaDto {
   }
 }
 
-declare namespace OllamaVo {
+declare namespace OllamaDto {
   /**
    * generate 接口请求参数
    */

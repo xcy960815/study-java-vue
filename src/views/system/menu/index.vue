@@ -1,6 +1,12 @@
 <template>
   <div class="system-menu">
-    <el-form :model="queryFormData" label-width="auto" inline v-show="showSearch">
+    <el-form
+      :model="queryFormData"
+      ref="queryFormRef"
+      label-width="auto"
+      inline
+      v-show="showSearch"
+    >
       <el-form-item label="菜单名称">
         <el-input v-model="queryFormData.menuName" placeholder="菜单名称" @change="fetchMenuList" />
       </el-form-item>
@@ -17,6 +23,7 @@
         </el-select>
       </el-form-item>
     </el-form>
+
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="fetchMenuList">
       <el-button size="small" type="primary" @click="handleClickAddMenu">新增菜单</el-button>
     </Handle-ToolBar>
@@ -53,8 +60,8 @@
       :page-sizes="[10, 20, 30, 40]"
       layout="total, sizes, prev, pager, next, jumper"
       :total="menuListInfo.total"
-      @size-change="menuListInfo.handlePageSizeChange"
-      @current-change="menuListInfo.handlePageNumChange"
+      @size-change="handlePageSizeChange"
+      @current-change="handlePageNumChange"
     />
 
     <el-dialog v-model="addOrEditMenuDialogVisible" :title="addOrEditMenuDialogTitle">
@@ -118,13 +125,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 
 interface MenuListInfo {
-  tableData: StudyJavaSysMenuDto[]
+  tableData: StudyJavaSysMenuVo[]
   total: number | undefined
   pageSize: number
   pageNum: number
-  handlePageSizeChange(pageSize: number): void
-  handlePageNumChange(pageNum: number): void
 }
+
+const queryFormRef = ref<FormInstance>()
 
 /**
  * @description 查询条件
@@ -140,23 +147,36 @@ const addOrEditMenuDialogTitle = ref('')
 
 const addOrEditMenuDialogVisible = ref(false)
 
-const menuTreeData = ref<StudyJavaSysMenuDto[]>([])
+const menuTreeData = ref<StudyJavaSysMenuVo[]>([])
 
 const menuListInfo = reactive<MenuListInfo>({
   tableData: [],
   total: 0,
   pageSize: 10,
   pageNum: 1,
-  handlePageSizeChange: (pageSize: number) => {
-    menuListInfo.pageSize = pageSize
-    fetchMenuList()
-  },
-  handlePageNumChange: (pageNum: number) => {
-    menuListInfo.pageNum = pageNum
-    fetchMenuList()
-  },
 })
 
+/**
+ * @description 处理页码大小变化
+ * @param {number} pageSize 页码大小
+ */
+const handlePageSizeChange = (pageSize: number) => {
+  menuListInfo.pageSize = pageSize
+  fetchMenuList()
+}
+
+/**
+ * @description 处理页码变化
+ * @param {number} pageNum 页码
+ */
+const handlePageNumChange = (pageNum: number) => {
+  menuListInfo.pageNum = pageNum
+  fetchMenuList()
+}
+
+/**
+ * @description 查询菜单列表
+ */
 const fetchMenuList = async () => {
   const pageSize = menuListInfo.pageSize
   const pageNum = menuListInfo.pageNum
@@ -175,7 +195,7 @@ const fetchMenuList = async () => {
 
 const addOrEditMenuFormRef = ref<FormInstance>()
 
-const addOrEditMenuFormData = reactive<StudyJavaSysMenuVo>({
+const addOrEditMenuFormData = reactive<StudyJavaSysMenuDto>({
   menuId: 0,
   parentId: 0,
   menuName: '',
@@ -255,7 +275,11 @@ const handleClickAddOrEditConfirm = async () => {
   }
 }
 
-const handleClickDeleteMenu = (row: StudyJavaSysMenuDto) => {
+/**
+ * @description 删除菜单
+ * @param {StudyJavaSysMenuVo} row
+ */
+const handleClickDeleteMenu = (row: StudyJavaSysMenuVo) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',

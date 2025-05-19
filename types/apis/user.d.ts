@@ -1,4 +1,7 @@
-declare interface UserInfoDto {
+/**
+ * 后端返回的用户信息
+ */
+declare interface UserInfoVo {
   /**
    * 用户主键id
    */
@@ -35,9 +38,10 @@ declare interface UserInfoDto {
   avatar: string
 }
 
-declare type UserInfoVo = Partial<
-  Omit<UserInfoDto, 'avatar' | 'createTime'>
-> & {
+/**
+ * 前端请求的用户信息
+ */
+declare type UserInfoDto = Partial<Omit<UserInfoVo, 'avatar' | 'createTime'>> & {
   passwordMd5?: string
   newPasswordMd5?: string
   confirmNewPassword?: string

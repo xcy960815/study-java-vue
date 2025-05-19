@@ -2,10 +2,10 @@ import { request } from '@utils/request'
 
 /**
  * 登入接口
- * @param {LoginRequestVo} requestParams
+ * @param {LoginRequestDto} requestParams
  * @returns {Promise<ResponseResult<T>>}
  */
-export function login<T extends LoginResponseDto>(requestParams: LoginRequestVo) {
+export function login<T extends LoginResponseVo>(requestParams: LoginRequestDto) {
   const url = `/login`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, requestParams)
 }

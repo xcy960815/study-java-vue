@@ -1,4 +1,4 @@
-declare interface baseListParams {
+declare interface baseListDto {
   pageSize: number
   pageNum: number
 }

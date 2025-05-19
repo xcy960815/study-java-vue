@@ -1,9 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
-import { eventEmitter } from '@/utils/event-emits'
-import { getToken } from '@utils/token'
-import { changeTabIcon } from '@/utils/system-style'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -249,68 +246,5 @@ const router = createRouter({
 })
 
 /*************** 统一管理通用路由跳转 *****************/
-
-/**
- * token过期
- */
-eventEmitter.on('token-invalid', () => {
-  const route = router.currentRoute.value
-  const redirect = route.fullPath
-  router.replace({
-    path: '/login',
-    query: {
-      redirect,
-    },
-  })
-})
-/**
- * 登录成功
- */
-eventEmitter.on('login', () => {
-  const redirect = router.currentRoute.value.query.redirect as string
-  console.log('登录', redirect)
-  router.replace({
-    path: redirect || '/user/list',
-  })
-})
-
-eventEmitter.on('logout', () => {
-  const route = router.currentRoute.value
-  const redirect = route.fullPath
-  // TODO 重定向之后 不会携带路径的参数
-  console.log('退出登录', router)
-
-  router.replace({
-    path: '/login',
-    query: {
-      redirect,
-    },
-  })
-})
-
-/*************** 统一管理通用路由跳转 *****************/
-
-// 全局路由守卫
-router.beforeEach(async (to, _from, next) => {
-  changeTabIcon(to)
-  const token = await getToken()
-  if (to.path === '/login') {
-    if (token) {
-      next('/user/list')
-    } else {
-      next()
-    }
-  } else {
-    if (!token) {
-      next('/login')
-    }
-    next()
-  }
-})
-
-router.afterEach((_to, _from) => {
-  // console.log(to, from)
-  // console.log('afterEach')
-})
 
 export default router

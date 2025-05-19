@@ -1,4 +1,4 @@
-declare namespace DeepSeekDto {
+declare namespace DeepSeekVo {
   export interface Models {
     object: string
     data: Array<ModelOption>
@@ -12,7 +12,7 @@ declare namespace DeepSeekDto {
   }
 
   export interface Balance {
-    is_available: boolean;
+    is_available: boolean
     balance_infos: Array<BalanceInfo>
   }
   interface BalanceInfo {

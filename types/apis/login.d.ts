@@ -1,17 +1,7 @@
 /**
- * 登录接口参数
- */
-declare interface LoginRequestVo {
-  username: string
-  password: string
-  rememberMe: boolean
-  captcha: string
-}
-
-/**
  * 登录接口返回值
  */
-declare interface LoginResponseDto {
+declare interface LoginResponseVo {
   address: string
   createTime: string
   id: number
@@ -19,4 +9,14 @@ declare interface LoginResponseDto {
   loginName: string
   nickName: string
   token: string
+}
+
+/**
+ * 登录接口请求值
+ */
+declare interface LoginRequestDto {
+  username: string
+  password: string
+  rememberMe: boolean
+  captcha: string
 }

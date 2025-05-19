@@ -26,14 +26,14 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { type FormInstance, type FormRules } from 'element-plus'
-import { getGoodsCategoryDetail } from '@apis/goods-category'
+import { getGoodsCategoryDetail } from '@/apis/goodsCategory'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const goodsCategoryFormRef = ref<FormInstance>()
 
 const goodsCategoryFormData = reactive<Partial<GoodsCategoryDto>>({
   categoryName: '',
-  categoryLevel: ''
+  categoryLevel: '',
 })
 const goodsCategoryFormRules: FormRules<GoodsCategoryDto> = {}
 

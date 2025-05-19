@@ -11,12 +11,12 @@ export const loginStore = defineStore(StoreNames.LOGIN, {
   },
   getters: {},
   actions: {
-    async login(loginData: LoginRequestVo) {
+    async login(loginData: LoginRequestDto) {
       const result = await loginModule.login(loginData)
       if (result.code === 200) {
         ElMessage({
           message: '登入成功',
-          type: 'success'
+          type: 'success',
         })
         const { token } = result.data
         await setToken(token)
@@ -31,12 +31,12 @@ export const loginStore = defineStore(StoreNames.LOGIN, {
       if (result.code === 200) {
         ElMessage({
           message: '退出成功',
-          type: 'success'
+          type: 'success',
         })
         await removeToken()
         eventEmitter.emit('logout')
       }
-    }
-  }
+    },
+  },
   // persist: true
 })

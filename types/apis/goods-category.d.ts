@@ -1,4 +1,7 @@
-declare interface GoodsCategoryDto {
+/**
+ * 商品分类
+ */
+declare interface GoodsCategoryVo {
   categoryId: number | null
 
   /**
@@ -47,15 +50,12 @@ declare interface GoodsCategoryDto {
   updateUser: number
 }
 
-declare interface GoodsCategoryVo
+/**
+ * 商品分类请求参数
+ */
+declare interface GoodsCategoryDto
   extends Partial<
-    Omit<
-      GoodsCategoryDto & baseListParams,
-      | 'createTime'
-      | 'createUser'
-      | 'updateTime'
-      | 'updateUser'
-    >
+    Omit<GoodsCategoryVo & baseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
   > {
   categoryLevel: number
 }
