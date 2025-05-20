@@ -54,6 +54,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <el-pagination
       v-model:current-page="menuListInfo.pageNum"
       v-model:page-size="menuListInfo.pageSize"
@@ -88,7 +89,8 @@
           <el-input v-model="addOrEditMenuFormData.path" placeholder="请输入菜单路径" />
         </el-form-item>
         <el-form-item label="组件路径" prop="component">
-          <el-input v-model="addOrEditMenuFormData.component" placeholder="请输入组件路径" />
+          <!-- <el-input v-model="addOrEditMenuFormData.component" placeholder="请输入组件路径" /> -->
+          <FileTree v-model="addOrEditMenuFormData.component" />
         </el-form-item>
         <el-form-item label="菜单图标" prop="icon">
           <el-input v-model="addOrEditMenuFormData.icon" placeholder="请输入菜单图标" />
@@ -138,7 +140,7 @@ const queryFormRef = ref<FormInstance>()
  */
 const queryFormData = reactive({
   menuName: '',
-  menuType: undefined as number | undefined,
+  menuType: undefined,
 })
 
 const showSearch = ref(true)
@@ -161,6 +163,7 @@ const menuListInfo = reactive<MenuListInfo>({
  * @param {number} pageSize 页码大小
  */
 const handlePageSizeChange = (pageSize: number) => {
+  menuListInfo.pageNum = 1
   menuListInfo.pageSize = pageSize
   fetchMenuList()
 }
@@ -196,7 +199,7 @@ const fetchMenuList = async () => {
 const addOrEditMenuFormRef = ref<FormInstance>()
 
 const addOrEditMenuFormData = reactive<StudyJavaSysMenuDto>({
-  menuId: 0,
+  menuId: undefined,
   parentId: 0,
   menuName: '',
   path: '',
@@ -238,6 +241,9 @@ const addOrEditMenuFormRules: FormRules<typeof addOrEditMenuFormData> = {
   ],
 }
 
+/**
+ * @description 新增菜单
+ */
 const handleClickAddMenu = () => {
   addOrEditMenuDialogTitle.value = '新增菜单'
   addOrEditMenuDialogVisible.value = true
@@ -246,7 +252,11 @@ const handleClickAddMenu = () => {
   })
 }
 
-const handleClickEditMenu = (row: StudyJavaSysMenuDto) => {
+/**
+ * @description 编辑菜单
+ * @param {StudyJavaSysMenuDto} row
+ */
+const handleClickEditMenu = (row: StudyJavaSysMenuVo) => {
   addOrEditMenuDialogTitle.value = '编辑菜单'
   addOrEditMenuDialogVisible.value = true
   nextTick(() => {
@@ -255,6 +265,9 @@ const handleClickEditMenu = (row: StudyJavaSysMenuDto) => {
   })
 }
 
+/**
+ * @description 新增或编辑菜单确认
+ */
 const handleClickAddOrEditConfirm = async () => {
   const valid = await addOrEditMenuFormRef.value
     ?.validate()

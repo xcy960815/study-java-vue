@@ -14,6 +14,7 @@ import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import ElementPlus from 'unplugin-element-plus/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { fileStructurePlugin } from './src/plugins/file-structure'
 /**
  * @type {import('vite').UserConfig}
  * @link https://vitejs.dev/config/
@@ -209,6 +210,7 @@ export default defineConfig(({ mode }) => {
       //   // 可选：自定义快捷键/端口/编辑器等
       //   toggleButtonPos:"bottom-left"
       // }),
+      fileStructurePlugin(),
     ],
     resolve: {
       alias: {
