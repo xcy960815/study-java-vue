@@ -51,7 +51,6 @@ const emit = defineEmits<{
 }>()
 
 const fileStructureData = ref<FileTree.FileNode[]>([])
-
 // 配置树形选择器的属性
 const defaultProps = {
   children: 'children',
@@ -68,7 +67,6 @@ const fetchFileStructure = async () => {
       const result = await response.json()
       if (result.code === 200 && result.data) {
         fileStructureData.value = result.data
-        console.log('fileStructureData', fileStructureData.value)
       }
     }
   } else {

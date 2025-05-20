@@ -5,7 +5,6 @@ import HandleTooBar from './handle-toolbar/index.vue'
 import Icon from './icon/index.vue'
 // import * as ElIcon from '@element-plus/icons-vue'
 import * as IconParkAll from '@icon-park/vue-next'
-import FileTree from './file-tree/index.vue'
 const { IconProvider, DEFAULT_ICON_CONFIGS, ...IconPark } = IconParkAll
 
 /**
@@ -25,7 +24,5 @@ export const registerGlobalComponents = {
     // for (const [key, component] of Object.entries(IconPark)) {
     //   app.component(key, component)
     // }
-    // 文件树组件
-    app.component(FileTree.name!, FileTree)
   },
 }
