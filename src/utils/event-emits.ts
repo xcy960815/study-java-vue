@@ -47,9 +47,9 @@ class CustomEventEmitter {
 
   /**
    * 移除监听
-   * @param eventName
-   * @param listener
-   * @returns
+   * @param {T extends EventNames} eventName
+   * @param {Function} listener
+   * @returns {this}
    */
   public off<T extends EventNames>(eventName: T, listener: (...args: EventMap[T]) => void): this {
     this.listeners.get(eventName)?.delete(listener as (...args: any[]) => void)

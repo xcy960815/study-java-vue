@@ -5,7 +5,12 @@ import { eventEmitter } from '@/utils/event-emits'
 import { loginModule } from '@apis'
 import { setToken, removeToken } from '@utils/token'
 
-export const loginStore = defineStore(StoreNames.LOGIN, {
+export const loginStore = defineStore<
+  StoreNames.LOGIN,
+  BaseStore.State<LoginStore.State>,
+  BaseStore.Getters<LoginStore.State, LoginStore.Getters>,
+  BaseStore.Actions<LoginStore.State, LoginStore.Actions>
+>(StoreNames.LOGIN, {
   state: () => {
     return {}
   },

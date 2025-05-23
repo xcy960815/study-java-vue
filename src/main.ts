@@ -10,6 +10,11 @@ import store from './store'
 import router from '@/router'
 import '@plugins/redirect'
 import { registerGlobalComponents } from './components'
+import { simulateLoadingProgress } from './utils/loading-progress'
+
+// 开始模拟加载进度
+simulateLoadingProgress()
+
 const app = createApp(App)
 app
 

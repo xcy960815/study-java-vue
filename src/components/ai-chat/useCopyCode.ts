@@ -1,5 +1,3 @@
-
-
 export function useCopyCode() {
   const timeoutIdMap: WeakMap<HTMLElement, NodeJS.Timeout> = new WeakMap()
   window.addEventListener('click', (e) => {
@@ -12,18 +10,12 @@ export function useCopyCode() {
       return
     }
 
-    const isShell = /language-(shellscript|shell|bash|sh|zsh)/.test(
-      parent.className
-    )
+    const isShell = /language-(shellscript|shell|bash|sh|zsh)/.test(parent.className)
 
-    const ignoredNodes:Array<string> = []
-
-    // Clone the node and remove the ignored nodes
+    const ignoredNodes: Array<string> = []
     const clone = sibling.cloneNode(true) as HTMLElement
     if (ignoredNodes.length) {
-      clone
-        .querySelectorAll(ignoredNodes.join(','))
-        .forEach((node) => node.remove())
+      clone.querySelectorAll(ignoredNodes.join(',')).forEach((node) => node.remove())
     }
 
     let text = clone.textContent || ''
@@ -60,17 +52,14 @@ async function copyToClipboard(text: string) {
     element.style.contain = 'strict'
     element.style.position = 'absolute'
     element.style.left = '-9999px'
-    element.style.fontSize = '12pt' // Prevent zooming on iOS
+    element.style.fontSize = '12pt'
 
     const selection = document.getSelection()
-    const originalRange = selection
-      ? selection.rangeCount > 0 && selection.getRangeAt(0)
-      : null
+    const originalRange = selection ? selection.rangeCount > 0 && selection.getRangeAt(0) : null
 
     document.body.appendChild(element)
     element.select()
 
-    // Explicit selection workaround for iOS
     element.selectionStart = 0
     element.selectionEnd = text.length
 
@@ -78,13 +67,12 @@ async function copyToClipboard(text: string) {
     document.body.removeChild(element)
 
     if (originalRange) {
-      selection!.removeAllRanges() // originalRange can't be truthy when selection is falsy
+      selection!.removeAllRanges()
       selection!.addRange(originalRange)
     }
 
-    // Get the focus back on the previously focused element, if any
     if (previouslyFocusedElement) {
-      (previouslyFocusedElement as HTMLElement).focus()
+      ;(previouslyFocusedElement as HTMLElement).focus()
     }
   }
 }
