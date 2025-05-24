@@ -2,7 +2,10 @@
  * 商品分类
  */
 declare interface GoodsCategoryVo {
-  categoryId: number | null
+  /**
+   * 分类id
+   */
+  categoryId: number
 
   /**
    * 分类级别(1-一级分类 2-二级分类 3-三级分类)
@@ -57,5 +60,5 @@ declare interface GoodsCategoryDto
   extends Partial<
     Omit<GoodsCategoryVo & baseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
   > {
-  categoryLevel: number
+  categoryLevel?: number
 }

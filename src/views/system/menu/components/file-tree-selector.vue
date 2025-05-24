@@ -38,7 +38,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { CopyDocument, Plus } from '@element-plus/icons-vue'
 
 defineOptions({
-  name: 'FileTree',
+  name: 'FileTreeSelector',
 })
 
 // 定义 props 和 emits

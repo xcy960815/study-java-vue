@@ -44,10 +44,19 @@ const progressColors = [
 ]
 
 const progressDialogVisible = ref(false)
+/**
+ * @description 分片进度条
+ */
 const chunkProgressArr = ref<number[]>([])
 
+/**
+ * @description 上传文件前
+ */
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => true
 
+/**
+ * @description 上传文件
+ */
 const handleUploadFile = async ({ file }: UploadRequestOptions) => {
   progressDialogVisible.value = true
   chunkProgressArr.value = []

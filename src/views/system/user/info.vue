@@ -5,7 +5,7 @@
     :model="userInfoFormData"
     :rules="userInfoFormRules"
     label-width="auto"
-    class="user-info"
+    class="user-info-container"
     status-icon
   >
     <el-form-item label="昵称" prop="nickName">
@@ -63,7 +63,8 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons'
 
 const userInfoFormRef = ref<FormInstance>()
-const userInfoFormData = reactive<UserInfoDto>({
+
+const userInfoFormData = reactive<UserInfoVo>({
   /**
    * 用户主键id
    */
@@ -73,17 +74,9 @@ const userInfoFormData = reactive<UserInfoDto>({
    */
   nickName: '',
   /**
-   * 年龄
-   */
-  age: 0,
-  /**
    * 登陆名称(默认为手机号)
    */
   loginName: '',
-  /**
-   * MD5加密后的密码
-   */
-  passwordMd5: '',
   /**
    * 个性签名
    */
@@ -176,7 +169,7 @@ onMounted(() => {
 })
 </script>
 <style lang="less" scoped>
-.user-info {
+.user-info-container {
   margin: 0 auto;
 
   :deep(.avatar-uploader .el-upload) {

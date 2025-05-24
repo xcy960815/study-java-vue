@@ -1,5 +1,5 @@
 <template>
-  <div class="login-page w-screen h-screen flex items-center justify-center">
+  <div class="login-container w-screen h-screen flex items-center justify-center">
     <canvas class="login-backage" id="cvs"></canvas>
     <el-form ref="loginFormRef" :model="loginFormData" :rules="loginFormRules" class="login-form">
       <h3 class="login-title">{{ viteAppTitle }}</h3>
@@ -185,7 +185,7 @@ onMounted(() => {
 })
 </script>
 <style lang="less" scoped>
-.login-page {
+.login-container {
   position: relative;
   display: flex;
   align-items: center;

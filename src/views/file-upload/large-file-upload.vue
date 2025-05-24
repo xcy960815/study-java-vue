@@ -1,5 +1,5 @@
 <template>
-  <div class="large-file-upload">
+  <div class="large-file-upload h-full w-full relative">
     <el-upload
       class="large-file-uploader"
       drag

@@ -1,12 +1,13 @@
 import { request } from '@utils/request'
 
 interface RequestParams extends baseListDto {}
+
 /**
  * 获取超级管理员列表
  * @param {RequestParams} queryFormData
  * @returns {Promise<ResponseResult<T>>}
  */
-export function getAdminUserList<T = Array<AdminUserInfoVo>>(
+export function getAdminUserList<T extends ListResponseResult<AdminUserInfoVo>>(
   queryFormData: RequestParams
 ): Promise<ResponseResult<T>> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
@@ -18,26 +19,26 @@ export function getAdminUserList<T = Array<AdminUserInfoVo>>(
 
 /**
  * 更新管理员信息
- * @param {AdminUserInfoDto} adminUserInfo
+ * @param {AdminUserInfoDto} adminUserInfoDto
  * @returns {Promise<ResponseResult<T>>}
  */
 export function updateUser<T = boolean>(
-  adminUserInfo: AdminUserInfoDto
+  adminUserInfoDto: AdminUserInfoDto
 ): Promise<ResponseResult<T>> {
   const url = `/adminUser/updateUser`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, adminUserInfo)
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, adminUserInfoDto)
 }
 
 /**
  * 新增管理员
- * @param {AdminUserInfoDto} adminUserInfo
+ * @param {AdminUserInfoDto} adminUserInfoDto
  * @returns {Promise<ResponseResult<T>>}
  */
 export function insertUser<T = boolean>(
-  adminUserInfo: AdminUserInfoDto
+  adminUserInfoDto: AdminUserInfoDto
 ): Promise<ResponseResult<T>> {
   const url = `/adminUser/insertUser`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, adminUserInfo)
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, adminUserInfoDto)
 }
 
 /**

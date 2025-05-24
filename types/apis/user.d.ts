@@ -41,7 +41,7 @@ declare interface UserInfoVo {
 /**
  * 前端请求的用户信息
  */
-declare type UserInfoDto = Partial<Omit<UserInfoVo, 'avatar' | 'createTime'>> & {
+declare type UserInfoDto = Partial<Omit<UserInfoVo, 'createTime'>> & {
   passwordMd5?: string
   newPasswordMd5?: string
   confirmNewPassword?: string

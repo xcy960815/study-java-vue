@@ -46,14 +46,15 @@
         </template>
       </el-table-column>
     </el-table>
+
     <el-pagination
       v-model:current-page="userListInfo.pageNum"
       v-model:page-size="userListInfo.pageSize"
       :page-sizes="[10, 20, 30, 40]"
       layout="total, sizes, prev, pager, next, jumper"
       :total="userListInfo.total"
-      @size-change="userListInfo.handlePageSizeChange"
-      @current-change="userListInfo.handlePageNumChange"
+      @size-change="handlePageSizeChange"
+      @current-change="handlePageNumChange"
       class="pagination"
     />
     <el-dialog
@@ -105,16 +106,12 @@ import HandleToolBar from '@/components/handle-toolbar/index.vue'
 //   name: "userList"
 // })
 interface UserListInfo {
-  tableData: UserInfoDto[]
+  tableData: UserInfoVo[]
   total: number | undefined
   pageSize: number
   pageNum: number
-  handlePageSizeChange(pageSize: number): void
-  handlePageNumChange(pageNum: number): void
 }
-/**
- * @description 查询条件
- */
+
 const queryFormData = reactive({
   nickName: '',
   loginName: '',
@@ -130,16 +127,11 @@ const userListInfo = reactive<UserListInfo>({
   total: 0,
   pageSize: 10,
   pageNum: 1,
-  handlePageSizeChange(pageSize: number) {
-    userListInfo.pageSize = pageSize
-    getUserList()
-  },
-  handlePageNumChange(pageNum: number) {
-    userListInfo.pageNum = pageNum
-    getUserList()
-  },
 })
 
+/**
+ * 获取用户列表
+ */
 const getUserList = async () => {
   const pageSize = userListInfo.pageSize
   const pageNum = userListInfo.pageNum
@@ -151,18 +143,16 @@ const getUserList = async () => {
   if (result.code === 200) {
     userListInfo.tableData = result.data.data
     userListInfo.total = result.data.total
-    // userListInfo.total = undefined
   }
 }
 
 const addOrEditUserFormRef = ref<FormInstance>()
 
-const addOrEditUserFormData = reactive<Omit<UserInfoDto, 'userId' | 'age' | 'createTime'>>({
+const addOrEditUserFormData = reactive<Omit<UserInfoDto, 'userId' | 'createTime'>>({
   nickName: '',
   loginName: '',
   introduceSign: '',
   address: '',
-  // passwordMd5: 'e10adc3949ba59abbe56e057f20f883e',
   avatar: '',
 })
 
@@ -197,6 +187,9 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
   ],
 }
 
+/**
+ * 新增用户
+ */
 const handleClickAddUser = () => {
   addOrEditUserDialogTitle.value = '新增用户'
   addOrEditUserDialogVisible.value = true
@@ -205,6 +198,9 @@ const handleClickAddUser = () => {
   })
 }
 
+/**
+ * 编辑用户
+ */
 const handleClickEditUser = (row: UserInfoDto) => {
   addOrEditUserDialogTitle.value = '编辑用户'
   addOrEditUserDialogVisible.value = true
@@ -214,6 +210,9 @@ const handleClickEditUser = (row: UserInfoDto) => {
   })
 }
 
+/**
+ * 确认新增或编辑
+ */
 const handleClickAddOrEditConfirm = async () => {
   const valid = await addOrEditUserFormRef.value
     ?.validate()
@@ -234,6 +233,9 @@ const handleClickAddOrEditConfirm = async () => {
   }
 }
 
+/**
+ * 删除用户
+ */
 const handleClickDeleteUser = (row: UserInfoDto) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
@@ -260,6 +262,17 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
 }
 
 const showSearch = ref(true)
+
+const handlePageSizeChange = (pageSize: number) => {
+  userListInfo.pageNum = 1
+  userListInfo.pageSize = pageSize
+  getUserList()
+}
+
+const handlePageNumChange = (pageNum: number) => {
+  userListInfo.pageNum = pageNum
+  getUserList()
+}
 
 onMounted(() => {
   getUserList()

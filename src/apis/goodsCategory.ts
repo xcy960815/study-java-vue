@@ -6,7 +6,7 @@ import { request } from '@utils/request'
  * @returns {Promise<ResponseResult<T>>}
  */
 export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsCategoryVo>>(
-  requestParams: GoodsCategoryDto
+  requestParams: GoodsCategoryDto & baseListDto
 ) => {
   const url = `/goodsCategory/list`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
@@ -16,14 +16,50 @@ export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsCat
 
 /**
  * 获取商品分类详情
- * @param requestParams
+ * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
 export const getGoodsCategoryDetail = async <T extends GoodsCategoryVo>(
-  requestParams: GoodsCategoryDto
+  goodsCategoryDto: GoodsCategoryDto
 ) => {
   const url = `/goodsCategory/getGoodsCategoryDetail`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
-    params: requestParams,
+    params: goodsCategoryDto,
+  })
+}
+
+/**
+ * 新增商品分类
+ * @param goodsCategoryDto
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const insertGoodsCategory = async <T extends boolean>(
+  goodsCategoryDto: GoodsCategoryDto
+) => {
+  const url = `/goodsCategory/insertGoodsCategory`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsCategoryDto)
+}
+
+/**
+ * 更新商品分类
+ * @param goodsCategoryDto
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const updateGoodsCategory = async <T extends boolean>(
+  goodsCategoryDto: GoodsCategoryDto
+) => {
+  const url = `/goodsCategory/updateGoodsCategory`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsCategoryDto)
+}
+
+/**
+ * 删除商品分类
+ * @param goodsCategoryDto
+ * @returns {Promise<ResponseResult<T>>}
+ */
+export const deleteGoodsCategory = async <T extends boolean>(goodsCategoryDto: number) => {
+  const url = `/goodsCategory/deleteGoodsCategory`
+  return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: goodsCategoryDto,
   })
 }

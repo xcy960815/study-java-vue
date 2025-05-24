@@ -17,7 +17,7 @@ interface UserListRequestParams extends baseListDto, UserInfoVo {}
  * @returns {Promise<ResponseResult<T>>}
  */
 export const getUserList = <T extends ListResponseResult<UserInfoVo>>(
-  queryFormData: UserListRequestParams
+  queryFormData: Partial<UserListRequestParams>
 ): Promise<ResponseResult<T>> => {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `/user/getUserList?pageSize=${pageSize}&pageNum=${pageNum}`
@@ -32,7 +32,7 @@ export const getUserList = <T extends ListResponseResult<UserInfoVo>>(
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export const updateUserInfo = <T extends boolean>(
-  params: UserInfoVo
+  params: UserInfoDto
 ): Promise<ResponseResult<T>> => {
   const url = `/user/updateUserInfo`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)

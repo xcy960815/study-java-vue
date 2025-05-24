@@ -23,6 +23,11 @@
 <script setup lang="ts">
 import * as IconParkIcons from '@icon-park/vue-next'
 import { ref, watch } from 'vue'
+
+defineOptions({
+  name: 'MenuIconSelector',
+})
+
 const props = defineProps<{
   modelValue: string
 }>()

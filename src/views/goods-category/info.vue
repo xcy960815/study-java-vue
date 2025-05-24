@@ -1,6 +1,6 @@
 <template>
   <el-form
-    class="goods-category-info"
+    class="goods-category-info-container h-full w-full relative"
     ref="goodsCategoryFormRef"
     :model="goodsCategoryFormData"
     :rules="goodsCategoryFormRules"
@@ -24,27 +24,44 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { type FormInstance, type FormRules } from 'element-plus'
 import { getGoodsCategoryDetail } from '@/apis/goodsCategory'
 import { useRoute } from 'vue-router'
+
 const route = useRoute()
+
+/**
+ * @description 商品分类表单
+ */
 const goodsCategoryFormRef = ref<FormInstance>()
 
-const goodsCategoryFormData = reactive<Partial<GoodsCategoryDto>>({
+/**
+ * @description 商品分类表单数据
+ */
+const goodsCategoryFormData = reactive<Partial<GoodsCategoryVo>>({
   categoryName: '',
-  categoryLevel: '',
+  categoryLevel: undefined,
 })
-const goodsCategoryFormRules: FormRules<GoodsCategoryDto> = {}
+/**
+ * @description 商品分类表单规则
+ */
+const goodsCategoryFormRules: FormRules<GoodsCategoryVo> = {}
 
 const getGoodsCategoryFormData = async () => {
   const categoryId = Number(route.query.id)
 
-  // const result = await getGoodsCategoryDetail({ categoryId })
+  const result = await getGoodsCategoryDetail({ categoryId })
+  if (result.code === 200) {
+    Object.assign(goodsCategoryFormData, result.data)
+  }
 }
+onMounted(() => {
+  getGoodsCategoryFormData()
+})
 </script>
 <style lang="less" scoped>
-.goods-category-info {
+.goods-category-info-container {
   position: relative;
 }
 </style>

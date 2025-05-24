@@ -41,8 +41,8 @@
       :page-sizes="[10, 20, 30, 40]"
       layout="total, sizes, prev, pager, next, jumper"
       :total="adminUserListInfo.total"
-      @size-change="adminUserListInfo.handlePageSizeChange"
-      @current-change="adminUserListInfo.handlePageNumChange"
+      @size-change="handlePageSizeChange"
+      @current-change="handlePageNumChange"
     />
 
     <el-dialog v-model="addOrEditAdminUserDialogVisible" :title="addOrEditAdminUserDialogTitle">
@@ -92,12 +92,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 
 interface AdminUserListInfo {
-  tableData: AdminUserInfoDto[]
-  total: number | undefined
+  tableData: AdminUserInfoVo[]
+  total: number
   pageSize: number
   pageNum: number
-  handlePageSizeChange(pageSize: number): void
-  handlePageNumChange(pageNum: number): void
 }
 
 /**
@@ -111,37 +109,38 @@ const queryFormData = reactive({
 const addOrEditAdminUserDialogTitle = ref('')
 const addOrEditAdminUserDialogVisible = ref(false)
 
+/**
+ * @description 管理员列表信息
+ */
 const adminUserListInfo = reactive<AdminUserListInfo>({
   tableData: [],
   total: 0,
   pageSize: 10,
   pageNum: 1,
-  handlePageSizeChange: (pageSize: number) => {
-    adminUserListInfo.pageSize = pageSize
-    getAdminUserList()
-  },
-  handlePageNumChange: (pageNum: number) => {
-    adminUserListInfo.pageNum = pageNum
-    getAdminUserList()
-  },
 })
 
+/**
+ * @description 获取管理员列表
+ */
 const getAdminUserList = async () => {
   const pageSize = adminUserListInfo.pageSize
   const pageNum = adminUserListInfo.pageNum
-  const result = await adminUserModule.getAdminUserList({
+  const result = await adminUserModule.getAdminUserList<ListResponseResult<AdminUserInfoVo>>({
     pageSize,
     pageNum,
     ...queryFormData,
   })
   if (result.code === 200) {
-    adminUserListInfo.tableData = result.data
-    adminUserListInfo.total = result.data.length
+    adminUserListInfo.tableData = result.data.data
+    adminUserListInfo.total = result.data.total
   }
 }
 
 const addOrEditAdminUserFormRef = ref<FormInstance>()
 
+/**
+ * @description 新增或编辑管理员表单数据
+ */
 const addOrEditAdminUserFormData = reactive<Omit<AdminUserInfoDto, 'userId' | 'createTime'>>({
   nickName: '',
   loginUserName: '',
@@ -150,6 +149,9 @@ const addOrEditAdminUserFormData = reactive<Omit<AdminUserInfoDto, 'userId' | 'c
   locked: 0,
 })
 
+/**
+ * @description 新增或编辑管理员表单验证规则
+ */
 const addOrEditAdminUserFormRules: FormRules<typeof addOrEditAdminUserFormData> = {
   nickName: [
     {
@@ -174,6 +176,9 @@ const addOrEditAdminUserFormRules: FormRules<typeof addOrEditAdminUserFormData> 
   ],
 }
 
+/**
+ * @description 新增管理员
+ */
 const handleClickAddAdminUser = () => {
   addOrEditAdminUserDialogTitle.value = '新增管理员'
   addOrEditAdminUserDialogVisible.value = true
@@ -182,6 +187,9 @@ const handleClickAddAdminUser = () => {
   })
 }
 
+/**
+ * @description 编辑管理员
+ */
 const handleClickEditAdminUser = (row: AdminUserInfoDto) => {
   addOrEditAdminUserDialogTitle.value = '编辑管理员'
   addOrEditAdminUserDialogVisible.value = true
@@ -191,6 +199,9 @@ const handleClickEditAdminUser = (row: AdminUserInfoDto) => {
   })
 }
 
+/**
+ * @description 确认新增或编辑管理员
+ */
 const handleClickAddOrEditConfirm = async () => {
   const valid = await addOrEditAdminUserFormRef.value
     ?.validate()
@@ -211,7 +222,10 @@ const handleClickAddOrEditConfirm = async () => {
   }
 }
 
-const handleClickDeleteAdminUser = (row: AdminUserInfoDto) => {
+/**
+ * @description 删除管理员
+ */
+const handleClickDeleteAdminUser = (row: AdminUserInfoVo) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -235,6 +249,16 @@ const handleClickDeleteAdminUser = (row: AdminUserInfoDto) => {
 }
 
 const showSearch = ref(true)
+
+const handlePageSizeChange = (pageSize: number) => {
+  adminUserListInfo.pageSize = pageSize
+  getAdminUserList()
+}
+
+const handlePageNumChange = (pageNum: number) => {
+  adminUserListInfo.pageNum = pageNum
+  getAdminUserList()
+}
 
 onMounted(() => {
   getAdminUserList()

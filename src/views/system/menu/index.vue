@@ -1,5 +1,5 @@
 <template>
-  <div class="system-menu">
+  <div class="system-menu-container">
     <el-form
       :model="queryFormData"
       ref="queryFormRef"
@@ -152,7 +152,6 @@ import MenuIcon from './components/menu-icon.vue'
 import { useAsyncComputed } from '@/plugins/async-computed'
 
 interface MenuListInfo {
-  // tableData: StudyJavaSysMenuVo[]
   treeData: Array<StudyJavaSysMenuVo & { hasChildren: boolean }>
   total: number | undefined
   pageSize: number
@@ -175,6 +174,9 @@ const addOrEditMenuDialogTitle = ref('')
 
 const addOrEditMenuDialogVisible = ref(false)
 
+/**
+ * @description 菜单树数据
+ */
 const menuTreeData = useAsyncComputed(async () => {
   const queryParams = {
     pageSize: 1000,
@@ -200,6 +202,9 @@ const filterMenuTree = <R extends StudyJavaSysMenuVo>(tree: R[]): R[] => {
     })
 }
 
+/**
+ * @description 菜单列表信息
+ */
 const menuListInfo = reactive<MenuListInfo>({
   treeData: [],
   total: 0,
@@ -239,7 +244,6 @@ const fetchMenuList = async () => {
   })
   if (result.code === 200) {
     menuListInfo.treeData = handleMenuTreeData(result.data.data)
-    console.log(menuListInfo.treeData)
     menuListInfo.total = result.data.total
   }
 }
@@ -257,6 +261,9 @@ const handleMenuTreeData = <R extends StudyJavaSysMenuVo>(
 
 const addOrEditMenuFormRef = ref<FormInstance>()
 
+/**
+ * @description 新增或编辑菜单表单数据
+ */
 const addOrEditMenuFormData = reactive<StudyJavaSysMenuDto>({
   menuId: undefined,
   parentId: 0,
@@ -269,6 +276,9 @@ const addOrEditMenuFormData = reactive<StudyJavaSysMenuDto>({
   orderNum: 0,
 })
 
+/**
+ * @description 新增或编辑菜单表单验证规则
+ */
 const addOrEditMenuFormRules: FormRules<StudyJavaSysMenuDto> = {
   menuName: [
     {
@@ -423,7 +433,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.system-menu {
+.system-menu-container {
   position: relative;
 }
 </style>
