@@ -1,10 +1,19 @@
 <template>
-  <el-row class="handle-toolbar" :gutter="20">
-    <el-col v-for="(slotContent, index) in defaultSlotContents" :key="index" :span="columnSpans[index] || 2">
+  <el-row class="handle-toolbar flex items-center mb-2" :gutter="20">
+    <el-col
+      v-for="(slotContent, index) in defaultSlotContents"
+      :key="index"
+      :span="columnSpans[index] || 2"
+    >
       <component class="el-col-item" :is="slotContent" />
     </el-col>
     <el-col :span="2" class="right-panel">
-      <el-tooltip class="item" effect="dark" :content="showSearch ? '隐藏搜索' : '显示搜索'" placement="top">
+      <el-tooltip
+        class="item"
+        effect="dark"
+        :content="showSearch ? '隐藏搜索' : '显示搜索'"
+        placement="top"
+      >
         <el-button size="small" circle :icon="Search" @click="toggleSearch()" />
       </el-tooltip>
       <el-tooltip class="item" effect="dark" content="刷新" placement="top">
@@ -19,10 +28,10 @@ import { Search, Refresh } from '@element-plus/icons-vue'
 import { useSlots, ref, onMounted, nextTick } from 'vue'
 
 defineOptions({
-  name: 'handle-toolbar'
+  name: 'handle-toolbar',
 })
 const showSearch = defineModel('showSearch', {
-  default: true
+  default: true,
 })
 const emits = defineEmits(['queryTableData'])
 

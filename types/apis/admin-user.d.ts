@@ -14,5 +14,5 @@ declare interface AdminUserInfoVo {
  */
 declare interface AdminUserInfoDto
   extends Partial<
-    Omit<AdminUserInfoVo & baseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
+    Omit<AdminUserInfoVo & BaseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
   > {}

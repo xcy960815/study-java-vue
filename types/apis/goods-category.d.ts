@@ -58,7 +58,7 @@ declare interface GoodsCategoryVo {
  */
 declare interface GoodsCategoryDto
   extends Partial<
-    Omit<GoodsCategoryVo & baseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
+    Omit<GoodsCategoryVo & BaseListDto, 'createTime' | 'createUser' | 'updateTime' | 'updateUser'>
   > {
   categoryLevel?: number
 }

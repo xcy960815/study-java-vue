@@ -212,14 +212,22 @@ export const routes: RouteRecordRaw[] = [
           title: '用户列表',
         },
       },
+      // {
+      //   path: '/system/user/info',
+      //   name: 'systemUserInfo',
+      //   component: () => import(`../views/system/user/info.vue`),
+      //   meta: {
+      //     hightlight: '/system/user/list',
+      //     hidden: true,
+      //     title: '用户中心',
+      //   },
+      // },
       {
-        path: '/system/user/info',
-        name: 'systemUserInfo',
-        component: () => import(`../views/system/user/info.vue`),
+        path: '/system/data-dictionary',
+        name: 'systemDataDictionary',
+        component: () => import(`../views/system/data-dictionary/index.vue`),
         meta: {
-          hightlight: '/system/user/list',
-          hidden: true,
-          title: '用户中心',
+          title: '数据字典',
         },
       },
     ],

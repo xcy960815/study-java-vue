@@ -6,7 +6,7 @@ import { request } from '@utils/request'
  * @returns {Promise<ResponseResult<T>>}
  */
 export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsCategoryVo>>(
-  requestParams: GoodsCategoryDto & baseListDto
+  requestParams: GoodsCategoryDto & BaseListDto
 ) => {
   const url = `/goodsCategory/list`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {

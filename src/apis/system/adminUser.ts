@@ -1,6 +1,6 @@
 import { request } from '@utils/request'
 
-interface RequestParams extends baseListDto {}
+interface RequestParams extends BaseListDto {}
 
 /**
  * 获取超级管理员列表

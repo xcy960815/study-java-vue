@@ -2,11 +2,11 @@ import { request } from '@utils/request'
 const baseUrl = '/studyJavaSysMenu'
 /**
  * 获取菜单列表
- * @param {baseListDto} queryFormData
+ * @param {BaseListDto} queryFormData
  * @returns {Promise<ResponseResult<ListResponseResult<StudyJavaSysMenuVo>>>}
  */
 export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
-  queryFormData: baseListDto & Partial<StudyJavaSysMenuDto>
+  queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
 ): Promise<ResponseResult<T>> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `${baseUrl}/getMenuList?pageSize=${pageSize}&pageNum=${pageNum}`
@@ -20,7 +20,7 @@ export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
  * @returns {Promise<ResponseResult<StudyJavaSysMenuVo[]>>}
  */
 export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
-  queryFormData: baseListDto & Partial<StudyJavaSysMenuDto>
+  queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
 ): Promise<ResponseResult<T>> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `${baseUrl}/getMenuTree?pageSize=${pageSize}&pageNum=${pageNum}`

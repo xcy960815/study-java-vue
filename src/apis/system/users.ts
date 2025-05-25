@@ -9,7 +9,7 @@ export const getUserInfo = <T extends UserInfoVo>() => {
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
 
-interface UserListRequestParams extends baseListDto, UserInfoVo {}
+interface UserListRequestParams extends BaseListDto, UserInfoVo {}
 
 /**
  * 获取用户列表请求参数类型

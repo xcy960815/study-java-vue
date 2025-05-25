@@ -25,7 +25,7 @@ const routerViewKey = ref(route.fullPath)
 const { initTheme } = useSystemTheme()
 
 onMounted(() => {
-  initTheme()
+  // initTheme()
 })
 </script>
 <style lang="less" scoped></style>

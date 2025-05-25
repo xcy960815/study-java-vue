@@ -147,8 +147,8 @@ import { getMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-import FileTree from './components/file-tree.vue'
-import MenuIcon from './components/menu-icon.vue'
+import FileTree from './components/file-tree-selector.vue'
+import MenuIcon from './components/menu-icon-selector.vue'
 import { useAsyncComputed } from '@/plugins/async-computed'
 
 interface MenuListInfo {
