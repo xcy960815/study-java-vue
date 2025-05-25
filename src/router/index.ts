@@ -133,26 +133,26 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  {
-    path: '/admin-user',
-    name: 'admin-user',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '超级管理员',
-      icon: 'DataUser',
-    },
-    children: [
-      {
-        path: '/admin-user/list',
-        name: 'admin-user-list',
-        component: () => import(`../views/admin-user/list.vue`),
-        meta: {
-          title: '超级管理员列表',
-          icon: 'ListView',
-        },
-      },
-    ],
-  },
+  // {
+  //   path: '/admin-user',
+  //   name: 'admin-user',
+  //   component: () => import(`../components/layout/index.vue`),
+  //   meta: {
+  //     title: '超级管理员',
+  //     icon: 'DataUser',
+  //   },
+  //   children: [
+  //     {
+  //       path: '/admin-user/list',
+  //       name: 'admin-user-list',
+  //       component: () => import(`../views/admin-user/list.vue`),
+  //       meta: {
+  //         title: '超级管理员列表',
+  //         icon: 'ListView',
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/upload',
     name: 'upload',
@@ -212,6 +212,15 @@ export const routes: RouteRecordRaw[] = [
           title: '用户列表',
         },
       },
+      {
+        path: '/admin-user/list',
+        name: 'admin-user-list',
+        component: () => import(`../views/admin-user/list.vue`),
+        meta: {
+          title: '管理员列表',
+          icon: 'ListView',
+        },
+      },
       // {
       //   path: '/system/user/info',
       //   name: 'systemUserInfo',
@@ -228,6 +237,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import(`../views/system/data-dictionary/index.vue`),
         meta: {
           title: '数据字典',
+          // icon: 'data',
         },
       },
     ],
