@@ -1,0 +1,98 @@
+# version: "3.8"
+
+services:
+  # redis配置
+  redis:
+    image: redis:7.2.5
+    container_name: study-java-redis-container
+    command: redis-server --bind 0.0.0.0
+    ports:
+      - "6381:6379"
+    networks:
+      - study-java-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+  # mysql配置
+  mysql:
+    image: mysql:8.4.2
+    container_name: study-java-mysql-container
+    command: [
+      "--bind-address=0.0.0.0",
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+      "--max_allowed_packet=128M",
+      "--sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+      "--default-time-zone=+8:00"
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: study_java
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - study-java-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+  # 后端配置
+  springboot:
+    image: xcy960815/study-java:1.2
+    container_name: study-java-container
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    ports:
+      - "12316:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      # redis配置
+      SPRING_REDIS_HOST: study-java-redis-container
+      SPRING_REDIS_PORT: 6379
+      # mysql配置
+      SPRING_DATASOURCE_URL: jdbc:mysql://study-java-mysql-container:3306/study_java?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 123456
+    networks:
+      - study-java-network
+    restart: on-failure
+  # 前端配置
+  vue:
+    image: xcy960815/study-java-web:1.2
+    container_name: study-java-web-container
+    #    build: ./frontend  # 假设有前端代码的目录
+    ports:
+      - "12315:80"
+    environment:
+      VITE_API_SERVER_DOMAIN: 'http://study-java-container:12316'  # 配置前端访问后端的地址
+    networks:
+      - study-java-network
+    depends_on:
+      springboot:
+        condition: service_started
+
+volumes:
+  mysql-data:
+    name: study-java-mysql-data
+    external: true
+
+networks:
+  study-java-network:
+    driver: bridge
+
+# 执行指令
+#  docker-compose up -d
+# docker-compose -f study-java-docker-compose.yml up -d --remove-orphans
+
+# 停止 study-java-web 项目的容器
+# docker-compose -f study-java-docker-compose.yml down
