@@ -148,7 +148,7 @@ const getUserList = async () => {
 
 const addOrEditUserFormRef = ref<FormInstance>()
 
-const addOrEditUserFormData = reactive<Omit<UserInfoDto, 'userId' | 'createTime'>>({
+const addOrEditUserFormData = reactive<Omit<UserInfoVo, 'userId' | 'createTime'>>({
   nickName: '',
   loginName: '',
   introduceSign: '',
@@ -201,7 +201,7 @@ const handleClickAddUser = () => {
 /**
  * 编辑用户
  */
-const handleClickEditUser = (row: UserInfoDto) => {
+const handleClickEditUser = (row: UserInfoVo) => {
   addOrEditUserDialogTitle.value = '编辑用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
