@@ -62,7 +62,7 @@ import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const ollamaModelsListInfo = reactive<{
-  tableData: Array<OllamaDto.ModelOption>
+  tableData: Array<OllamaVo.ModelOption>
 }>({
   tableData: [],
 })
@@ -81,7 +81,7 @@ const getOllamaModelsList = async () => {
  * 开始对话
  * @param row {OllamaDto.ModelOption}
  */
-const handleStartChat = (row?: OllamaDto.ModelOption) => {
+const handleStartChat = (row?: OllamaVo.ModelOption) => {
   router.push({
     path: '/ollama/chat',
     query: row ? { model: row.id } : {},
@@ -99,7 +99,7 @@ const version = async () => {
 }
 
 const psDialogVisible = ref(false)
-const psModelsList = ref<Array<OllamaDto.PsModelOption>>([])
+const psModelsList = ref<Array<OllamaVo.PsModelOption>>([])
 
 /**
  * 查看正在内存运行的模型
@@ -123,7 +123,7 @@ const ps = async () => {
  * 删除模型
  * @param row {OllamaDto.ModelOption}
  */
-const handleClickDeleteModel = (row: OllamaDto.ModelOption) => {
+const handleClickDeleteModel = (row: OllamaVo.ModelOption) => {
   ElMessageBox.confirm(`确认要删除模型【${row.id}】吗?`, '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',

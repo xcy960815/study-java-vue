@@ -14,7 +14,7 @@ const DEFAULT_TIMEOUT = 1000 * 60
  * AI 聊天核心类
  * 提供基础的对话管理、请求处理、流式响应等功能
  */
-export class Core {
+export class CompletionsCore {
   /** API 密钥 */
   protected readonly _apiKey: string
   /** API 基础 URL */

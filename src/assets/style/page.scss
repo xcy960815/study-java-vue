@@ -1,0 +1,24 @@
+.search-form {
+  background-color: var(--el-bg-color-overlay);
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-light);
+
+  :deep(.el-form-item) {
+    margin-bottom: 16px;
+    margin-right: 16px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    .el-form-item__label {
+      color: var(--el-text-color-primary);
+    }
+
+    .el-input__wrapper {
+      background-color: var(--el-bg-color);
+    }
+  }
+}

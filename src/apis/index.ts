@@ -10,8 +10,8 @@ export * as systemModule from './system'
 
 export * as ollamaModule from './ollama'
 
-export * as deepseekModule from './deepseek'
-
 export * as uploadModule from './upload'
 
 export * as sysMenuModule from './system/menu'
+
+export * as roleModule from './system/role'

@@ -9,7 +9,7 @@ const publicKey =
  * @param {sting} txt
  * @returns {string|false}
  */
-export function encryptByRsa(txt: string) {
+export function useEncryptByRsa(txt: string) {
   const encryptor: JSEncrypt = new JSEncrypt()
   encryptor.setPublicKey(publicKey) // 设置公钥return
   return encryptor.encrypt(txt) // 对数据进行加密

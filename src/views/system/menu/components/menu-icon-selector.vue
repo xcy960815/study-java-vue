@@ -16,7 +16,7 @@
         </div>
       </template>
     </el-select-v2>
-    <icon v-if="preIconName" :name="preIconName" class="preview-icon" />
+    <icon v-if="modelValue" :name="modelValue" class="preview-icon" />
   </div>
 </template>
 
@@ -36,16 +36,9 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
 }>()
 
-const preIconName = ref('')
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    preIconName.value = newVal
-    console.log(preIconName.value)
-  }
-)
-
+/**
+ * 获取所有图标
+ */
 const iconOptions = Object.keys(IconParkIcons).map((key) => ({
   value: key,
   label: key,

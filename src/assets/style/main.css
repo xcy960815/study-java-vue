@@ -1,6 +1,6 @@
 @import './base.css';
 @import './naive-variables.scss';
-
+@import './page.scss';
 /* index.css(入口文件中引入该入口样式文件) */
 @tailwind base;
 @tailwind components;
@@ -13,5 +13,6 @@ body,
   height: 100%;
   width: 100%;
   /* font-family: 'Better Times', cursive; */
+  font-family: Monaco;
 }
 /* } */

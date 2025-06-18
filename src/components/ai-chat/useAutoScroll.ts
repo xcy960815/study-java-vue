@@ -4,7 +4,6 @@ import { throttle } from '@/plugins/function-decorator'
 interface UseAutoScrollParams {
   readonly props: {
     readonly conversations: AI.Conversation[]
-    readonly conversation: AI.Gpt.AssistantConversation | null
     readonly roleAlias: Record<'system' | 'user' | 'assistant', string>
   }
 }

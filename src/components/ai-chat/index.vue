@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useCopyCode } from './useCopyCode'
 import { useAutoScroll } from './useAutoScroll'
 import { renderMarkdownText } from '@plugins/markdown'

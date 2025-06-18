@@ -15,11 +15,11 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import { OllamaModel } from '@utils/ai'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
 import { RoleEnum } from '@enums'
 import { cloneDeep } from 'lodash'
+import { useCompletions } from '@/composables/useCompletions'
 defineOptions({
   name: 'ollama-chat',
 })
@@ -45,10 +45,8 @@ const conversations = ref<AI.Conversation[]>([])
  */
 const conversation = ref<AI.Gpt.AssistantConversation | null>(null)
 
-/**
- * ollama 模型
- */
-const ollamaModel = new OllamaModel({
+const { Completions } = useCompletions()
+const ollamaModel = new Completions({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: '/ollama/completions',
@@ -65,23 +63,21 @@ const parentMessageId = ref('')
 const completions = async (question: string) => {
   setTimeout(async () => {
     conversations.value = await ollamaModel.getAllConversations()
-    const userMessage = conversations.value[conversations.value.length - 1]
-    conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, '', userMessage)
+    console.log('conversations', conversations.value)
   })
-
-  const questionOption: AI.Gpt.CompletionsOptions = {
+  const response = await ollamaModel.completions(question, {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
       model,
     },
     onProgress(partialResponse) {
-      conversation.value = cloneDeep(partialResponse)
+      if (conversations.value.length > 0) {
+        conversations.value[conversations.value.length - 1] = cloneDeep(partialResponse)
+      }
     },
-  }
-  const response = await ollamaModel.completions(question, questionOption)
+  })
   if (!!response.done) {
-    conversation.value = null
     conversations.value = await ollamaModel.getAllConversations()
     parentMessageId.value = response.parentMessageId
   }
@@ -91,7 +87,6 @@ const completions = async (question: string) => {
  */
 const cancelConversation = () => {
   ollamaModel.cancelConversation('用户手动取消会话')
-  conversation.value = null
 }
 </script>
 <style lang="less" scoped>
@@ -145,28 +140,33 @@ const cancelConversation = () => {
         var(--el-color-primary-light-8) 100%
       );
       color: var(--el-text-color-primary);
+
       .chat-meta {
         font-weight: bold;
         color: var(--el-color-primary);
         margin-bottom: 6px;
       }
     }
+
     &.assistant {
       align-self: flex-start;
       background: linear-gradient(135deg, var(--el-bg-color-overlay) 60%, #f6f8fa 100%);
       color: var(--el-text-color-primary);
+
       .chat-meta {
         font-weight: bold;
         color: var(--el-color-success);
         margin-bottom: 6px;
       }
     }
+
     &.system {
       align-self: center;
       background: var(--el-fill-color-light);
       color: var(--el-text-color-secondary);
       font-size: 14px;
       box-shadow: none;
+
       .chat-meta {
         color: var(--el-text-color-disabled);
       }
@@ -177,6 +177,7 @@ const cancelConversation = () => {
 .chat-messages::-webkit-scrollbar {
   width: 6px;
 }
+
 .chat-messages::-webkit-scrollbar-thumb {
   background: #e0e0e0;
   border-radius: 3px;

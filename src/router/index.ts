@@ -34,7 +34,6 @@ export const routes: RouteRecordRaw[] = [
       content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
     },
   },
-
   {
     path: '/goods-category',
     name: 'goods-category',
@@ -206,38 +205,28 @@ export const routes: RouteRecordRaw[] = [
         name: 'systemUserList',
         component: () => import(`../views/system/user/list.vue`),
         meta: {
-          // icon: 'ListView',
-          icon: 'other',
+          icon: 'AddressBook',
           keepAlive: true,
           title: '用户列表',
         },
       },
       {
-        path: '/admin-user/list',
-        name: 'admin-user-list',
-        component: () => import(`../views/admin-user/list.vue`),
+        // 角色管理
+        path: '/system/role/list',
+        name: 'systemRoleList',
+        component: () => import(`../views/system/role/list.vue`),
         meta: {
-          title: '管理员列表',
-          icon: 'ListView',
+          title: '角色列表',
+          icon: 'Permissions',
         },
       },
-      // {
-      //   path: '/system/user/info',
-      //   name: 'systemUserInfo',
-      //   component: () => import(`../views/system/user/info.vue`),
-      //   meta: {
-      //     hightlight: '/system/user/list',
-      //     hidden: true,
-      //     title: '用户中心',
-      //   },
-      // },
       {
         path: '/system/data-dictionary',
         name: 'systemDataDictionary',
         component: () => import(`../views/system/data-dictionary/index.vue`),
         meta: {
           title: '数据字典',
-          // icon: 'data',
+          icon: 'Bookmark',
         },
       },
     ],

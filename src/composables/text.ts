@@ -1,12 +1,13 @@
-import { Core } from './core'
+import { CompletionsCore } from '../utils/completions-core'
 import { RoleEnum } from '@enums'
+
 const MODEL = 'text-davinci-003'
 
 const USER_PROMPT_PREFIX = 'User'
 
 const SYSTEM_PROMPT_PREFIX_DEFAULT = 'ChatGPT'
 
-export class Text extends Core {
+export class Text extends CompletionsCore {
   /** 默认请求参数 */
   private _requestParams: Omit<AI.Text.RequestParams, 'prompt'>
   /** 用户提示前缀 */
@@ -28,7 +29,7 @@ export class Text extends Core {
       temperature: 0.8, // 默认的 temperature
       top_p: 1, // 默认的 top_
       presence_penalty: 1, // 默认的 presence_penalty
-      ...requestParams
+      ...requestParams,
     }
 
     this._endToken = '<|endoftext|>'
@@ -63,13 +64,13 @@ export class Text extends Core {
       ...requestParams,
       prompt,
       stream,
-      max_tokens: maxTokens
+      max_tokens: maxTokens,
     }
     const requestInit: AI.FetchRequestInit = {
       method: 'POST',
       headers: this.headers,
       body: JSON.stringify(body),
-      signal: this._abortController.signal
+      signal: this._abortController.signal,
     }
     return requestInit
   }
@@ -80,7 +81,10 @@ export class Text extends Core {
    * @param {AI.Text.CompletionsOptions} options
    * @returns {Promise<AI.Text.AssistantConversation>}
    */
-  public async completions(text: string, options: AI.Text.CompletionsOptions): Promise<AI.Text.AssistantConversation> {
+  public async completions(
+    text: string,
+    options: AI.Text.CompletionsOptions
+  ): Promise<AI.Text.AssistantConversation> {
     const { onProgress, stream = onProgress ? true : false, requestParams } = options
     // 构建用户消息
     const userMessage = this.buildConversation(RoleEnum.User, text, options)
@@ -89,7 +93,7 @@ export class Text extends Core {
     /* 构建助手消息 */
     const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
       ...options,
-      messageId: userMessage.messageId
+      messageId: userMessage.messageId,
     })
     const responseP = new Promise<AI.Text.AssistantConversation>(async (resolve, reject) => {
       const requestInit = await this._getFetchRequestInit(text, options)
@@ -146,7 +150,7 @@ export class Text extends Core {
     })
     return this.clearablePromise(responseP, {
       milliseconds: this._milliseconds,
-      message: ``
+      message: ``,
     })
   }
   /**
@@ -189,7 +193,8 @@ export class Text extends Core {
         break
       }
       const parentMessageRole = parentMessage.role
-      const parentMessagePromptPrefix = parentMessageRole === 'user' ? this._userPromptPrefix : this._systemPromptPrefix
+      const parentMessagePromptPrefix =
+        parentMessageRole === 'user' ? this._userPromptPrefix : this._systemPromptPrefix
       // 历史消息
       const parentMessagePrompt = `${parentMessagePromptPrefix}:${parentMessage.content}${this._endToken}`
       historyPrompt = `${parentMessagePrompt}${historyPrompt}`
@@ -198,7 +203,10 @@ export class Text extends Core {
 
     const prompt = `${systemMessage}${historyPrompt}${currentUserPrompt}${systemPromptPrefix}`
 
-    const maxTokens = Math.max(1, Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens))
+    const maxTokens = Math.max(
+      1,
+      Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens)
+    )
 
     return { prompt, maxTokens }
   }

@@ -115,7 +115,7 @@
           <FileTree v-model="addOrEditMenuFormData.component" />
         </el-form-item>
         <el-form-item label="菜单图标" prop="icon">
-          <MenuIcon v-model="addOrEditMenuFormData.icon" />
+          <MenuIconSelector v-model="addOrEditMenuFormData.icon" />
         </el-form-item>
         <el-form-item label="菜单类型" prop="menuType">
           <el-radio-group v-model="addOrEditMenuFormData.menuType">
@@ -148,7 +148,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import FileTree from './components/file-tree-selector.vue'
-import MenuIcon from './components/menu-icon-selector.vue'
+import MenuIconSelector from './components/menu-icon-selector.vue'
 import { useAsyncComputed } from '@/plugins/async-computed'
 
 interface MenuListInfo {

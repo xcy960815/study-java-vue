@@ -1,0 +1,58 @@
+import { request } from '@utils/request'
+
+const baseUrl = '/role'
+
+/**
+ * 获取角色列表
+ * @param {BaseListDto} queryFormData
+ * @returns {Promise<ResponseResult<ListResponseResult<RoleInfoVo>>>}
+ */
+export function getRoleList<T extends ListResponseResult<RoleInfoVo>>(
+  queryFormData: BaseListDto & Partial<RoleInfoDto>
+): Promise<ResponseResult<T>> {
+  const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
+  const url = `${baseUrl}/getRoleList?pageSize=${pageSize}&pageNum=${pageNum}`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: otherQueryFormData,
+  })
+}
+
+/**
+ * 更新角色信息
+ * @param {RoleInfoDto} roleInfo
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export function updateRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/updateRole`
+  return request.put<ResponseResult<boolean>, ResponseResult<boolean>>(url, roleInfo)
+}
+
+/**
+ * 新增角色
+ * @param {RoleInfoDto} roleInfo
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export function addRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/addRole`
+  return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, roleInfo)
+}
+
+/**
+ * 删除角色
+ * @param {number} id
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export function deleteRole(id: number): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/deleteRole/${id}`
+  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url)
+}
+
+/**
+ * 获取角色详情
+ * @param {number} id
+ * @returns {Promise<ResponseResult<RoleInfoVo>>}
+ */
+export function getRoleDetail<T extends RoleInfoVo>(id: number): Promise<ResponseResult<T>> {
+  const url = `${baseUrl}/getRoleDetail/${id}`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+}

@@ -3,7 +3,6 @@
     <ai-chat
       :role-alias="roleAlias"
       @completions="completions"
-      :conversation="conversation"
       @cancel-conversation="cancelConversation"
       :conversations="conversations"
     ></ai-chat>
@@ -11,8 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { OllamaModel } from '@utils/ai'
-import { renderMarkdownText } from '@plugins/markdown'
+import { useCompletions } from '@/composables/useCompletions'
 import { ref } from 'vue'
 // import { deepseekModule } from '@apis'
 import { useRoute } from 'vue-router'
@@ -30,15 +28,12 @@ const model = route.query.model as string
 const parentMessageId = ref<string>('')
 
 const conversations = ref<AI.Conversation[]>([])
-/**
- * 当前会话
- */
-const conversation = ref<AI.Gpt.AssistantConversation | null>(null)
 
+const { Completions } = useCompletions()
 /**
  * ollama 模型
  */
-const ollamaModel = new OllamaModel({
+const ollamaModel = new Completions({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: '/deepseek/completions',
@@ -63,8 +58,6 @@ const roleAlias = ref<Record<AI.Role, string>>({
 const completions = async (question: string) => {
   setTimeout(async () => {
     conversations.value = await ollamaModel.getAllConversations()
-    const userMessage = conversations.value[conversations.value.length - 1]
-    conversation.value = ollamaModel.buildConversation(RoleEnum.Assistant, '', userMessage)
   })
 
   const questionOption: AI.Gpt.CompletionsOptions = {
@@ -74,14 +67,16 @@ const completions = async (question: string) => {
       model,
     },
     onProgress(partialResponse) {
-      conversation.value = cloneDeep(partialResponse)
+      // 直接更新 conversations 的最后一条
+      if (conversations.value.length > 0) {
+        conversations.value[conversations.value.length - 1] = cloneDeep(partialResponse)
+      }
     },
   }
 
   const response = await ollamaModel.completions(question, questionOption)
 
   if (!!response.done) {
-    conversation.value = null
     conversations.value = await ollamaModel.getAllConversations()
     parentMessageId.value = response.parentMessageId
   }
