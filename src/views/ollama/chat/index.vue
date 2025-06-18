@@ -5,8 +5,7 @@
         :role-alias="roleAlias"
         @completions="completions"
         @cancel-conversation="cancelConversation"
-        :conversations="conversations"
-        :conversation="conversation"
+        :conversation-list="conversationList"
       >
       </ai-chat>
     </div>
@@ -17,9 +16,9 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
-import { RoleEnum } from '@enums'
 import { cloneDeep } from 'lodash'
 import { useCompletions } from '@/composables/useCompletions'
+import { RoleEnum } from '@enums'
 defineOptions({
   name: 'ollama-chat',
 })
@@ -38,15 +37,11 @@ const roleAlias = ref<Record<AI.Role, string>>({
 /**
  * 会话列表
  */
-const conversations = ref<AI.Conversation[]>([])
-
-/**
- * 当前会话
- */
-const conversation = ref<AI.Gpt.AssistantConversation | null>(null)
+const conversationList = ref<AI.Conversation[]>([])
 
 const { Completions } = useCompletions()
-const ollamaModel = new Completions({
+
+const completionsModel = new Completions({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: '/ollama/completions',
@@ -62,23 +57,24 @@ const parentMessageId = ref('')
  */
 const completions = async (question: string) => {
   setTimeout(async () => {
-    conversations.value = await ollamaModel.getAllConversations()
-    console.log('conversations', conversations.value)
+    conversationList.value = await completionsModel.getAllConversations()
+    console.log('conversationList.value', JSON.parse(JSON.stringify(conversationList.value)))
   })
-  const response = await ollamaModel.completions(question, {
+  const response = await completionsModel.completions(question, {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
       model,
     },
     onProgress(partialResponse) {
-      if (conversations.value.length > 0) {
-        conversations.value[conversations.value.length - 1] = cloneDeep(partialResponse)
+      if (conversationList.value.length > 0) {
+        conversationList.value[conversationList.value.length - 1] = cloneDeep(partialResponse)
       }
     },
   })
   if (!!response.done) {
-    conversations.value = await ollamaModel.getAllConversations()
+    conversationList.value = await completionsModel.getAllConversations()
+    console.log('conversationList.123', JSON.parse(JSON.stringify(conversationList.value)))
     parentMessageId.value = response.parentMessageId
   }
 }
@@ -86,7 +82,7 @@ const completions = async (question: string) => {
  * 取消当前会话
  */
 const cancelConversation = () => {
-  ollamaModel.cancelConversation('用户手动取消会话')
+  completionsModel.cancelConversation('用户手动取消会话')
 }
 </script>
 <style lang="less" scoped>

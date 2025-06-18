@@ -9,7 +9,7 @@
       <!-- 历史会话 -->
       <transition-group name="conversation-fade">
         <div
-          v-for="conversation of conversations"
+          v-for="conversation of conversationList"
           :key="conversation.messageId"
           class="history-conversation group flex flex-col px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg mb-2 hover:shadow-md transition-shadow duration-200"
         >
@@ -23,53 +23,28 @@
             />
           </div>
           <div class="answer-wrapper flex-1">
+            <chat-thinking v-if="showThinking(conversation)" />
             <div
               class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
               v-html="renderMarkdownText(conversation.content)"
-            />
-          </div>
-        </div>
-      </transition-group>
-
-      <!-- 当前会话 -->
-      <transition name="conversation-fade">
-        <div
-          v-if="currentConversation"
-          class="current-conversation group flex flex-col px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg mb-2 hover:shadow-md transition-shadow duration-200"
-        >
-          <div class="flex justify-between items-center mb-2">
-            <div class="font-bold text-slate-700 dark:text-slate-200">
-              {{ getRoleAlias(currentConversation.role) }}：
-            </div>
-            <chat-copy
-              class="invisible group-hover:visible transition-opacity duration-200"
-              :content="currentConversation.content"
-            />
-          </div>
-          <div class="answer-wrapper flex-1">
-            <chat-thinking v-if="showThinking(currentConversation)" />
-            <div
-              class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
-              v-html="renderMarkdownText(currentConversation.content)"
-            />
+            ></div>
             <img
-              v-if="showAsking(currentConversation)"
+              v-if="showAsking(conversation)"
               :src="loadingSvg"
               class="w-6 h-6 animate-pulse"
               alt="loading"
             />
           </div>
         </div>
-      </transition>
+      </transition-group>
     </div>
-
     <!-- 问题&发送消息按钮 -->
     <chat-input :conversation="currentConversation" v-bind="$attrs" @send="handleSend" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useCopyCode } from './useCopyCode'
 import { useAutoScroll } from './useAutoScroll'
 import { renderMarkdownText } from '@plugins/markdown'
@@ -84,17 +59,12 @@ import 'highlight.js/styles/github-dark.css'
 const LOADING_SVG =
   "data:image/svg+xml;utf8,%3Csvg viewBox='0 0 24 24' width='1em' height='1em' xmlns='http://www.w3.org/2000/svg' %3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse30' fill='freeze' attributeName='r' begin='0;svgSpinnersPulse32.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='0;svgSpinnersPulse32.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse31' fill='freeze' attributeName='r' begin='svgSpinnersPulse30.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='svgSpinnersPulse30.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse32' fill='freeze' attributeName='r' begin='svgSpinnersPulse30.begin+0.8s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='svgSpinnersPulse30.begin+0.8s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3C/svg%3E"
 
-// Props 定义
 const props = defineProps({
-  conversations: {
+  conversationList: {
     type: Array as PropType<AI.Conversation[]>,
     default: () => [],
     required: true,
     validator: (val: AI.Conversation[]) => Array.isArray(val),
-  },
-  conversation: {
-    type: Object as PropType<AI.Gpt.AssistantConversation | null>,
-    default: () => null,
   },
   roleAlias: {
     type: Object as PropType<Record<AI.Role, string>>,
@@ -112,49 +82,65 @@ const emit = defineEmits<{
   (e: 'scroll', event: Event): void
 }>()
 
-// 计算属性
-const currentConversation = computed(() => props.conversation)
+/**
+ * 当前会话
+ */
+const currentConversation = computed(
+  () => props.conversationList[props.conversationList.length - 1]
+)
+/**
+ * 加载动画
+ */
 const loadingSvg = computed(() => LOADING_SVG)
 
-// 默认角色别名
+/**
+ * 默认角色别名
+ */
 const defaultRoleAlias: Record<AI.Role, string> = {
   user: 'ME',
   assistant: 'ChatGPT',
   system: 'System',
 }
 
-// 方法定义
+/**
+ * 获取角色别名
+ */
 const getRoleAlias = (role: AI.Role): string => {
   return props.roleAlias[role] || defaultRoleAlias[role]
 }
 
+/**
+ * 显示思考动画
+ */
 const showThinking = (conversation: AI.Gpt.AssistantConversation): boolean => {
   return Boolean(conversation.thinking)
 }
 
+/**
+ * 显示提问动画
+ */
 const showAsking = (conversation: AI.Gpt.AssistantConversation): boolean => {
-  return !conversation.done && !conversation.thinking
+  return conversation.done === true && conversation.thinking === true
 }
 
+/**
+ * 滚动事件
+ */
 const handleScroll = (event: Event) => {
   emit('scroll', event)
 }
 
+/**
+ * 发送消息
+ */
 const handleSend = (message: string) => {
   emit('send', message)
 }
 
 // 生命周期钩子
 const { conversationListRef } = useAutoScroll({ props })
+
 useCopyCode()
-
-onMounted(() => {
-  // 初始化逻辑
-})
-
-onUnmounted(() => {
-  // 清理逻辑
-})
 </script>
 
 <style lang="scss" scoped>
@@ -191,18 +177,23 @@ onUnmounted(() => {
   h1 {
     @apply text-2xl;
   }
+
   h2 {
     @apply text-xl;
   }
+
   h3 {
     @apply text-lg;
   }
+
   h4 {
     @apply text-base;
   }
+
   h5 {
     @apply text-sm;
   }
+
   h6 {
     @apply text-xs;
   }

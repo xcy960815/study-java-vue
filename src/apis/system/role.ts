@@ -18,6 +18,17 @@ export function getRoleList<T extends ListResponseResult<RoleInfoVo>>(
 }
 
 /**
+ * 获取所有角色列表
+ * @returns {Promise<ResponseResult<ListResponseResult<RoleInfoVo>>>}
+ */
+export function getAllRoleList<T extends ListResponseResult<RoleInfoVo>>(): Promise<
+  ResponseResult<T>
+> {
+  const url = `${baseUrl}/getAllRoleList`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+}
+
+/**
  * 更新角色信息
  * @param {RoleInfoDto} roleInfo
  * @returns {Promise<ResponseResult<boolean>>}

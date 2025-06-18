@@ -10,8 +10,8 @@
       <el-form-item label="用户昵称">
         <el-input v-model="queryFormData.nickName" placeholder="用户昵称" @change="getUserList" />
       </el-form-item>
-      <el-form-item label="登陆名称">
-        <el-input v-model="queryFormData.loginName" placeholder="登陆名称" @change="getUserList" />
+      <el-form-item label="登陆账号">
+        <el-input v-model="queryFormData.loginName" placeholder="登陆账号" @change="getUserList" />
       </el-form-item>
       <el-form-item label="个性签名">
         <el-input
@@ -31,7 +31,9 @@
     <el-table border :data="userListInfo.tableData" style="width: 100%" class="user-table">
       <el-table-column prop="nickName" label="用户昵称" width="100" />
       <el-table-column prop="age" label="用户年龄" width="100" />
-      <el-table-column prop="loginName" label="登陆名称" />
+      <el-table-column prop="loginName" label="登陆账号" />
+      <el-table-column prop="roleName" label="角色" />
+      <el-table-column prop="roleCode" label="角色编码" />
       <el-table-column prop="introduceSign" label="个性签名" />
       <el-table-column prop="address" label="收货地址" />
       <el-table-column prop="createTime" label="注册时间" />
@@ -72,8 +74,18 @@
         <el-form-item label="用户昵称" prop="nickName">
           <el-input v-model="addOrEditUserFormData.nickName" placeholder="请输入用户昵称" />
         </el-form-item>
-        <el-form-item label="登陆名称" prop="loginName">
-          <el-input v-model="addOrEditUserFormData.loginName" placeholder="请输入登陆名称" />
+        <el-form-item label="登陆账号" prop="loginName">
+          <el-input v-model="addOrEditUserFormData.loginName" placeholder="请输入登陆账号" />
+        </el-form-item>
+        <el-form-item label="角色" prop="roleId">
+          <el-select v-model="addOrEditUserFormData.roleId" placeholder="请选择角色">
+            <el-option
+              v-for="role of roleList"
+              :key="role.id"
+              :label="role.roleName"
+              :value="role.id"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="个性签名" prop="introduceSign">
           <el-input v-model="addOrEditUserFormData.introduceSign" placeholder="请输入个性签名" />
@@ -91,20 +103,16 @@
     </el-dialog>
   </div>
 </template>
-<script lang="ts">
-export default {
-  name: 'userList',
-}
-</script>
+
 <script setup lang="ts">
-import { userModule } from '@apis'
+import { userModule, roleModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-// defineOptions({
-//   name: "userList"
-// })
+defineOptions({
+  name: 'userList',
+})
 interface UserListInfo {
   tableData: UserInfoVo[]
   total: number | undefined
@@ -117,6 +125,7 @@ const queryFormData = reactive({
   loginName: '',
   introduceSign: '',
   address: '',
+  roleId: undefined,
 })
 const addOrEditUserDialogTitle = ref('')
 
@@ -128,7 +137,14 @@ const userListInfo = reactive<UserListInfo>({
   pageSize: 10,
   pageNum: 1,
 })
+const roleList = ref<RoleInfoVo[]>([])
 
+const getRoleList = async () => {
+  const result = await roleModule.getAllRoleList()
+  if (result.code === 200) {
+    roleList.value = result.data.data
+  }
+}
 /**
  * 获取用户列表
  */
@@ -148,12 +164,13 @@ const getUserList = async () => {
 
 const addOrEditUserFormRef = ref<FormInstance>()
 
-const addOrEditUserFormData = reactive<Omit<UserInfoVo, 'userId' | 'createTime'>>({
+const addOrEditUserFormData = reactive<UserInfoDto>({
   nickName: '',
   loginName: '',
   introduceSign: '',
   address: '',
   avatar: '',
+  roleId: undefined,
 })
 
 const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
@@ -167,8 +184,15 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
   loginName: [
     {
       required: true,
-      message: '请输入登陆名称',
+      message: '请输入登陆账号',
       trigger: 'blur',
+    },
+  ],
+  roleId: [
+    {
+      required: true,
+      message: '请选择角色',
+      trigger: 'change',
     },
   ],
   introduceSign: [
@@ -190,7 +214,8 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
 /**
  * 新增用户
  */
-const handleClickAddUser = () => {
+const handleClickAddUser = async () => {
+  await getRoleList()
   addOrEditUserDialogTitle.value = '新增用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
@@ -201,7 +226,8 @@ const handleClickAddUser = () => {
 /**
  * 编辑用户
  */
-const handleClickEditUser = (row: UserInfoVo) => {
+const handleClickEditUser = async (row: UserInfoVo) => {
+  await getRoleList()
   addOrEditUserDialogTitle.value = '编辑用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
@@ -244,7 +270,7 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
   })
     .then(async () => {
       const result = await userModule.deleteUserInfo<boolean>({
-        userId: row.userId,
+        id: row.id,
       })
       if (result.code !== 200) return
       getUserList()

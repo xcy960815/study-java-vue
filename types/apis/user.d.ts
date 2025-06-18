@@ -5,7 +5,22 @@ declare interface UserInfoVo {
   /**
    * 用户主键id
    */
-  userId: number | null
+  id: number | null
+
+  /**
+   * 角色id
+   */
+  roleId: number | undefined
+
+  /**
+   * 角色名称
+   */
+  roleName: string
+
+  /**
+   * 角色编码
+   */
+  roleCode: string
 
   /**
    * 用户昵称
@@ -13,7 +28,7 @@ declare interface UserInfoVo {
   nickName: string
 
   /**
-   * 登陆名称(默认为手机号)
+   * 登陆账号(默认为手机号)
    */
   loginName: string
 

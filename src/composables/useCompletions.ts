@@ -34,7 +34,6 @@ class Completions extends CompletionsCore {
   ): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
     const { messages, maxTokens } = await this.getConversationHistory(question, options)
-
     return {
       method: 'POST',
       headers: this.headers,
@@ -56,8 +55,6 @@ class Completions extends CompletionsCore {
     question: string,
     options: AI.Gpt.CompletionsOptions
   ): Promise<AI.Gpt.AssistantConversation> {
-    const { onProgress, stream = !!onProgress } = options
-
     // 构建并保存用户消息
     const userMessage = this.buildConversation(RoleEnum.User, question, options)
     await this.upsertConversation(userMessage)
@@ -72,7 +69,9 @@ class Completions extends CompletionsCore {
     // 处理响应
     const conversationPromise = this.handleAnswerRequest(assistantMessage, options)
       .then(async (conversation) => {
-        await this.upsertConversation(conversation)
+        console.log('conversation-123', conversation)
+
+        // await this.upsertConversation(conversation)
         conversation.parentMessageId = conversation.messageId
         return conversation
       })
@@ -135,7 +134,6 @@ class Completions extends CompletionsCore {
       resolve(assistantMessage)
       return
     }
-
     try {
       const response: AI.Gpt.Response = JSON.parse(data)
       this.updateConversationFromResponse(assistantMessage, response)
