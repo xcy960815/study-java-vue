@@ -10,17 +10,17 @@ declare interface UserInfoVo {
   /**
    * 角色id
    */
-  roleId: number | undefined
+  roleIds: Array<number> | undefined
 
   /**
    * 角色名称
    */
-  roleName: string
+  roleNames: Array<string> | undefined
 
   /**
    * 角色编码
    */
-  roleCode: string
+  roleCodes: Array<string> | undefined
 
   /**
    * 用户昵称

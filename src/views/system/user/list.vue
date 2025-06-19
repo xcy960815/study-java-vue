@@ -13,15 +13,22 @@
       <el-form-item label="登陆账号">
         <el-input v-model="queryFormData.loginName" placeholder="登陆账号" @change="getUserList" />
       </el-form-item>
-      <el-form-item label="个性签名">
-        <el-input
-          v-model="queryFormData.introduceSign"
-          placeholder="个性签名"
+      <!-- 角色 -->
+      <el-form-item label="角色">
+        <el-select
+          v-model="queryFormData.roleIds"
+          placeholder="请选择角色"
           @change="getUserList"
-        />
-      </el-form-item>
-      <el-form-item label="收货地址">
-        <el-input v-model="queryFormData.address" placeholder="收货地址" @change="getUserList" />
+          multiple
+          style="width: 200px"
+        >
+          <el-option
+            v-for="role of roleList"
+            :key="role.id"
+            :label="role.roleName"
+            :value="role.id"
+          />
+        </el-select>
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getUserList">
@@ -29,14 +36,27 @@
     </Handle-ToolBar>
 
     <el-table border :data="userListInfo.tableData" style="width: 100%" class="user-table">
-      <el-table-column prop="nickName" label="用户昵称" width="100" />
-      <el-table-column prop="age" label="用户年龄" width="100" />
-      <el-table-column prop="loginName" label="登陆账号" />
-      <el-table-column prop="roleName" label="角色" />
-      <el-table-column prop="roleCode" label="角色编码" />
-      <el-table-column prop="introduceSign" label="个性签名" />
-      <el-table-column prop="address" label="收货地址" />
-      <el-table-column prop="createTime" label="注册时间" />
+      <el-table-column prop="nickName" label="用户昵称" min-width="100" />
+      <el-table-column prop="age" label="用户年龄" min-width="100" />
+      <el-table-column prop="loginName" label="登陆账号" min-width="150" />
+      <el-table-column prop="roleNames" label="角色" min-width="200">
+        <template #default="{ row }">
+          <el-tag class="mr-1" v-for="roleName of row.roleNames" :key="roleName" size="small">{{
+            roleName
+          }}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="roleCode" label="角色编码" min-width="200">
+        <template #default="{ row }">
+          <el-tag class="mr-1" v-for="roleCode of row.roleCodes" :key="roleCode" size="small">{{
+            roleCode
+          }}</el-tag>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="introduceSign" label="个性签名" min-width="200" />
+      <el-table-column prop="address" label="收货地址" min-width="200" />
+      <el-table-column prop="createTime" label="注册时间" min-width="200" />
       <el-table-column fixed="right" label="操作" width="120">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditUser(row)"
@@ -77,8 +97,8 @@
         <el-form-item label="登陆账号" prop="loginName">
           <el-input v-model="addOrEditUserFormData.loginName" placeholder="请输入登陆账号" />
         </el-form-item>
-        <el-form-item label="角色" prop="roleId">
-          <el-select v-model="addOrEditUserFormData.roleId" placeholder="请选择角色">
+        <el-form-item label="角色" prop="roleIds">
+          <el-select v-model="addOrEditUserFormData.roleIds" placeholder="请选择角色" multiple>
             <el-option
               v-for="role of roleList"
               :key="role.id"
@@ -120,12 +140,12 @@ interface UserListInfo {
   pageNum: number
 }
 
-const queryFormData = reactive({
+const queryFormData = reactive<UserInfoDto>({
   nickName: '',
   loginName: '',
   introduceSign: '',
   address: '',
-  roleId: undefined,
+  roleIds: [],
 })
 const addOrEditUserDialogTitle = ref('')
 
@@ -170,7 +190,7 @@ const addOrEditUserFormData = reactive<UserInfoDto>({
   introduceSign: '',
   address: '',
   avatar: '',
-  roleId: undefined,
+  roleIds: [],
 })
 
 const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
@@ -188,10 +208,11 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
       trigger: 'blur',
     },
   ],
-  roleId: [
+  roleIds: [
     {
       required: true,
       message: '请选择角色',
+      type: 'array',
       trigger: 'change',
     },
   ],
@@ -301,6 +322,7 @@ const handlePageNumChange = (pageNum: number) => {
 }
 
 onMounted(() => {
+  getRoleList()
   getUserList()
 })
 </script>
