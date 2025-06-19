@@ -54,8 +54,32 @@ export function addRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>>
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export function deleteRole(id: number): Promise<ResponseResult<boolean>> {
-  const url = `${baseUrl}/deleteRole/${id}`
-  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url)
+  const url = `${baseUrl}/deleteRole`
+  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url, {
+    params: {
+      id,
+    },
+  })
+}
+
+/**
+ * 禁用角色
+ * @param {number} id
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export function disableRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/disableRole`
+  return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, roleInfo)
+}
+
+/**
+ * 启用角色
+ * @param {number} id
+ * @returns {Promise<ResponseResult<boolean>>}
+ */
+export function enableRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/enableRole`
+  return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, roleInfo)
 }
 
 /**

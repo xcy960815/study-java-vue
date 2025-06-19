@@ -42,13 +42,6 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="menuCheckStrictly" label="菜单关联" width="100">
-        <template #default="{ row }">
-          <el-tag :type="row.menuCheckStrictly === 1 ? 'primary' : 'info'">
-            {{ row.menuCheckStrictly === 1 ? '关联显示' : '不关联显示' }}
-          </el-tag>
-        </template>
-      </el-table-column>
       <el-table-column prop="remark" label="备注" />
       <el-table-column prop="createTime" label="创建时间" width="260" />
       <el-table-column fixed="right" label="操作" width="120">
@@ -58,6 +51,22 @@
           >
           <el-button link type="danger" size="small" @click="handleClickDeleteRole(row)"
             >删除</el-button
+          >
+          <el-button
+            v-if="row.status === 1"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDisableRole(row)"
+            >禁用</el-button
+          >
+          <el-button
+            v-if="row.status === 0"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEnableRole(row)"
+            >启用</el-button
           >
         </template>
       </el-table-column>
@@ -102,11 +111,17 @@
             <el-radio :label="0">停用</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="菜单关联" prop="menuCheckStrictly">
-          <el-radio-group v-model="addOrEditRoleFormData.menuCheckStrictly">
-            <el-radio :label="1">关联显示</el-radio>
-            <el-radio :label="0">不关联显示</el-radio>
-          </el-radio-group>
+        <!-- 菜单权限 -->
+        <el-form-item label="菜单权限" prop="menuIds">
+          <el-tree-select
+            show-checkbox
+            v-model="addOrEditRoleFormData.menuIds"
+            :data="menuTreeData"
+            :props="{ label: 'menuName', children: 'children' }"
+            placeholder="请选择菜单权限"
+            check-strictly
+            multiple
+          />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input
@@ -131,9 +146,11 @@
 import { roleModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { getMenuTree } from '@/apis/system/menu'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-
+import { useAsyncComputed } from '@/composables/useAsyncComputed'
+import { useFilterMenuTree } from '@/composables/useFilterMenuTree'
 defineOptions({
   name: 'roleList',
 })
@@ -149,6 +166,19 @@ const queryFormData = reactive({
   roleName: '',
   roleCode: '',
   status: undefined as number | undefined,
+})
+
+/**
+ * @description 菜单树数据
+ */
+const menuTreeData = useAsyncComputed(async () => {
+  const queryParams = {
+    pageSize: 1000,
+    pageNum: 1,
+  }
+  const result = await getMenuTree(queryParams)
+  const menuTree = useFilterMenuTree(result.data.data)
+  return menuTree
 })
 
 const addOrEditRoleDialogTitle = ref('')
@@ -181,14 +211,11 @@ const getRoleList = async () => {
 
 const addOrEditRoleFormRef = ref<FormInstance>()
 
-const addOrEditRoleFormData = reactive<
-  Omit<RoleInfoVo, 'id' | 'createTime' | 'updateTime' | 'createBy' | 'updateBy' | 'delFlag'>
->({
+const addOrEditRoleFormData = reactive<RoleInfoDto>({
   roleName: '',
   roleCode: '',
   roleSort: 0,
   status: 1,
-  menuCheckStrictly: 1,
   remark: '',
 })
 
@@ -218,13 +245,6 @@ const addOrEditRoleFormRules: FormRules<typeof addOrEditRoleFormData> = {
     {
       required: true,
       message: '请选择状态',
-      trigger: 'change',
-    },
-  ],
-  menuCheckStrictly: [
-    {
-      required: true,
-      message: '请选择菜单关联方式',
       trigger: 'change',
     },
   ],
@@ -284,7 +304,7 @@ const handleClickAddOrEditConfirm = async () => {
  * 删除角色
  */
 const handleClickDeleteRole = (row: RoleInfoVo) => {
-  ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
+  ElMessageBox.confirm(`确认要删除角色 【${row.roleName}】 吗?`, '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
@@ -303,6 +323,48 @@ const handleClickDeleteRole = (row: RoleInfoVo) => {
         type: 'info',
         message: '操作取消',
       })
+    })
+}
+
+/**
+ * 禁用角色
+ */
+const handleClickDisableRole = (row: RoleInfoVo) => {
+  console.log(row)
+  ElMessageBox.confirm(`确认要禁用角色 【${row.roleName}】 吗?`, '警告⚠️', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(async () => {
+      const result = await roleModule.disableRole(row)
+      if (result.code !== 200) return
+      getRoleList()
+      ElMessage({ type: 'success', message: '操作成功' })
+    })
+    .catch(() => {
+      ElMessage({ type: 'info', message: '操作取消' })
+    })
+}
+
+/**
+ * 启用角色
+ */
+const handleClickEnableRole = (row: RoleInfoVo) => {
+  console.log(row)
+  ElMessageBox.confirm(`确认要启用角色 【${row.roleName}】 吗?`, '警告⚠️', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(async () => {
+      const result = await roleModule.enableRole(row)
+      if (result.code !== 200) return
+      getRoleList()
+      ElMessage({ type: 'success', message: '操作成功' })
+    })
+    .catch(() => {
+      ElMessage({ type: 'info', message: '操作取消' })
     })
 }
 

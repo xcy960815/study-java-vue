@@ -31,14 +31,13 @@
     <el-table
       border
       :data="menuListInfo.treeData"
-      row-key="menuId"
-      default-expand-all
+      row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       style="width: 100%"
     >
       <el-table-column prop="menuName" label="菜单名称" width="120" />
-      <el-table-column prop="path" label="菜单路径" />
-      <el-table-column prop="component" label="组件路径" />
+      <el-table-column prop="path" label="菜单路径" width="150" />
+      <el-table-column prop="component" label="组件路径" min-width="160" />
       <el-table-column prop="icon" label="图标" width="80" align="center">
         <template #default="{ row }">
           <icon v-if="row.icon" :name="row.icon" />
@@ -53,8 +52,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="perms" label="权限标识" />
-      <el-table-column prop="orderNum" label="排序" width="80" />
-      <el-table-column prop="createTime" label="创建时间" width="180" />
+      <el-table-column prop="createTime" label="创建时间" min-width="180" />
       <el-table-column fixed="right" label="操作" width="300">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditMenu(row)"
@@ -100,7 +98,7 @@
           <el-tree-select
             v-model="addOrEditMenuFormData.parentId"
             :data="menuTreeData"
-            :props="{ label: 'menuName', value: 'menuId' }"
+            :props="{ label: 'menuName', value: 'id' }"
             placeholder="请选择父菜单"
             check-strictly
           />
@@ -112,7 +110,7 @@
           <el-input v-model="addOrEditMenuFormData.path" placeholder="请输入菜单路径" />
         </el-form-item>
         <el-form-item label="组件路径" prop="component">
-          <FileTree v-model="addOrEditMenuFormData.component" />
+          <FileTreeSelector v-model="addOrEditMenuFormData.component" />
         </el-form-item>
         <el-form-item label="菜单图标" prop="icon">
           <MenuIconSelector v-model="addOrEditMenuFormData.icon" />
@@ -147,9 +145,9 @@ import { getMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-import FileTree from './components/file-tree-selector.vue'
+import FileTreeSelector from './components/file-tree-selector.vue'
 import MenuIconSelector from './components/menu-icon-selector.vue'
-import { useAsyncComputed } from '@/plugins/async-computed'
+import { useAsyncComputed } from '@/composables/useAsyncComputed'
 
 interface MenuListInfo {
   treeData: Array<StudyJavaSysMenuVo & { hasChildren: boolean }>
@@ -244,6 +242,8 @@ const fetchMenuList = async () => {
   })
   if (result.code === 200) {
     menuListInfo.treeData = handleMenuTreeData(result.data.data)
+    console.log(JSON.stringify(menuListInfo.treeData, null, 2))
+
     menuListInfo.total = result.data.total
   }
 }
@@ -265,8 +265,8 @@ const addOrEditMenuFormRef = ref<FormInstance>()
  * @description 新增或编辑菜单表单数据
  */
 const addOrEditMenuFormData = reactive<StudyJavaSysMenuDto>({
-  menuId: undefined,
-  parentId: 0,
+  id: null,
+  parentId: null,
   menuName: '',
   path: '',
   component: '',
@@ -344,7 +344,7 @@ const handleClickCopyMenu = (row: StudyJavaSysMenuVo) => {
   nextTick(() => {
     addOrEditMenuFormRef.value?.resetFields()
     Object.assign(addOrEditMenuFormData, row)
-    addOrEditMenuFormData.menuId = undefined
+    addOrEditMenuFormData.id = null
   })
 }
 
@@ -366,8 +366,8 @@ const handleClickCreateSubMenu = (row: StudyJavaSysMenuVo) => {
   nextTick(() => {
     addOrEditMenuFormRef.value?.resetFields()
     // Object.assign(addOrEditMenuFormData, row)
-    addOrEditMenuFormData.menuId = undefined
-    addOrEditMenuFormData.parentId = row.menuId
+    addOrEditMenuFormData.id = null
+    addOrEditMenuFormData.parentId = row.id
   })
 }
 
@@ -411,7 +411,7 @@ const handleClickDeleteMenu = (row: StudyJavaSysMenuVo) => {
     type: 'warning',
   })
     .then(async () => {
-      const result = await deleteMenu(row.menuId)
+      const result = await deleteMenu(row.id)
       if (result.code !== 200) return
       fetchMenuList()
       ElMessage({

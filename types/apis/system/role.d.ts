@@ -18,6 +18,16 @@ declare interface RoleInfoVo {
   roleCode: string
 
   /**
+   * 菜单名称
+   */
+  menuNames: string[]
+
+  /**
+   * 菜单编码
+   */
+  menuIds: number[]
+
+  /**
    * 显示顺序
    */
   roleSort: number

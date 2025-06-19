@@ -5,12 +5,12 @@ declare interface StudyJavaSysMenuVo {
   /**
    * 菜单ID
    */
-  menuId: number
+  id: number
 
   /**
    * 父菜单ID
    */
-  parentId: number
+  parentId: number | null
 
   /**
    * 菜单名称
@@ -71,5 +71,5 @@ declare interface StudyJavaSysMenuDto
   /**
    * 菜单ID
    */
-  menuId?: number
+  id?: number | null
 }

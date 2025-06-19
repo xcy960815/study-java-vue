@@ -14,19 +14,6 @@
     <template #default="{ node, data }">
       <div class="custom-tree-node">
         <span class="node-label">{{ data.value }}</span>
-        <span class="node-actions">
-          <el-button type="text" size="small" @click.stop="copyPath(data.value)" title="复制路径">
-            <el-icon><CopyDocument /></el-icon>
-          </el-button>
-          <el-button
-            type="text"
-            size="small"
-            @click.stop="createChildMenu(data)"
-            title="创建子菜单"
-          >
-            <el-icon><Plus /></el-icon>
-          </el-button>
-        </span>
       </div>
     </template>
   </el-tree-select>
@@ -34,8 +21,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { CopyDocument, Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 
 defineOptions({
   name: 'FileTreeSelector',
@@ -93,28 +79,6 @@ const copyPath = async (path: string) => {
   } catch {
     ElMessage.error('复制失败')
   }
-}
-
-// 创建子菜单功能
-const createChildMenu = (node: any) => {
-  ElMessageBox.prompt('请输入新子菜单名称', '创建子菜单', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    inputPattern: /^.+$/, // 非空
-    inputErrorMessage: '名称不能为空',
-  })
-    .then(({ value }) => {
-      if (!node.children) node.children = []
-      // 生成新子菜单路径
-      const newPath = node.value.endsWith('/') ? node.value + value : node.value + '/' + value
-      node.children.push({
-        value: newPath,
-        label: value,
-        children: [],
-      })
-      ElMessage.success('子菜单创建成功')
-    })
-    .catch(() => {})
 }
 
 onMounted(() => {
