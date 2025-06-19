@@ -1,18 +1,20 @@
 <template>
   <div class="deepseek-chat">
-    <ai-chat
-      :role-alias="roleAlias"
-      @completions="completions"
-      @cancel-conversation="cancelConversation"
-      :conversations="conversations"
-    ></ai-chat>
+    <div class="chat-main-card">
+      <ai-chat
+        :role-alias="roleAlias"
+        @completions="completions"
+        @cancel-conversation="cancelConversation"
+        :conversation-list="conversationList"
+        :current-conversation="currentConversation"
+      ></ai-chat>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useCompletions } from '@/composables/useCompletions'
 import { ref } from 'vue'
-// import { deepseekModule } from '@apis'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
 import { RoleEnum } from '@enums'
@@ -27,13 +29,13 @@ const model = route.query.model as string
 
 const parentMessageId = ref<string>('')
 
-const conversations = ref<AI.Conversation[]>([])
+const conversationList = ref<AI.Conversation[]>([])
 
 const { Completions } = useCompletions()
 /**
- * ollama 模型
+ * deepseek 模型
  */
-const ollamaModel = new Completions({
+const deepseekModel = new Completions({
   apiKey: '',
   apiBaseUrl: import.meta.env.VITE_API_DOMAIN_PREFIX,
   completionsUrl: '/deepseek/completions',
@@ -47,17 +49,19 @@ const ollamaModel = new Completions({
  */
 const roleAlias = ref<Record<AI.Role, string>>({
   user: 'ME',
-  assistant: 'Ollama',
+  assistant: 'DeepSeek',
   system: 'System',
 })
 
+const currentConversation = ref<AI.Conversation | null>(null)
 /**
  * 流式会话
  * @param {string} question
  */
 const completions = async (question: string) => {
   setTimeout(async () => {
-    conversations.value = await ollamaModel.getAllConversations()
+    conversationList.value = await deepseekModel.getAllConversations()
+    currentConversation.value = deepseekModel.buildConversation(RoleEnum.Assistant, '', {})
   })
 
   const questionOption: AI.Gpt.CompletionsOptions = {
@@ -67,17 +71,15 @@ const completions = async (question: string) => {
       model,
     },
     onProgress(partialResponse) {
-      // 直接更新 conversations 的最后一条
-      if (conversations.value.length > 0) {
-        conversations.value[conversations.value.length - 1] = cloneDeep(partialResponse)
-      }
+      currentConversation.value = cloneDeep(partialResponse)
     },
   }
 
-  const response = await ollamaModel.completions(question, questionOption)
+  const response = await deepseekModel.completions(question, questionOption)
 
   if (!!response.done) {
-    conversations.value = await ollamaModel.getAllConversations()
+    currentConversation.value = null
+    conversationList.value = await deepseekModel.getAllConversations()
     parentMessageId.value = response.parentMessageId
   }
 }
@@ -85,7 +87,7 @@ const completions = async (question: string) => {
  * 取消会话
  */
 const cancelConversation = () => {
-  ollamaModel.cancelConversation()
+  deepseekModel.cancelConversation()
 }
 </script>
 <style lang="less" scoped>
@@ -95,6 +97,19 @@ const cancelConversation = () => {
   width: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--el-bg-color);
+
+  .chat-main-card {
+    flex: 1;
+    margin: 24px 24px 0 24px;
+    background: var(--el-bg-color);
+    border-radius: 10px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.04);
+    padding: 32px 32px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
 
   .conversation-list {
     flex: 1;

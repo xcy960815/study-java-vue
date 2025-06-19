@@ -132,26 +132,6 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  // {
-  //   path: '/admin-user',
-  //   name: 'admin-user',
-  //   component: () => import(`../components/layout/index.vue`),
-  //   meta: {
-  //     title: '超级管理员',
-  //     icon: 'DataUser',
-  //   },
-  //   children: [
-  //     {
-  //       path: '/admin-user/list',
-  //       name: 'admin-user-list',
-  //       component: () => import(`../views/admin-user/list.vue`),
-  //       meta: {
-  //         title: '超级管理员列表',
-  //         icon: 'ListView',
-  //       },
-  //     },
-  //   ],
-  // },
   {
     path: '/upload',
     name: 'upload',

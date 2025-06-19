@@ -6,6 +6,7 @@
         @completions="completions"
         @cancel-conversation="cancelConversation"
         :conversation-list="conversationList"
+        :current-conversation="currentConversation"
       >
       </ai-chat>
     </div>
@@ -52,13 +53,15 @@ const completionsModel = new Completions({
 
 const parentMessageId = ref('')
 
+const currentConversation = ref<AI.Conversation | null>(null)
+
 /**
  * 流式会话
  */
 const completions = async (question: string) => {
   setTimeout(async () => {
     conversationList.value = await completionsModel.getAllConversations()
-    console.log('conversationList.value', JSON.parse(JSON.stringify(conversationList.value)))
+    currentConversation.value = completionsModel.buildConversation(RoleEnum.Assistant, '', {})
   })
   const response = await completionsModel.completions(question, {
     parentMessageId: parentMessageId.value,
@@ -67,17 +70,16 @@ const completions = async (question: string) => {
       model,
     },
     onProgress(partialResponse) {
-      if (conversationList.value.length > 0) {
-        conversationList.value[conversationList.value.length - 1] = cloneDeep(partialResponse)
-      }
+      currentConversation.value = cloneDeep(partialResponse)
     },
   })
   if (!!response.done) {
+    currentConversation.value = null
     conversationList.value = await completionsModel.getAllConversations()
-    console.log('conversationList.123', JSON.parse(JSON.stringify(conversationList.value)))
     parentMessageId.value = response.parentMessageId
   }
 }
+
 /**
  * 取消当前会话
  */
@@ -97,7 +99,7 @@ const cancelConversation = () => {
   .chat-main-card {
     flex: 1;
     margin: 24px 24px 0 24px;
-    background: #fff;
+    background: var(--el-bg-color);
     border-radius: 10px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.04);
     padding: 32px 32px 24px 32px;
@@ -170,10 +172,12 @@ const cancelConversation = () => {
   }
 }
 
+// 滚动条
 .chat-messages::-webkit-scrollbar {
   width: 6px;
 }
 
+// 滚动条的样式
 .chat-messages::-webkit-scrollbar-thumb {
   background: #e0e0e0;
   border-radius: 3px;

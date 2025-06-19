@@ -73,7 +73,7 @@ export class CompletionsCore {
   /**
    * 获取模型列表 URL
    */
-  private get modelsUrl(): string {
+  private get _modelsUrl(): string {
     return `${this._apiBaseUrl}/v1/models`
   }
 
@@ -324,7 +324,6 @@ export class CompletionsCore {
       await this.upsertConversation(conversation)
       this._currentConversation = null
     }
-
     this._abortController.abort(reason)
     this._abortController = new AbortController()
   }
@@ -340,7 +339,7 @@ export class CompletionsCore {
       headers: this.headers,
     }
     const response = await this._fetchSSE<{ data: Array<{ id: string; name: string }> }>(
-      this.modelsUrl,
+      this._modelsUrl,
       requestInit
     )
     if (!response) {

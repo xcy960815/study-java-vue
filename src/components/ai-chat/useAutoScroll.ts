@@ -4,6 +4,7 @@ import { throttle } from '@/plugins/function-decorator'
 interface UseAutoScrollParams {
   readonly props: {
     readonly conversationList: AI.Conversation[]
+    readonly currentConversation: AI.Conversation | null
     readonly roleAlias: Record<'system' | 'user' | 'assistant', string>
   }
 }
@@ -46,14 +47,14 @@ export function useAutoScroll({ props }: UseAutoScrollParams) {
   /**
    * 监听内容变化，自动滚动
    */
-  // watch(
-  //   () => props.conversation?.content,
-  //   () => {
-  //     if (autoScroll.value && !isUserScrolling.value) {
-  //       scrollToBottom()
-  //     }
-  //   }
-  // )
+  watch(
+    () => props.currentConversation?.content,
+    () => {
+      if (autoScroll.value && !isUserScrolling.value) {
+        scrollToBottom()
+      }
+    }
+  )
 
   /**
    * 处理滚动事件

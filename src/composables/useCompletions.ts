@@ -64,14 +64,12 @@ class Completions extends CompletionsCore {
       ...options,
       messageId: userMessage.messageId,
     })
-    await this.upsertConversation(assistantMessage)
+    // await this.upsertConversation(assistantMessage)
 
     // 处理响应
     const conversationPromise = this.handleAnswerRequest(assistantMessage, options)
       .then(async (conversation) => {
-        console.log('conversation-123', conversation)
-
-        // await this.upsertConversation(conversation)
+        await this.upsertConversation(conversation)
         conversation.parentMessageId = conversation.messageId
         return conversation
       })

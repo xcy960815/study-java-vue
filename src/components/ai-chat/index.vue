@@ -23,20 +23,44 @@
             />
           </div>
           <div class="answer-wrapper flex-1">
-            <chat-thinking v-if="showThinking(conversation)" />
             <div
               class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
               v-html="renderMarkdownText(conversation.content)"
             ></div>
+          </div>
+        </div>
+      </transition-group>
+      <!-- 当前会话 -->
+      <transition name="conversation-fade">
+        <div
+          v-if="currentConversation"
+          :key="currentConversation.messageId"
+          class="current-conversation group flex flex-col px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg mb-2 hover:shadow-md transition-shadow duration-200"
+        >
+          <div class="flex justify-between items-center mb-2">
+            <div class="font-bold text-slate-700 dark:text-slate-200">
+              {{ getRoleAlias(currentConversation.role) }}：
+            </div>
+            <chat-copy
+              class="invisible group-hover:visible transition-opacity duration-200"
+              :content="currentConversation.content"
+            />
+          </div>
+          <div class="answer-wrapper flex-1">
+            <chat-thinking v-if="showThinking(currentConversation)" />
+            <div
+              class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
+              v-html="renderMarkdownText(currentConversation.content)"
+            />
             <img
-              v-if="showAsking(conversation)"
+              v-if="showAsking(currentConversation)"
               :src="loadingSvg"
               class="w-6 h-6 animate-pulse"
               alt="loading"
             />
           </div>
         </div>
-      </transition-group>
+      </transition>
     </div>
     <!-- 问题&发送消息按钮 -->
     <chat-input :conversation="currentConversation" v-bind="$attrs" @send="handleSend" />
@@ -66,6 +90,10 @@ const props = defineProps({
     required: true,
     validator: (val: AI.Conversation[]) => Array.isArray(val),
   },
+  currentConversation: {
+    type: Object as PropType<AI.Conversation | null>,
+    default: null,
+  },
   roleAlias: {
     type: Object as PropType<Record<AI.Role, string>>,
     default: () => ({
@@ -82,12 +110,6 @@ const emit = defineEmits<{
   (e: 'scroll', event: Event): void
 }>()
 
-/**
- * 当前会话
- */
-const currentConversation = computed(
-  () => props.conversationList[props.conversationList.length - 1]
-)
 /**
  * 加载动画
  */
@@ -117,7 +139,7 @@ const showThinking = (conversation: AI.Gpt.AssistantConversation): boolean => {
 }
 
 /**
- * 显示提问动画
+ * 显示回答动画
  */
 const showAsking = (conversation: AI.Gpt.AssistantConversation): boolean => {
   return conversation.done === true && conversation.thinking === true
