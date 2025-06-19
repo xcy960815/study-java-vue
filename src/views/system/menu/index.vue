@@ -35,9 +35,9 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       style="width: 100%"
     >
-      <el-table-column prop="menuName" label="菜单名称" width="120" />
-      <el-table-column prop="path" label="菜单路径" width="150" />
-      <el-table-column prop="component" label="组件路径" min-width="160" />
+      <el-table-column prop="menuName" label="菜单名称" width="120" sortable />
+      <el-table-column prop="path" label="菜单路径" width="150" sortable />
+      <el-table-column prop="component" label="组件路径" min-width="160" sortable />
       <el-table-column prop="icon" label="图标" width="80" align="center">
         <template #default="{ row }">
           <icon v-if="row.icon" :name="row.icon" />
@@ -51,8 +51,8 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="perms" label="权限标识" />
-      <el-table-column prop="createTime" label="创建时间" min-width="180" />
+      <el-table-column prop="perms" label="权限标识" sortable />
+      <el-table-column prop="createTime" label="创建时间" min-width="180" sortable />
       <el-table-column fixed="right" label="操作" width="300">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditMenu(row)"
@@ -150,7 +150,7 @@ import MenuIconSelector from './components/menu-icon-selector.vue'
 import { useAsyncComputed } from '@/composables/useAsyncComputed'
 
 interface MenuListInfo {
-  treeData: Array<StudyJavaSysMenuVo & { hasChildren: boolean }>
+  treeData: Array<StudyJavaSysMenuVo>
   total: number | undefined
   pageSize: number
   pageNum: number
@@ -233,28 +233,22 @@ const handlePageNumChange = (pageNum: number) => {
  * @description 查询菜单列表
  */
 const fetchMenuList = async () => {
-  const pageSize = menuListInfo.pageSize
-  const pageNum = menuListInfo.pageNum
+  // 一次性请求全部菜单数据，不分页
   const result = await getMenuTree({
-    pageSize,
-    pageNum,
+    pageSize: 10000, // 设置一个足够大的值，确保拿到所有菜单
+    pageNum: 1,
     ...queryFormData,
   })
   if (result.code === 200) {
     menuListInfo.treeData = handleMenuTreeData(result.data.data)
-    console.log(JSON.stringify(menuListInfo.treeData, null, 2))
-
     menuListInfo.total = result.data.total
   }
 }
 
-const handleMenuTreeData = <R extends StudyJavaSysMenuVo>(
-  data?: R[]
-): Array<R & { hasChildren: boolean }> => {
+const handleMenuTreeData = <R extends StudyJavaSysMenuVo>(data?: R[]): Array<R> => {
   if (!data) return []
   return data.map((item) => ({
     ...item,
-    hasChildren: Boolean(item.children?.length),
     children: handleMenuTreeData(item.children),
   }))
 }

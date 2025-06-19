@@ -33,8 +33,8 @@ importers:
         specifier: ^1.11.13
         version: 1.11.13
       element-plus:
-        specifier: ^2.9.3
-        version: 2.9.8(vue@3.5.13(typescript@5.4.5))
+        specifier: ^2.10.2
+        version: 2.10.2(vue@3.5.13(typescript@5.4.5))
       eventsource-parser:
         specifier: ^3.0.0
         version: 3.0.1
@@ -2193,8 +2193,8 @@ packages:
   electron-to-chromium@1.5.139:
     resolution: {integrity: sha512-GGnRYOTdN5LYpwbIr0rwP/ZHOQSvAF6TG0LSzp28uCBb9JiXHJGmaaKw29qjNJc5bGnnp6kXJqRnGMQoELwi5w==}
 
-  element-plus@2.9.8:
-    resolution: {integrity: sha512-srViUaUdfblBKGMeuEPiXxxKlH5aUmKqEwmhb/At9Sj91DbU6od/jYN1955cTnzt3wTSA7GfnZF7UiRX9sdRHg==}
+  element-plus@2.10.2:
+    resolution: {integrity: sha512-p2KiAa0jEGXrzdlTAfpiS7HQFAhla4gvx6H7RuDf+OO0uC3DGpolxvdHjFR8gt7+vaWyxQNcHa1sAdBkmjqlgA==}
     peerDependencies:
       vue: ^3.2.0
 
@@ -7470,7 +7470,7 @@ snapshots:
 
   electron-to-chromium@1.5.139: {}
 
-  element-plus@2.9.8(vue@3.5.13(typescript@5.4.5)):
+  element-plus@2.10.2(vue@3.5.13(typescript@5.4.5)):
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.1(vue@3.5.13(typescript@5.4.5))
@@ -10563,7 +10563,7 @@ snapshots:
 
   use-element-plus-theme@0.0.5(@types/node@20.17.30)(rollup@4.40.0)(typescript@5.4.5)(vite@5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0)):
     dependencies:
-      element-plus: 2.9.8(vue@3.5.13(typescript@5.4.5))
+      element-plus: 2.10.2(vue@3.5.13(typescript@5.4.5))
       vite-plugin-dts: 3.9.1(@types/node@20.17.30)(rollup@4.40.0)(typescript@5.4.5)(vite@5.4.18(@types/node@20.17.30)(less@4.3.0)(sass@1.83.4)(terser@5.39.0))
       vue: 3.5.13(typescript@5.4.5)
     transitivePeerDependencies:
