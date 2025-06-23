@@ -10,6 +10,7 @@ export const systemInfoStore = defineStore<
 >(StoreNames.SYSTEM, {
   state: () => {
     return {
+      hasAddedRoutes: false,
       openMenuFlag: true,
       historyList: [],
       keepLiveList: [],
@@ -24,6 +25,9 @@ export const systemInfoStore = defineStore<
     },
     getHistoryList(state) {
       return state.historyList
+    },
+    getHasAddedRoutes(state) {
+      return state.hasAddedRoutes
     },
   },
   actions: {
@@ -92,6 +96,9 @@ export const systemInfoStore = defineStore<
         router.push(preHistoryItem)
       }
     },
+    setHasAddedRoutes(flag) {
+      this.hasAddedRoutes = flag
+    },
   },
-  persist: true,
+  // persist: true,
 })

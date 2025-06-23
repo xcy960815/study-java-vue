@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" />
       <el-table-column prop="createTime" label="创建时间" width="260" />
-      <el-table-column fixed="right" label="操作" width="120">
+      <el-table-column fixed="right" label="操作" min-width="150">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditRole(row)"
             >编辑</el-button
@@ -146,7 +146,7 @@
 import { roleModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { getMenuTree } from '@/apis/system/menu'
+import { getAllMenuTree } from '@/apis/system/menu'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { useAsyncComputed } from '@/composables/useAsyncComputed'
@@ -172,12 +172,11 @@ const queryFormData = reactive({
  * @description 菜单树数据
  */
 const menuTreeData = useAsyncComputed(async () => {
-  const queryParams = {
-    pageSize: 1000,
-    pageNum: 1,
-  }
-  const result = await getMenuTree(queryParams)
+  const result = await getAllMenuTree()
+
   const menuTree = useFilterMenuTree(result.data.data)
+  console.log('menuTree', menuTree)
+
   return menuTree
 })
 

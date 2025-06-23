@@ -130,9 +130,11 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
+import { useRouter } from 'vue-router'
 defineOptions({
   name: 'userList',
 })
+const router = useRouter()
 interface UserListInfo {
   tableData: UserInfoVo[]
   total: number | undefined

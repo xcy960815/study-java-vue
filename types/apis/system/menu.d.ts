@@ -1,3 +1,15 @@
+// import { svgIcons } from '@assets/svg-icons/index'
+
+// import * as ElIcons from '@element-plus/icons-vue'
+
+// import * as IconParkIcons from "@icon-park/vue-next"
+
+// type ElIconNames = keyof typeof ElIcons
+
+// type IconParkNames = keyof typeof IconParkIcons
+
+// type LocalIconNames = keyof typeof svgIcons
+
 /**
  * 后端返回的菜单信息
  */
@@ -30,7 +42,7 @@ declare interface StudyJavaSysMenuVo {
   /**
    * 菜单图标
    */
-  icon: string
+  icon: string //Exclude<IconParkNames, "IconProvider" | "DEFAULT_ICON_CONFIGS"> | LocalIconNames
 
   /**
    * 菜单类型（0目录 1菜单 2按钮）

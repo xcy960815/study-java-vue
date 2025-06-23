@@ -1,8 +1,10 @@
 // import { type RouteLocationNormalizedLoadedGeneric } from "vue-router"
 
 declare namespace SystemStore {
-  type RouteLocationNormalizedLoadedGeneric = import('vue-router').RouteLocationNormalizedLoadedGeneric
+  type RouteLocationNormalizedLoadedGeneric =
+    import('vue-router').RouteLocationNormalizedLoadedGeneric
   type State = {
+    hasAddedRoutes: boolean
     openMenuFlag: boolean
     historyList: Array<RouteLocationNormalizedLoadedGeneric>
     keepLiveList: Array<string>
@@ -16,14 +18,8 @@ declare namespace SystemStore {
    */
   type Actions = {
     reversalOpenMenuFlag: () => void
-    addKeepLiveItem: (
-      keepLiveItem: RouteLocationNormalizedLoadedGeneric
-    ) => void
-    addHistoryItem: (
-      historyItem: RouteLocationNormalizedLoadedGeneric
-    ) => void
-    removeHistoryItem: (
-      historyItem: RouteLocationNormalizedLoadedGeneric
-    ) => void
+    addKeepLiveItem: (keepLiveItem: RouteLocationNormalizedLoadedGeneric) => void
+    addHistoryItem: (historyItem: RouteLocationNormalizedLoadedGeneric) => void
+    removeHistoryItem: (historyItem: RouteLocationNormalizedLoadedGeneric) => void
   }
 }

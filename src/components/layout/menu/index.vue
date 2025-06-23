@@ -17,6 +17,7 @@ import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router'
+import { restoreRouteTree } from '@/plugins/redirect'
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
@@ -34,7 +35,7 @@ const isCollapse = computed(() => {
 })
 
 const menuData = computed(() => {
-  const routes = router.options.routes
+  const routes = router.getRoutes()
   function filterRoutes(data: ReadonlyArray<RouteRecordRaw>) {
     return data
       .map((node) => {

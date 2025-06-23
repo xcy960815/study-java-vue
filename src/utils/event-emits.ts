@@ -1,4 +1,4 @@
-const eventNames = ['token-invalid', 'login', 'logout'] as const
+const eventNames = ['token-invalid', 'login', 'logout', 'get-routes'] as const
 
 // 定义事件名称
 type EventNames = (typeof eventNames)[number]
@@ -8,11 +8,12 @@ interface EventMap {
   'token-invalid': [] // 无参数
   login: [] // 示例参数为数字
   logout: []
+  'get-routes': []
 }
 
-export const HOME_PATH = '/system/user/list'
+export const BASE_REDIRECT_PATH = '/system/user'
 export const LOGIN_PATH = '/login'
-export const WHITELIST_PATHS = [HOME_PATH, LOGIN_PATH]
+export const WHITELIST_PATHS = [LOGIN_PATH]
 
 // 自定义事件发射器类
 class CustomEventEmitter {

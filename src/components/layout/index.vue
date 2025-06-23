@@ -17,6 +17,7 @@
 </template>
 
 <script lang="ts" setup>
+import { onMounted } from 'vue'
 import LayoutHeader from './header/index.vue'
 import LayoutHistory from './history/index.vue'
 import LayoutMenu from './menu/index.vue'

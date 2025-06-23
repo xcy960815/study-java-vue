@@ -1,8 +1,11 @@
-import { getToken } from '@utils/token'
+import { getToken } from '@/utils/token'
 import { changeTabIcon } from '@/utils/system-style'
-import { eventEmitter, HOME_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@/utils/event-emits'
+import { eventEmitter, BASE_REDIRECT_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@/utils/event-emits'
 import router from '@/router'
-
+import { getRoutes } from '@apis/system/menu'
+import { useSystemInfoStore } from '@store'
+import { buildRoute } from '@/utils/build-route'
+import type { RouteRecord, RouteRecordRaw } from 'vue-router'
 /**
  * token过期
  */
@@ -22,22 +25,46 @@ eventEmitter.on('token-invalid', () => {
  */
 eventEmitter.on('login', () => {
   const redirect = router.currentRoute.value.query.redirect as string
-  console.log('登录', redirect)
   router.replace({
-    path: redirect || '/system/user/list',
+    path: redirect || BASE_REDIRECT_PATH,
   })
 })
 
+/**
+ * 退出登录
+ */
 eventEmitter.on('logout', () => {
   const route = router.currentRoute.value
   const redirect = route.fullPath
-  // TODO 重定向之后 不会携带路径的参数
   router.replace({
     path: '/login',
     query: {
       redirect,
     },
   })
+})
+
+/**
+ * 获取路由
+ */
+eventEmitter.on('get-routes', async () => {
+  console.log('get-routes', JSON.stringify(router.getRoutes(), null, 2))
+  return
+  const systemInfoStore = useSystemInfoStore()
+  const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
+
+  if (!hasAddedRoutes) {
+    const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
+    if (routesRes.code === 200) {
+      const routes = routesRes.data
+      const routeList = buildRoute(routes)
+      routeList.forEach((route) => {
+        router.addRoute(route)
+      })
+      console.log('router', router.getRoutes())
+      systemInfoStore.setHasAddedRoutes(true)
+    }
+  }
 })
 
 /*************** 统一管理通用路由跳转 *****************/
@@ -52,12 +79,14 @@ router.beforeEach(async (to, _from, next) => {
     const token = await getToken()
     if (!token) {
       next(LOGIN_PATH)
+    } else {
+      eventEmitter.emit('get-routes')
+      next()
     }
-    next()
   }
 })
 
-router.afterEach((_to, _from) => {
-  // console.log(to, from)
-  // console.log('afterEach')
-})
+/**
+ * 还原树形结构并移除在其它 routes 中已存在 path 的节点
+ */
+export function restoreRouteTree(routes: RouteRecordRaw[]): RouteRecordRaw[] {}

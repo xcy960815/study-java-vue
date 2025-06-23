@@ -35,9 +35,9 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       style="width: 100%"
     >
-      <el-table-column prop="menuName" label="菜单名称" width="120" sortable />
-      <el-table-column prop="path" label="菜单路径" width="150" sortable />
-      <el-table-column prop="component" label="组件路径" min-width="160" sortable />
+      <el-table-column prop="menuName" label="菜单名称" width="120" />
+      <el-table-column prop="path" label="菜单路径" width="150" />
+      <el-table-column prop="component" label="组件路径" min-width="160" />
       <el-table-column prop="icon" label="图标" width="80" align="center">
         <template #default="{ row }">
           <icon v-if="row.icon" :name="row.icon" />
@@ -51,8 +51,8 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="perms" label="权限标识" sortable />
-      <el-table-column prop="createTime" label="创建时间" min-width="180" sortable />
+      <el-table-column prop="perms" label="权限标识" />
+      <el-table-column prop="createTime" label="创建时间" min-width="180" />
       <el-table-column fixed="right" label="操作" width="300">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditMenu(row)"
@@ -141,7 +141,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, computed, ref, nextTick } from 'vue'
-import { getMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
+import { getRoutes, getMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
@@ -423,6 +423,7 @@ const handleClickDeleteMenu = (row: StudyJavaSysMenuVo) => {
 
 onMounted(() => {
   fetchMenuList()
+  // getRoutes()
 })
 </script>
 

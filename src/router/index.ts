@@ -66,39 +66,39 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
-  {
-    path: '/deepseek',
-    name: 'deepseek',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: 'deepseek',
-      icon: 'Brain',
-    },
-    children: [
-      {
-        path: '/deepseek/models',
-        name: 'deepseek-models',
-        component: () => import(`../views/deepseek/models/index.vue`),
-        meta: {
-          title: '模型列表',
-          icon: 'ListView',
-        },
-      },
-      {
-        path: '/deepseek/chat',
-        name: 'deepseek-chat',
-        component: () => import(`../views/deepseek/chat/index.vue`),
-        meta: {
-          hightlight: '/deepseek/models',
-          openMore: true,
-          keepAlive: true,
-          title: '聊天',
-          hidden: true,
-          icon: 'Intercom',
-        },
-      },
-    ],
-  },
+  // {
+  //   path: '/deepseek',
+  //   name: 'deepseek',
+  //   component: () => import(`../components/layout/index.vue`),
+  //   meta: {
+  //     title: 'deepseek',
+  //     icon: 'Brain',
+  //   },
+  //   children: [
+  //     {
+  //       path: '/deepseek/models',
+  //       name: 'deepseek-models',
+  //       component: () => import(`../views/deepseek/models/index.vue`),
+  //       meta: {
+  //         title: '模型列表',
+  //         icon: 'ListView',
+  //       },
+  //     },
+  //     {
+  //       path: '/deepseek/chat',
+  //       name: 'deepseek-chat',
+  //       component: () => import(`../views/deepseek/chat/index.vue`),
+  //       meta: {
+  //         hightlight: '/deepseek/models',
+  //         openMore: true,
+  //         keepAlive: true,
+  //         title: '聊天',
+  //         hidden: true,
+  //         icon: 'Intercom',
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/ollama',
     name: 'ollama',
@@ -181,8 +181,8 @@ export const routes: RouteRecordRaw[] = [
         },
       },
       {
-        path: '/system/user/list',
-        name: 'systemUserList',
+        path: '/system/user',
+        name: 'systemUser',
         component: () => import(`../views/system/user/list.vue`),
         meta: {
           icon: 'AddressBook',
@@ -192,8 +192,8 @@ export const routes: RouteRecordRaw[] = [
       },
       {
         // 角色管理
-        path: '/system/role/list',
-        name: 'systemRoleList',
+        path: '/system/role',
+        name: 'systemRole',
         component: () => import(`../views/system/role/list.vue`),
         meta: {
           title: '角色列表',
@@ -231,7 +231,5 @@ const router = createRouter({
   // history: createWebHistory(),  // history 模式
   routes,
 })
-
-/*************** 统一管理通用路由跳转 *****************/
 
 export default router

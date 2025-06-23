@@ -30,6 +30,17 @@ export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
 }
 
 /**
+ * 获取所有菜单树
+ * @returns {Promise<ResponseResult<StudyJavaSysMenuVo[]>>}
+ */
+export function getAllMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(): Promise<
+  ResponseResult<T>
+> {
+  const url = `${baseUrl}/getAllMenuTree`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+}
+
+/**
  * 更新菜单信息
  * @param {StudyJavaSysMenuDto} menuInfo
  * @returns {Promise<ResponseResult<boolean>>}
@@ -68,5 +79,14 @@ export function getMenuDetail<T extends StudyJavaSysMenuVo>(
   menuId: number
 ): Promise<ResponseResult<T>> {
   const url = `${baseUrl}/getMenuDetail/${menuId}`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+}
+
+/**
+ * 获取当前登录用户所拥有的路由列表
+ * @returns {Promise<ResponseResult<Array<StudyJavaSysMenuVo>>>>}
+ */
+export const getRoutes = <T extends Array<StudyJavaSysMenuVo>>() => {
+  const url = `${baseUrl}/getRoutes`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }
