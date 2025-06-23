@@ -47,20 +47,23 @@ eventEmitter.on('logout', () => {
  * 获取路由
  */
 eventEmitter.on('get-routes', async () => {
-  const systemInfoStore = useSystemInfoStore()
-  const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
-  if (!hasAddedRoutes) {
-    const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
-    if (routesRes.code === 200) {
-      const routes = routesRes.data
-      const routeList = buildRoute(routes)
-      routeList.forEach((route) => {
-        router.addRoute(route)
-      })
-      // console.log('routeList', JSON.stringify(routeList,null,2))
-      systemInfoStore.setHasAddedRoutes(true)
+  return new Promise<void>(async (resolve) => {
+    const systemInfoStore = useSystemInfoStore()
+    const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
+    if (!hasAddedRoutes) {
+      const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
+      if (routesRes.code === 200) {
+        const routes = routesRes.data
+        const routeList = buildRoute(routes)
+        routeList.forEach((route) => {
+          router.addRoute(route)
+        })
+        console.log('getRoutes', router.getRoutes())
+        systemInfoStore.setHasAddedRoutes(true)
+      }
     }
-  }
+    resolve()
+  })
 })
 
 /*************** 统一管理通用路由跳转 *****************/

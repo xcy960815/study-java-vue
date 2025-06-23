@@ -65,7 +65,7 @@ function restoreRouteTree<T extends RouteRecordRaw>(flatRoutes: T[]): T[] {
 /**
  * 过滤路由
  * @param data {ReadonlyArray<RouteRecordRaw>} 路由
- * @returns {any[]} 菜单
+ * @returns {RouteRecordRaw[]} 菜单
  */
 function filterRoutes<T extends RouteRecordRaw>(data: ReadonlyArray<T>): T[] {
   return data
@@ -81,7 +81,9 @@ function filterRoutes<T extends RouteRecordRaw>(data: ReadonlyArray<T>): T[] {
 
 const menuData = computed(() => {
   const routes = router.getRoutes()
+  console.log('getRoutes', routes)
   const treeRoutes = restoreRouteTree(routes)
+  console.log('treeRoutes', treeRoutes)
 
   return filterRoutes(treeRoutes)
 })
