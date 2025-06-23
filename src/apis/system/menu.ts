@@ -33,9 +33,7 @@ export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
  * 获取所有菜单树
  * @returns {Promise<ResponseResult<StudyJavaSysMenuVo[]>>}
  */
-export function getAllMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(): Promise<
-  ResponseResult<T>
-> {
+export function getAllMenuTree<T extends Array<StudyJavaSysMenuVo>>(): Promise<ResponseResult<T>> {
   const url = `${baseUrl}/getAllMenuTree`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url)
 }

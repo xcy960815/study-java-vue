@@ -86,7 +86,7 @@
     <el-dialog
       v-model="addOrEditRoleDialogVisible"
       :title="addOrEditRoleDialogTitle"
-      class="role-dialog"
+      class="system-role-dialog"
       width="500px"
     >
       <el-form
@@ -174,7 +174,7 @@ const queryFormData = reactive({
 const menuTreeData = useAsyncComputed(async () => {
   const result = await getAllMenuTree()
 
-  const menuTree = useFilterMenuTree(result.data.data)
+  const menuTree = useFilterMenuTree(result.data)
   return menuTree
 })
 
@@ -421,42 +421,9 @@ onMounted(() => {
       border-color: var(--el-border-color-light);
     }
   }
-
-  .pagination {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
-    padding: 16px 0;
-    background-color: var(--el-bg-color-overlay);
-    border-radius: 4px;
-
-    :deep(.el-pagination__total),
-    :deep(.el-pagination__jump) {
-      color: var(--el-text-color-regular);
-    }
-
-    :deep(.el-pagination__sizes) {
-      .el-input__wrapper {
-        background-color: var(--el-bg-color);
-      }
-    }
-
-    :deep(.el-pager li) {
-      background-color: var(--el-bg-color);
-      color: var(--el-text-color-regular);
-
-      &.is-active {
-        color: var(--el-color-primary);
-      }
-
-      &:hover {
-        color: var(--el-color-primary);
-      }
-    }
-  }
 }
 
-.role-dialog {
+.system-role-dialog {
   :deep(.el-dialog__header) {
     border-bottom: 1px solid var(--el-border-color-light);
     padding: 16px 20px;

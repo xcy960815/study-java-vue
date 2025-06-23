@@ -82,7 +82,7 @@
     <el-dialog
       v-model="addOrEditUserDialogVisible"
       :title="addOrEditUserDialogTitle"
-      class="user-dialog"
+      class="system-user-dialog"
     >
       <el-form
         ref="addOrEditUserFormRef"
@@ -392,42 +392,9 @@ onMounted(() => {
       border-color: var(--el-border-color-light);
     }
   }
-
-  .pagination {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
-    padding: 16px 0;
-    background-color: var(--el-bg-color-overlay);
-    border-radius: 4px;
-
-    :deep(.el-pagination__total),
-    :deep(.el-pagination__jump) {
-      color: var(--el-text-color-regular);
-    }
-
-    :deep(.el-pagination__sizes) {
-      .el-input__wrapper {
-        background-color: var(--el-bg-color);
-      }
-    }
-
-    :deep(.el-pager li) {
-      background-color: var(--el-bg-color);
-      color: var(--el-text-color-regular);
-
-      &.is-active {
-        color: var(--el-color-primary);
-      }
-
-      &:hover {
-        color: var(--el-color-primary);
-      }
-    }
-  }
 }
 
-.user-dialog {
+.system-user-dialog {
   :deep(.el-dialog__header) {
     border-bottom: 1px solid var(--el-border-color-light);
     padding: 16px 20px;

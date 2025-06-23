@@ -34,7 +34,11 @@
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="handleGetDataDictionaryList">
       <el-button size="small" type="primary" @click="handleAddDictionary">新增字典</el-button>
     </Handle-ToolBar>
-    <el-table v-loading="dataDictionaryListInfo.loading" :data="dataDictionaryListInfo.tableData">
+    <el-table
+      class="data-dictionary-table"
+      v-loading="dataDictionaryListInfo.loading"
+      :data="dataDictionaryListInfo.tableData"
+    >
       <el-table-column type="index" label="序号" width="55" />
       <el-table-column prop="dictType" label="字典类型" />
       <el-table-column prop="dictCode" label="字典编码" />
@@ -67,6 +71,7 @@
 
     <!-- 添加或修改字典对话框 -->
     <el-dialog
+      class="system-data-dictionary-dialog"
       :title="dataDictionaryDialogTitle"
       v-model="dataDictionaryDialogVisible"
       width="500px"
@@ -276,6 +281,68 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-// .data-dictionary-container {
-// }
+.data-dictionary-container {
+  position: relative;
+
+  .data-dictionary-table {
+    margin-bottom: 16px;
+    background-color: var(--el-bg-color-overlay);
+    border-radius: 4px;
+    overflow: hidden;
+
+    :deep(.el-table__header) {
+      background-color: var(--el-bg-color-overlay);
+
+      th {
+        background-color: var(--el-bg-color-overlay);
+        color: var(--el-text-color-primary);
+        font-weight: 600;
+      }
+    }
+
+    :deep(.el-table__body) {
+      td {
+        background-color: var(--el-bg-color-overlay);
+        color: var(--el-text-color-regular);
+      }
+    }
+
+    :deep(.el-table--border) {
+      border-color: var(--el-border-color-light);
+    }
+
+    :deep(.el-table__cell) {
+      border-color: var(--el-border-color-light);
+    }
+  }
+}
+.system-data-dictionary-dialog {
+  :deep(.el-dialog__header) {
+    border-bottom: 1px solid var(--el-border-color-light);
+    padding: 16px 20px;
+    margin: 0;
+
+    .el-dialog__title {
+      color: var(--el-text-color-primary);
+      font-weight: 600;
+    }
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 20px;
+  }
+
+  :deep(.el-dialog__footer) {
+    border-top: 1px solid var(--el-border-color-light);
+    padding: 16px 20px;
+  }
+
+  :deep(.el-form-item__label) {
+    color: var(--el-text-color-primary);
+  }
+
+  :deep(.el-input__wrapper) {
+    background-color: var(--el-bg-color);
+  }
+}
 </style>

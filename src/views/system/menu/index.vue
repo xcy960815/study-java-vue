@@ -30,14 +30,15 @@
 
     <el-table
       border
+      class="menu-table"
       :data="menuListInfo.treeData"
       row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       style="width: 100%"
     >
       <el-table-column prop="menuName" label="菜单名称" width="120" />
-      <el-table-column prop="path" label="菜单路径" width="150" />
-      <el-table-column prop="component" label="组件路径" min-width="160" />
+      <el-table-column prop="path" label="菜单路径" width="250" />
+      <el-table-column prop="component" label="组件路径" min-width="260" />
       <el-table-column prop="icon" label="图标" width="80" align="center">
         <template #default="{ row }">
           <icon v-if="row.icon" :name="row.icon" />
@@ -86,9 +87,12 @@
       @current-change="handlePageNumChange"
     />
 
-    <el-dialog v-model="addOrEditMenuDialogVisible" :title="addOrEditMenuDialogTitle">
+    <el-dialog
+      class="system-menu-dialog"
+      v-model="addOrEditMenuDialogVisible"
+      :title="addOrEditMenuDialogTitle"
+    >
       <el-form
-        v-if="addOrEditMenuDialogVisible"
         ref="addOrEditMenuFormRef"
         :model="addOrEditMenuFormData"
         :rules="addOrEditMenuFormRules"
@@ -111,7 +115,10 @@
           <el-input v-model="addOrEditMenuFormData.path" placeholder="请输入菜单路径" />
         </el-form-item>
         <el-form-item label="组件路径" prop="component">
-          <FileTreeSelector v-model="addOrEditMenuFormData.component" />
+          <FileTreeSelector
+            v-model="addOrEditMenuFormData.component"
+            placeholder="请选择组件路径"
+          />
         </el-form-item>
         <el-form-item label="菜单图标" prop="icon">
           <MenuIconSelector v-model="addOrEditMenuFormData.icon" />
@@ -142,7 +149,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, computed, ref, nextTick } from 'vue'
-import { getRoutes, getMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
+import { getMenuTree, getAllMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
@@ -177,12 +184,8 @@ const addOrEditMenuDialogVisible = ref(false)
  * @description 菜单树数据
  */
 const menuTreeData = useAsyncComputed(async () => {
-  const queryParams = {
-    pageSize: 1000,
-    pageNum: 1,
-  }
-  const result = await getMenuTree(queryParams)
-  return filterMenuTree(result.data.data)
+  const result = await getAllMenuTree()
+  return filterMenuTree(result.data)
 })
 
 // 递归过滤菜单树
@@ -236,8 +239,8 @@ const handlePageNumChange = (pageNum: number) => {
 const fetchMenuList = async () => {
   // 一次性请求全部菜单数据，不分页
   const result = await getMenuTree({
-    pageSize: 10000, // 设置一个足够大的值，确保拿到所有菜单
-    pageNum: 1,
+    pageSize: menuListInfo.pageSize, // 设置一个足够大的值，确保拿到所有菜单
+    pageNum: menuListInfo.pageNum,
     ...queryFormData,
   })
   if (result.code === 200) {
@@ -431,5 +434,66 @@ onMounted(() => {
 <style lang="scss" scoped>
 .system-menu-container {
   position: relative;
+
+  .menu-table {
+    margin-bottom: 16px;
+    background-color: var(--el-bg-color-overlay);
+    border-radius: 4px;
+    overflow: hidden;
+
+    :deep(.el-table__header) {
+      background-color: var(--el-bg-color-overlay);
+
+      th {
+        background-color: var(--el-bg-color-overlay);
+        color: var(--el-text-color-primary);
+        font-weight: 600;
+      }
+    }
+
+    :deep(.el-table__body) {
+      td {
+        background-color: var(--el-bg-color-overlay);
+        color: var(--el-text-color-regular);
+      }
+    }
+
+    :deep(.el-table--border) {
+      border-color: var(--el-border-color-light);
+    }
+
+    :deep(.el-table__cell) {
+      border-color: var(--el-border-color-light);
+    }
+  }
+}
+.system-menu-dialog {
+  :deep(.el-dialog__header) {
+    border-bottom: 1px solid var(--el-border-color-light);
+    padding: 16px 20px;
+    margin: 0;
+
+    .el-dialog__title {
+      color: var(--el-text-color-primary);
+      font-weight: 600;
+    }
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 20px;
+  }
+
+  :deep(.el-dialog__footer) {
+    border-top: 1px solid var(--el-border-color-light);
+    padding: 16px 20px;
+  }
+
+  :deep(.el-form-item__label) {
+    color: var(--el-text-color-primary);
+  }
+
+  :deep(.el-input__wrapper) {
+    background-color: var(--el-bg-color);
+  }
 }
 </style>

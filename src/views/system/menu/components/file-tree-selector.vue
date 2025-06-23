@@ -1,50 +1,55 @@
 <template>
   <el-tree-select
     class="file-tree-select"
-    :model-value="modelValue"
+    v-model="localModelValue"
     :data="fileStructureData"
     :props="defaultProps"
     :render-after-expand="false"
     filterable
     clearable
-    placeholder="搜索文件..."
+    :placeholder="placeholder"
     style="width: 100%"
-    @update:model-value="handleChange"
   >
-    <template #default="{ node, data }">
-      <div class="custom-tree-node">
-        <span class="node-label">{{ data.value }}</span>
-      </div>
-    </template>
   </el-tree-select>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, onMounted, computed } from 'vue'
 
 defineOptions({
   name: 'FileTreeSelector',
 })
 
 // 定义 props 和 emits
-const props = defineProps<{
-  modelValue: string
-}>()
+const props = defineProps({
+  placeholder: {
+    type: String,
+    default: () => '',
+  },
+  modelValue: {
+    type: String,
+    default: () => '',
+  },
+})
 
 const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
 const fileStructureData = ref<FileTree.FileNode[]>([])
-// 配置树形选择器的属性
+
+/**
+ * 树形选择器的属性
+ */
 const defaultProps = {
   children: 'children',
   label: 'value', // 使用 path 作为显示标签
   value: 'value', // 使用 path 作为选择值
 }
 
-// 获取项目文件结构
+/**
+ * 获取项目文件结构
+ */
 const fetchFileStructure = async () => {
   // 在开发环境中使用API获取文件结构
   if (import.meta.env.DEV) {
@@ -53,6 +58,7 @@ const fetchFileStructure = async () => {
       const result = await response.json()
       if (result.code === 200 && result.data) {
         fileStructureData.value = result.data
+        console.log('fileStructureData.value', fileStructureData.value)
       }
     }
   } else {
@@ -65,21 +71,15 @@ const fetchFileStructure = async () => {
   }
 }
 
-// 处理选择变化
-const handleChange = (value: string) => {
-  emit('update:modelValue', value)
-  console.log('Selected path:', value)
-}
-
-// 复制路径功能
-const copyPath = async (path: string) => {
-  try {
-    await navigator.clipboard.writeText(path)
-    ElMessage.success('路径已复制')
-  } catch {
-    ElMessage.error('复制失败')
-  }
-}
+const localModelValue = computed({
+  get() {
+    console.log('localModelValue', props.modelValue)
+    return props.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  },
+})
 
 onMounted(() => {
   fetchFileStructure()
@@ -89,27 +89,6 @@ onMounted(() => {
 <style lang="scss" scoped>
 .file-tree-select {
   width: 100%;
-}
-
-.custom-tree-node {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  font-size: 14px;
-  justify-content: space-between;
-}
-
-.node-label {
-  color: #303133;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.node-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 :deep(.el-tree-select__popper) {

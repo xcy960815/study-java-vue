@@ -150,7 +150,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: '/system/user',
         name: 'systemUser',
-        component: () => import(`../views/system/user/list.vue`),
+        component: () => import(`../views/system/user/index.vue`),
         meta: {
           icon: 'AddressBook',
           keepAlive: true,
@@ -161,7 +161,7 @@ export const routes: RouteRecordRaw[] = [
         // 角色管理
         path: '/system/role',
         name: 'systemRole',
-        component: () => import(`../views/system/role/list.vue`),
+        component: () => import(`../views/system/role/index.vue`),
         meta: {
           title: '角色列表',
           icon: 'Permissions',

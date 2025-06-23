@@ -49,7 +49,6 @@ eventEmitter.on('logout', () => {
 eventEmitter.on('get-routes', async () => {
   const systemInfoStore = useSystemInfoStore()
   const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
-
   if (!hasAddedRoutes) {
     const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
     if (routesRes.code === 200) {
@@ -76,7 +75,7 @@ router.beforeEach(async (to, _from, next) => {
     if (!token) {
       next(LOGIN_PATH)
     } else {
-      eventEmitter.emit('get-routes')
+      await eventEmitter.emit('get-routes')
       next()
     }
   }
