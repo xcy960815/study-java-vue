@@ -5,7 +5,6 @@ import router from '@/router'
 import { getRoutes } from '@apis/system/menu'
 import { useSystemInfoStore } from '@store'
 import { buildRoute } from '@/utils/build-route'
-import type { RouteRecord, RouteRecordRaw } from 'vue-router'
 /**
  * token过期
  */
@@ -48,8 +47,6 @@ eventEmitter.on('logout', () => {
  * 获取路由
  */
 eventEmitter.on('get-routes', async () => {
-  console.log('get-routes', JSON.stringify(router.getRoutes(), null, 2))
-  return
   const systemInfoStore = useSystemInfoStore()
   const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
 
@@ -61,7 +58,6 @@ eventEmitter.on('get-routes', async () => {
       routeList.forEach((route) => {
         router.addRoute(route)
       })
-      console.log('router', router.getRoutes())
       systemInfoStore.setHasAddedRoutes(true)
     }
   }
@@ -85,8 +81,3 @@ router.beforeEach(async (to, _from, next) => {
     }
   }
 })
-
-/**
- * 还原树形结构并移除在其它 routes 中已存在 path 的节点
- */
-export function restoreRouteTree(routes: RouteRecordRaw[]): RouteRecordRaw[] {}

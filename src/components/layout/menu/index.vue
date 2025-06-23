@@ -17,7 +17,6 @@ import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router'
-import { restoreRouteTree } from '@/plugins/redirect'
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
 const router = useRouter()
@@ -34,20 +33,57 @@ const isCollapse = computed(() => {
   return openMenuFlag
 })
 
+/**
+ * 还原为树形结构（可选，视你的路由结构而定）
+ * @param flatRoutes {RouteRecordRaw[]} 扁平化路由
+ * @returns {RouteRecordRaw[]} 树形路由
+ */
+function restoreRouteTree<T extends RouteRecordRaw>(flatRoutes: T[]): T[] {
+  const routeMap: Record<string, T & { children: T[] }> = {}
+  const tree: T[] = []
+
+  flatRoutes.forEach((route) => {
+    routeMap[route.path] = { ...route, children: [] }
+  })
+
+  flatRoutes.forEach((route) => {
+    // 通过 path 层级关系还原树
+    const segments = route.path.split('/').filter(Boolean)
+    if (segments.length > 1) {
+      const parentPath = '/' + segments.slice(0, -1).join('/')
+      if (routeMap[parentPath]) {
+        routeMap[parentPath].children.push(routeMap[route.path])
+        return
+      }
+    }
+    tree.push(routeMap[route.path])
+  })
+
+  return tree
+}
+
+/**
+ * 过滤路由
+ * @param data {ReadonlyArray<RouteRecordRaw>} 路由
+ * @returns {any[]} 菜单
+ */
+function filterRoutes<T extends RouteRecordRaw>(data: ReadonlyArray<T>): T[] {
+  return data
+    .map((node) => {
+      const newNode = { ...node }
+      if (newNode.children && newNode.children.length > 0) {
+        newNode.children = filterRoutes(newNode.children)
+      }
+      return newNode
+    })
+    .filter((node) => node.meta && node.meta?.title && !node.meta?.hidden)
+}
+
 const menuData = computed(() => {
   const routes = router.getRoutes()
-  function filterRoutes(data: ReadonlyArray<RouteRecordRaw>) {
-    return data
-      .map((node) => {
-        const newNode = { ...node }
-        if (newNode.children && newNode.children.length > 0) {
-          newNode.children = filterRoutes(newNode.children)
-        }
-        return newNode
-      })
-      .filter((node) => node.meta && node.meta?.title && !node.meta?.hidden)
-  }
-  return filterRoutes(routes)
+  const treeRoutes = restoreRouteTree(routes)
+
+  return filterRoutes(treeRoutes)
 })
 
 /**

@@ -34,104 +34,71 @@ export const routes: RouteRecordRaw[] = [
       content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
     },
   },
-  {
-    path: '/goods-category',
-    name: 'goods-category',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '商品',
-      icon: 'Commodity',
-    },
-    children: [
-      {
-        path: '/goods-category/list',
-        name: 'goods-category-list',
-        component: () => import(`../views/goods-category/list.vue`),
-        meta: {
-          title: '商品列表',
-          keepAlive: true,
-          icon: 'ListView',
-        },
-      },
-      {
-        path: '/goods-category/info',
-        name: 'info',
-        component: () => import(`../views/goods-category/info.vue`),
-        meta: {
-          hidden: true,
-          hightlight: '/goods-category/list',
-          title: '商品详情',
-          icon: 'DocDetail',
-        },
-      },
-    ],
-  },
   // {
-  //   path: '/deepseek',
-  //   name: 'deepseek',
+  //   path: '/goods-category',
+  //   name: 'goods-category',
   //   component: () => import(`../components/layout/index.vue`),
   //   meta: {
-  //     title: 'deepseek',
+  //     title: '商品',
+  //     icon: 'Commodity',
+  //   },
+  //   children: [
+  //     {
+  //       path: '/goods-category/list',
+  //       name: 'goods-category-list',
+  //       component: () => import(`../views/goods-category/list.vue`),
+  //       meta: {
+  //         title: '商品列表',
+  //         keepAlive: true,
+  //         icon: 'ListView',
+  //       },
+  //     },
+  //     {
+  //       path: '/goods-category/info',
+  //       name: 'info',
+  //       component: () => import(`../views/goods-category/info.vue`),
+  //       meta: {
+  //         hidden: true,
+  //         hightlight: '/goods-category/list',
+  //         title: '商品详情',
+  //         icon: 'DocDetail',
+  //       },
+  //     },
+  //   ],
+  // },
+  // {
+  //   path: '/ollama',
+  //   name: 'ollama',
+  //   component: () => import(`../components/layout/index.vue`),
+  //   meta: {
+  //     title: 'ollama',
   //     icon: 'Brain',
   //   },
   //   children: [
   //     {
-  //       path: '/deepseek/models',
-  //       name: 'deepseek-models',
-  //       component: () => import(`../views/deepseek/models/index.vue`),
+  //       path: '/ollama/models',
+  //       name: 'ollama-models',
+  //       component: () => import(`../views/ollama/models/index.vue`),
   //       meta: {
   //         title: '模型列表',
   //         icon: 'ListView',
   //       },
   //     },
   //     {
-  //       path: '/deepseek/chat',
-  //       name: 'deepseek-chat',
-  //       component: () => import(`../views/deepseek/chat/index.vue`),
+  //       name: 'ollama-chat',
+  //       path: '/ollama/chat',
+  //       component: () => import(`../views/ollama/chat/index.vue`),
   //       meta: {
-  //         hightlight: '/deepseek/models',
+  //         hightlight: '/ollama/models',
   //         openMore: true,
   //         keepAlive: true,
-  //         title: '聊天',
   //         hidden: true,
+  //         title: '会话',
   //         icon: 'Intercom',
   //       },
   //     },
   //   ],
   // },
-  {
-    path: '/ollama',
-    name: 'ollama',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: 'ollama',
-      icon: 'Brain',
-    },
-    children: [
-      {
-        path: '/ollama/models',
-        name: 'ollama-models',
-        component: () => import(`../views/ollama/models/index.vue`),
-        meta: {
-          title: '模型列表',
-          icon: 'ListView',
-        },
-      },
-      {
-        name: 'ollama-chat',
-        path: '/ollama/chat',
-        component: () => import(`../views/ollama/chat/index.vue`),
-        meta: {
-          hightlight: '/ollama/models',
-          openMore: true,
-          keepAlive: true,
-          hidden: true,
-          title: '会话',
-          icon: 'Intercom',
-        },
-      },
-    ],
-  },
   {
     path: '/upload',
     name: 'upload',

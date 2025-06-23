@@ -273,7 +273,7 @@ const handleClickAddOrEditConfirm = async () => {
   if (addOrEditUserDialogTitle.value === '新增用户') {
     result = await userModule.insertUserInfo(addOrEditUserFormData)
   } else {
-    result = await userModule.updateUserInfo<boolean>(addOrEditUserFormData)
+    result = await userModule.updateUser<boolean>(addOrEditUserFormData)
   }
 
   if (result.code === 200) {

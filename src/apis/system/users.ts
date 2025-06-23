@@ -29,10 +29,8 @@ export const getUserList = <T extends ListResponseResult<UserInfoVo>>(
  * @param {UserInfoVo} params
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const updateUserInfo = <T extends boolean>(
-  params: UserInfoDto
-): Promise<ResponseResult<T>> => {
-  const url = `/user/updateUserInfo`
+export const updateUser = <T extends boolean>(params: UserInfoDto): Promise<ResponseResult<T>> => {
+  const url = `/user/updateUser`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
 

@@ -88,6 +88,7 @@
 
     <el-dialog v-model="addOrEditMenuDialogVisible" :title="addOrEditMenuDialogTitle">
       <el-form
+        v-if="addOrEditMenuDialogVisible"
         ref="addOrEditMenuFormRef"
         :model="addOrEditMenuFormData"
         :rules="addOrEditMenuFormRules"

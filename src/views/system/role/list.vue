@@ -175,8 +175,6 @@ const menuTreeData = useAsyncComputed(async () => {
   const result = await getAllMenuTree()
 
   const menuTree = useFilterMenuTree(result.data.data)
-  console.log('menuTree', menuTree)
-
   return menuTree
 })
 
