@@ -57,7 +57,7 @@ eventEmitter.on('get-routes', async () => {
       routeList.forEach((route) => {
         router.addRoute(route)
       })
-      console.log('routeList', JSON.stringify(routeList,null,2))
+      // console.log('routeList', JSON.stringify(routeList,null,2))
       systemInfoStore.setHasAddedRoutes(true)
     }
   }
