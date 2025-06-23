@@ -1,27 +1,14 @@
 <template>
   <div class="data-dictionary-container h-full w-full relative">
-    <el-form :model="dataDictionaryQueryParams" ref="dataDictionaryQueryFormRef" inline>
+    <el-form class="search-form" :model="dataDictionaryQueryParams" ref="dataDictionaryQueryFormRef" inline>
       <el-form-item label="字典类型" prop="dictType">
-        <el-input
-          v-model="dataDictionaryQueryParams.dictType"
-          placeholder="请输入字典类型"
-          clearable
-        />
+        <el-input v-model="dataDictionaryQueryParams.dictType" placeholder="请输入字典类型" clearable />
       </el-form-item>
       <el-form-item label="字典名称" prop="dictName">
-        <el-input
-          v-model="dataDictionaryQueryParams.dictName"
-          placeholder="请输入字典名称"
-          clearable
-        />
+        <el-input v-model="dataDictionaryQueryParams.dictName" placeholder="请输入字典名称" clearable />
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="dataDictionaryQueryParams.status"
-          placeholder="请选择状态"
-          style="width: 200px"
-          clearable
-        >
+        <el-select v-model="dataDictionaryQueryParams.status" placeholder="请选择状态" style="width: 200px" clearable>
           <el-option label="启用" :value="1" />
           <el-option label="禁用" :value="0" />
         </el-select>
@@ -34,11 +21,8 @@
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="handleGetDataDictionaryList">
       <el-button size="small" type="primary" @click="handleAddDictionary">新增字典</el-button>
     </Handle-ToolBar>
-    <el-table
-      class="data-dictionary-table"
-      v-loading="dataDictionaryListInfo.loading"
-      :data="dataDictionaryListInfo.tableData"
-    >
+    <el-table border class="data-dictionary-table" v-loading="dataDictionaryListInfo.loading"
+      :data="dataDictionaryListInfo.tableData">
       <el-table-column type="index" label="序号" width="55" />
       <el-table-column prop="dictType" label="字典类型" />
       <el-table-column prop="dictCode" label="字典编码" />
@@ -61,28 +45,15 @@
       </el-table-column>
     </el-table>
 
-    <el-pagination
-      v-model:current-page="dataDictionaryQueryParams.pageNum"
-      v-model:page-size="dataDictionaryQueryParams.pageSize"
-      :total="dataDictionaryListInfo.total"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-    />
+    <el-pagination v-model:current-page="dataDictionaryQueryParams.pageNum"
+      v-model:page-size="dataDictionaryQueryParams.pageSize" :total="dataDictionaryListInfo.total"
+      @size-change="handleSizeChange" @current-change="handleCurrentChange" />
 
     <!-- 添加或修改字典对话框 -->
-    <el-dialog
-      class="system-data-dictionary-dialog"
-      :title="dataDictionaryDialogTitle"
-      v-model="dataDictionaryDialogVisible"
-      width="500px"
-      append-to-body
-    >
-      <el-form
-        ref="dataDictionaryFormRef"
-        :model="dataDictionaryFormData"
-        :rules="dataDictionaryFormRules"
-        label-width="80px"
-      >
+    <el-dialog class="system-data-dictionary-dialog" :title="dataDictionaryDialogTitle"
+      v-model="dataDictionaryDialogVisible" width="500px" append-to-body>
+      <el-form ref="dataDictionaryFormRef" :model="dataDictionaryFormData" :rules="dataDictionaryFormRules"
+        label-width="80px">
         <el-form-item label="字典类型" prop="dictType">
           <el-input v-model="dataDictionaryFormData.dictType" placeholder="请输入字典类型" />
         </el-form-item>
@@ -105,11 +76,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
-          <el-input
-            v-model="dataDictionaryFormData.remark"
-            type="textarea"
-            placeholder="请输入备注"
-          />
+          <el-input v-model="dataDictionaryFormData.remark" type="textarea" placeholder="请输入备注" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -283,6 +250,35 @@ onMounted(() => {
 <style lang="less" scoped>
 .data-dictionary-container {
   position: relative;
+  padding: 16px;
+  background-color: var(--el-bg-color);
+  min-height: 100%;
+  border-radius: 4px;
+
+  .search-form {
+    background-color: var(--el-bg-color-overlay);
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid var(--el-border-color-light);
+
+    :deep(.el-form-item) {
+      margin-bottom: 16px;
+      margin-right: 16px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .el-form-item__label {
+        color: var(--el-text-color-primary);
+      }
+
+      .el-input__wrapper {
+        background-color: var(--el-bg-color);
+      }
+    }
+  }
 
   .data-dictionary-table {
     margin-bottom: 16px;
@@ -316,6 +312,7 @@ onMounted(() => {
     }
   }
 }
+
 .system-data-dictionary-dialog {
   :deep(.el-dialog__header) {
     border-bottom: 1px solid var(--el-border-color-light);

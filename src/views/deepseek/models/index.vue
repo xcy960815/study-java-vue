@@ -35,6 +35,9 @@ import { useRouter } from 'vue-router'
 import { useSystemInfoStore } from '@store'
 import { deepseekModule } from '@apis'
 import { ElMessage } from 'element-plus'
+defineOptions({
+  name: 'DeepseekModels',
+})
 const systemInfoStore = useSystemInfoStore()
 const router = useRouter()
 interface DeepseekModelsListInfo {

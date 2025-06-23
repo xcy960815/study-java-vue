@@ -35,7 +35,7 @@
       <el-button size="small" type="primary" @click="handleClickAddUser"> 新增用户 </el-button>
     </Handle-ToolBar>
 
-    <el-table border :data="userListInfo.tableData" style="width: 100%" class="user-table">
+    <el-table border :data="userListInfo.tableData" style="width: 100%" class="system-user-table">
       <el-table-column prop="nickName" label="用户昵称" min-width="100" />
       <el-table-column prop="age" label="用户年龄" min-width="100" />
       <el-table-column prop="loginName" label="登陆账号" min-width="150" />
@@ -361,7 +361,7 @@ onMounted(() => {
     }
   }
 
-  .user-table {
+  .system-user-table {
     margin-bottom: 16px;
     background-color: var(--el-bg-color-overlay);
     border-radius: 4px;

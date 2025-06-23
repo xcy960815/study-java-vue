@@ -21,7 +21,7 @@ import { cloneDeep } from 'lodash'
 import { useCompletions } from '@/composables/useCompletions'
 import { RoleEnum } from '@enums'
 defineOptions({
-  name: 'ollama-chat',
+  name: 'OllamaChat',
 })
 const route = useRoute()
 

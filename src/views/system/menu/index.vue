@@ -1,6 +1,7 @@
 <template>
   <div class="system-menu-container">
     <el-form
+      class="search-form"
       :model="queryFormData"
       ref="queryFormRef"
       label-width="auto"
@@ -30,7 +31,7 @@
 
     <el-table
       border
-      class="menu-table"
+      class="system-menu-table"
       :data="menuListInfo.treeData"
       row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
@@ -434,8 +435,37 @@ onMounted(() => {
 <style lang="scss" scoped>
 .system-menu-container {
   position: relative;
+  padding: 16px;
+  background-color: var(--el-bg-color);
+  min-height: 100%;
+  border-radius: 4px;
 
-  .menu-table {
+  .search-form {
+    background-color: var(--el-bg-color-overlay);
+    padding: 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    border: 1px solid var(--el-border-color-light);
+
+    :deep(.el-form-item) {
+      margin-bottom: 16px;
+      margin-right: 16px;
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      .el-form-item__label {
+        color: var(--el-text-color-primary);
+      }
+
+      .el-input__wrapper {
+        background-color: var(--el-bg-color);
+      }
+    }
+  }
+
+  .system-menu-table {
     margin-bottom: 16px;
     background-color: var(--el-bg-color-overlay);
     border-radius: 4px;

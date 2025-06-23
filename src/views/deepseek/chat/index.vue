@@ -20,7 +20,7 @@ import AiChat from '@components/ai-chat/index.vue'
 import { RoleEnum } from '@enums'
 import { cloneDeep } from 'lodash'
 defineOptions({
-  name: 'deepseek-chat',
+  name: 'DeepseekChat',
 })
 
 const route = useRoute()

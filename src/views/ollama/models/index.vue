@@ -60,6 +60,9 @@ import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { useRouter } from 'vue-router'
+defineOptions({
+  name: 'OllamaModels',
+})
 const router = useRouter()
 const ollamaModelsListInfo = reactive<{
   tableData: Array<OllamaVo.ModelOption>
