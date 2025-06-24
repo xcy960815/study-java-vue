@@ -282,7 +282,7 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditRoleDialogTitle.value === '新增角色') {
-    result = await roleModule.addRole(addOrEditRoleFormData)
+    result = await roleModule.insertRole(addOrEditRoleFormData)
   } else {
     result = await roleModule.updateRole(addOrEditRoleFormData)
   }
@@ -307,7 +307,7 @@ const handleClickDeleteRole = (row: RoleInfoVo) => {
     type: 'warning',
   })
     .then(async () => {
-      const result = await roleModule.deleteRole(row.id)
+      const result = await roleModule.deleteRole(row)
       if (result.code !== 200) return
       getRoleList()
       ElMessage({

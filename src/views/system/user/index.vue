@@ -285,16 +285,14 @@ const handleClickAddOrEditConfirm = async () => {
 /**
  * 删除用户
  */
-const handleClickDeleteUser = (row: UserInfoDto) => {
-  ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
+const handleClickDeleteUser = (row: UserInfoVo) => {
+  ElMessageBox.confirm(`确认要删除【${row.nickName}】吗?`, '警告', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   })
     .then(async () => {
-      const result = await userModule.deleteUser<boolean>({
-        id: row.id,
-      })
+      const result = await userModule.deleteUser<boolean>(row)
       if (result.code !== 200) return
       getUserList()
       ElMessage({

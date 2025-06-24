@@ -150,7 +150,7 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, computed, ref, nextTick } from 'vue'
-import { getMenuTree, getAllMenuTree, addMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
+import { getMenuTree, getAllMenuTree, insertMenu, updateMenu, deleteMenu } from '@/apis/system/menu'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
@@ -382,13 +382,13 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditMenuDialogTitle.value === '新增菜单') {
-    result = await addMenu(addOrEditMenuFormData)
+    result = await insertMenu(addOrEditMenuFormData)
   } else if (addOrEditMenuDialogTitle.value === '编辑菜单') {
     result = await updateMenu(addOrEditMenuFormData)
   } else if (addOrEditMenuDialogTitle.value === '复制菜单') {
-    result = await addMenu(addOrEditMenuFormData)
+    result = await insertMenu(addOrEditMenuFormData)
   } else if (addOrEditMenuDialogTitle.value === '创建子菜单') {
-    result = await addMenu(addOrEditMenuFormData)
+    result = await insertMenu(addOrEditMenuFormData)
   } else {
     return
   }
@@ -404,13 +404,13 @@ const handleClickAddOrEditConfirm = async () => {
  * @param {StudyJavaSysMenuVo} row
  */
 const handleClickDeleteMenu = (row: StudyJavaSysMenuVo) => {
-  ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
+  ElMessageBox.confirm(`确认要删除【${row.menuName}】吗?`, '警告', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   })
     .then(async () => {
-      const result = await deleteMenu(row.id)
+      const result = await deleteMenu(row)
       if (result.code !== 200) return
       fetchMenuList()
       ElMessage({

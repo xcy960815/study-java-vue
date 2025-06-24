@@ -53,19 +53,21 @@ export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResul
  * @param {StudyJavaSysMenuDto} menuInfo
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export function addMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
-  const url = `${baseUrl}/addMenu`
+export function insertMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/insertMenu`
   return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, menuInfo)
 }
 
 /**
  * 删除菜单
- * @param {number} menuId
+ * @param {StudyJavaSysMenuVo} menuInfo
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export function deleteMenu(menuId: number): Promise<ResponseResult<boolean>> {
-  const url = `${baseUrl}/deleteMenu/${menuId}`
-  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url)
+export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/deleteMenu`
+  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url, {
+    data: menuInfo,
+  })
 }
 
 /**
@@ -73,11 +75,13 @@ export function deleteMenu(menuId: number): Promise<ResponseResult<boolean>> {
  * @param {number} menuId
  * @returns {Promise<ResponseResult<StudyJavaSysMenuVo>>}
  */
-export function getMenuDetail<T extends StudyJavaSysMenuVo>(
-  menuId: number
-): Promise<ResponseResult<T>> {
-  const url = `${baseUrl}/getMenuDetail/${menuId}`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<ResponseResult<T>> {
+  const url = `${baseUrl}/getMenuInfo`
+  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+    params: {
+      id,
+    },
+  })
 }
 
 /**

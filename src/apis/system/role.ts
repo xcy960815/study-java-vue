@@ -43,8 +43,8 @@ export function updateRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolea
  * @param {RoleInfoDto} roleInfo
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export function addRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
-  const url = `${baseUrl}/addRole`
+export function insertRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
+  const url = `${baseUrl}/insertRole`
   return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, roleInfo)
 }
 
@@ -53,12 +53,10 @@ export function addRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>>
  * @param {number} id
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export function deleteRole(id: number): Promise<ResponseResult<boolean>> {
+export function deleteRole(roleInfo: RoleInfoDto): Promise<ResponseResult<boolean>> {
   const url = `${baseUrl}/deleteRole`
   return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url, {
-    params: {
-      id,
-    },
+    data: roleInfo,
   })
 }
 
