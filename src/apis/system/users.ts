@@ -49,10 +49,8 @@ export const updateUserAvatar = <T extends string>(params: FormData) => {
  * @param params {UserInfoDto}
  * @returns {Promise<ResponseResult<T>>}
  */
-export const insertUserInfo = <T extends boolean>(
-  params: UserInfoDto
-): Promise<ResponseResult<T>> => {
-  const url = `/user/insertUserInfo`
+export const insertUser = <T extends boolean>(params: UserInfoDto): Promise<ResponseResult<T>> => {
+  const url = `/user/insertUser`
   return request.post<ResponseResult<T>, ResponseResult<T>>(url, params)
 }
 
@@ -61,9 +59,7 @@ export const insertUserInfo = <T extends boolean>(
  * @param params {Partial<UserInfoDto>}
  * @returns {Promise<ResponseResult<boolean>>}
  */
-export const deleteUserInfo = <T extends boolean>(
-  params: UserInfoDto
-): Promise<ResponseResult<T>> => {
+export const deleteUser = <T extends boolean>(params: UserInfoDto): Promise<ResponseResult<T>> => {
   const url = `/user/deleteUserInfoInfo`
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
     data: params,
@@ -72,6 +68,8 @@ export const deleteUserInfo = <T extends boolean>(
 
 /**
  * 修改用户密码
+ * @param requestParams {UserInfoDto}
+ * @returns {Promise<ResponseResult<T>>}
  */
 export const updateUserPassword = async <T extends boolean>(requestParams: UserInfoDto) => {
   const url = `/user/updateUserPassword`

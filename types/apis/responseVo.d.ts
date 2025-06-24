@@ -1,8 +1,3 @@
-declare interface BaseListDto {
-  pageSize: number
-  pageNum: number
-}
-
 declare type ResponseResult<T = any> = {
   code: number
   data: T

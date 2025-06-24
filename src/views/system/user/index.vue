@@ -271,7 +271,7 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditUserDialogTitle.value === '新增用户') {
-    result = await userModule.insertUserInfo(addOrEditUserFormData)
+    result = await userModule.insertUser(addOrEditUserFormData)
   } else {
     result = await userModule.updateUser<boolean>(addOrEditUserFormData)
   }
@@ -292,7 +292,7 @@ const handleClickDeleteUser = (row: UserInfoDto) => {
     type: 'warning',
   })
     .then(async () => {
-      const result = await userModule.deleteUserInfo<boolean>({
+      const result = await userModule.deleteUser<boolean>({
         id: row.id,
       })
       if (result.code !== 200) return

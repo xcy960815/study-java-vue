@@ -1,5 +1,5 @@
 import { onMounted, ref, watch, nextTick, onUnmounted } from 'vue'
-import { throttle } from '@/plugins/function-decorator'
+import { throttle } from '@/composables/function-decorator'
 
 interface UseAutoScrollParams {
   readonly props: {
