@@ -60,7 +60,7 @@ export const insertUser = <T extends boolean>(params: UserInfoDto): Promise<Resp
  * @returns {Promise<ResponseResult<boolean>>}
  */
 export const deleteUser = <T extends boolean>(params: UserInfoDto): Promise<ResponseResult<T>> => {
-  const url = `/user/deleteUserInfoInfo`
+  const url = `/user/deleteUser`
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
     data: params,
   })
