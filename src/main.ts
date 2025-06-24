@@ -8,7 +8,6 @@ import App from './App.vue'
 import 'virtual:svg-icons-register'
 import store from './store'
 import router from '@/router'
-import '@plugins/redirect'
 import { registerGlobalComponents } from './components'
 import { simulateLoadingProgress } from './utils/loading-progress'
 
@@ -17,7 +16,6 @@ simulateLoadingProgress()
 
 const app = createApp(App)
 app
-
   // .use(ElementPlus)
   .use(registerGlobalComponents)
   .use(store)

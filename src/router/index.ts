@@ -1,202 +1,92 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { defineAsyncComponent } from 'vue'
-import type { RouteRecordRaw } from 'vue-router'
-
-export const routes: RouteRecordRaw[] = [
-  {
-    path: '/',
-    name: 'home',
-    redirect: '/login',
-    meta: {
-      hidden: true,
-    },
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import(`../views/login/index.vue`),
-    meta: {
-      title: '登录',
-      hidden: true,
-      icon: 'Login',
-    },
-  },
-  {
-    path: '/password',
-    name: 'password',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '密码',
-      hidden: true,
-      icon: 'password',
-    },
-    props: {
-      content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
-    },
-  },
-  // {
-  //   path: '/goods-category',
-  //   name: 'goods-category',
-  //   component: () => import(`../components/layout/index.vue`),
-  //   meta: {
-  //     title: '商品',
-  //     icon: 'Commodity',
-  //   },
-  //   children: [
-  //     {
-  //       path: '/goods-category/list',
-  //       name: 'goods-category-list',
-  //       component: () => import(`../views/goods-category/list.vue`),
-  //       meta: {
-  //         title: '商品列表',
-  //         keepAlive: true,
-  //         icon: 'ListView',
-  //       },
-  //     },
-  //     {
-  //       path: '/goods-category/info',
-  //       name: 'info',
-  //       component: () => import(`../views/goods-category/info.vue`),
-  //       meta: {
-  //         hidden: true,
-  //         hightlight: '/goods-category/list',
-  //         title: '商品详情',
-  //         icon: 'DocDetail',
-  //       },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/ollama',
-  //   name: 'ollama',
-  //   component: () => import(`../components/layout/index.vue`),
-  //   meta: {
-  //     title: 'ollama',
-  //     icon: 'Brain',
-  //   },
-  //   children: [
-  //     {
-  //       path: '/ollama/models',
-  //       name: 'ollama-models',
-  //       component: () => import(`../views/ollama/models/index.vue`),
-  //       meta: {
-  //         title: '模型列表',
-  //         icon: 'ListView',
-  //       },
-  //     },
-  //     {
-  //       name: 'ollama-chat',
-  //       path: '/ollama/chat',
-  //       component: () => import(`../views/ollama/chat/index.vue`),
-  //       meta: {
-  //         hightlight: '/ollama/models',
-  //         openMore: true,
-  //         keepAlive: true,
-  //         hidden: true,
-  //         title: '会话',
-  //         icon: 'Intercom',
-  //       },
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: '/upload',
-  //   name: 'upload',
-  //   component: () => import(`../components/layout/index.vue`),
-  //   meta: {
-  //     title: '文件上传',
-  //     icon: 'InboxUploadR',
-  //   },
-  //   children: [
-  //     {
-  //       path: '/upload/file',
-  //       name: 'upload-file',
-  //       component: () => import(`../views/file-upload/file-upload.vue`),
-  //       meta: {
-  //         title: '文件上传',
-  //         icon: 'Upload',
-  //       },
-  //     },
-  //     {
-  //       path: '/upload/large-file',
-  //       name: 'upload-large-file',
-  //       component: () => import(`../views/file-upload/large-file-upload.vue`),
-  //       meta: {
-  //         title: '大文件切片上传',
-  //         icon: 'UploadThree',
-  //       },
-  //     },
-  //   ],
-  // },
-  {
-    path: '/system',
-    name: 'system',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '系统管理',
-      icon: 'Setting',
-    },
-    children: [
-      {
-        path: '/system/menu',
-        name: 'system-menu',
-        component: () => import(`../views/system/menu/index.vue`),
-        meta: {
-          title: '菜单管理',
-          icon: 'ApplicationMenu',
-          keepAlive: true,
-        },
-      },
-      {
-        path: '/system/user',
-        name: 'systemUser',
-        component: () => import(`../views/system/user/index.vue`),
-        meta: {
-          icon: 'AddressBook',
-          keepAlive: true,
-          title: '用户列表',
-        },
-      },
-      {
-        // 角色管理
-        path: '/system/role',
-        name: 'systemRole',
-        component: () => import(`../views/system/role/index.vue`),
-        meta: {
-          title: '角色列表',
-          icon: 'Permissions',
-        },
-      },
-      {
-        path: '/system/data-dictionary',
-        name: 'systemDataDictionary',
-        component: () => import(`../views/system/data-dictionary/index.vue`),
-        meta: {
-          title: '数据字典',
-          icon: 'Bookmark',
-        },
-      },
-    ],
-  },
-  {
-    path: '/404',
-    name: 'not-found',
-    component: () => import(`../views/error/404.vue`),
-    meta: {
-      title: '404',
-      hidden: true,
-    },
-  },
-  {
-    path: '/:pathMatch(.*)*',
-    redirect: '/404',
-  },
-]
+import { routes } from '@router/routes'
+import { getToken } from '@/utils/token'
+import { changeTabIcon } from '@/utils/system-style'
+import { eventEmitter, BASE_REDIRECT_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@/utils/event-emits'
+import { getRoutes } from '@apis/system/menu'
+import { useSystemInfoStore } from '@store'
+import { buildRoute } from '@/utils/build-route'
 
 const router = createRouter({
   history: createWebHashHistory(), // hash 模式
   // history: createWebHistory(),  // history 模式
   routes,
+})
+
+/**
+ * token过期
+ */
+eventEmitter.on('token-invalid', () => {
+  const route = router.currentRoute.value
+  const redirect = route.fullPath
+  router.replace({
+    path: '/login',
+    query: {
+      redirect,
+    },
+  })
+})
+
+/**
+ * 登录成功
+ */
+eventEmitter.on('login', () => {
+  const redirect = router.currentRoute.value.query.redirect as string
+  router.replace({
+    path: redirect || BASE_REDIRECT_PATH,
+  })
+})
+
+/**
+ * 退出登录
+ */
+eventEmitter.on('logout', () => {
+  const route = router.currentRoute.value
+  const redirect = route.fullPath
+  router.replace({
+    path: '/login',
+    query: {
+      redirect,
+    },
+  })
+})
+
+/**
+ * 获取路由
+ */
+eventEmitter.on('get-routes', async () => {
+  const systemInfoStore = useSystemInfoStore()
+  const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
+  if (!hasAddedRoutes) {
+    const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
+    if (routesRes.code === 200) {
+      const routes = routesRes.data
+      const routeList = buildRoute(routes)
+      routeList.forEach((route) => {
+        router.addRoute(route)
+      })
+      systemInfoStore.setHasAddedRoutes(true)
+    }
+  }
+})
+
+/*************** 统一管理通用路由跳转 *****************/
+
+// 全局路由守卫
+router.beforeEach(async (to, _from, next) => {
+  changeTabIcon(to)
+  const isIgnorePath = WHITELIST_PATHS.includes(to.path)
+  if (isIgnorePath) {
+    next()
+  } else {
+    const token = await getToken()
+    if (!token) {
+      next(LOGIN_PATH)
+    } else {
+      await eventEmitter.emit('get-routes')
+      next()
+    }
+  }
 })
 
 export default router
