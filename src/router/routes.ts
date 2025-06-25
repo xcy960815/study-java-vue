@@ -98,35 +98,35 @@ export const routes: RouteRecordRaw[] = [
   //     },
   //   ],
   // },
-  {
-    path: '/upload',
-    name: 'upload',
-    component: () => import(`../components/layout/index.vue`),
-    meta: {
-      title: '文件上传',
-      icon: 'InboxUploadR',
-    },
-    children: [
-      {
-        path: '/upload/file',
-        name: 'upload-file',
-        component: () => import(`../views/file-upload/file-upload.vue`),
-        meta: {
-          title: '文件上传',
-          icon: 'Upload',
-        },
-      },
-      {
-        path: '/upload/large-file',
-        name: 'upload-large-file',
-        component: () => import(`../views/file-upload/large-file-upload.vue`),
-        meta: {
-          title: '大文件切片上传',
-          icon: 'UploadThree',
-        },
-      },
-    ],
-  },
+  // {
+  //   path: '/upload',
+  //   name: 'upload',
+  //   component: () => import(`../components/layout/index.vue`),
+  //   meta: {
+  //     title: '文件上传',
+  //     icon: 'InboxUploadR',
+  //   },
+  //   children: [
+  //     {
+  //       path: '/upload/file',
+  //       name: 'upload-file',
+  //       component: () => import(`../views/file-upload/file-upload.vue`),
+  //       meta: {
+  //         title: '文件上传',
+  //         icon: 'Upload',
+  //       },
+  //     },
+  //     {
+  //       path: '/upload/large-file',
+  //       name: 'upload-large-file',
+  //       component: () => import(`../views/file-upload/large-file-upload.vue`),
+  //       meta: {
+  //         title: '大文件切片上传',
+  //         icon: 'UploadThree',
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/system',
     name: 'system',

@@ -14,16 +14,16 @@ type SvgIconNames = keyof typeof svgIcons
 const props = defineProps({
   type: {
     type: String as PropType<SvgIconNames>,
-    default: ''
+    default: '',
   },
   size: {
     type: [String, Number] as PropType<string | number>,
-    default: 24
+    default: 24,
   },
   fill: {
     type: String as PropType<string>,
-    default: 'currentColor' // 默认继承文本颜色
-  }
+    default: 'currentColor', // 默认继承文本颜色
+  },
 })
 
 const svgContent = ref('')
@@ -37,7 +37,6 @@ const loadSvg = async () => {
   try {
     const response = await fetch(`src/assets/svg-icons/${props.type}.svg`) // 确保路径正确
     svgContent.value = await response.text()
-    // console.log(' svgContent.value', svgContent.value)
   } catch (error) {
     console.error(`加载 SVG 失败: ${props.type}`, error)
     svgContent.value = '' // 遇到错误时清空

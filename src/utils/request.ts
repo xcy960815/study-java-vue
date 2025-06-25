@@ -13,13 +13,15 @@ let status = 0
 axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
-  timeout: 60 * 1000 * 10
+  timeout: 60 * 1000 * 10,
 })
 
 request.interceptors.request.use(
   async (config) => {
     const token = await getToken()
-    const isWithoutAuthorizationUrl = !withoutAuthorizationUrls.some((url) => config.url?.includes(url))
+    const isWithoutAuthorizationUrl = !withoutAuthorizationUrls.some((url) =>
+      config.url?.includes(url)
+    )
     if (isWithoutAuthorizationUrl) {
       // 添加请求头
       config.headers['Authorization'] = `Bearer ${token}`
@@ -28,10 +30,7 @@ request.interceptors.request.use(
     return config
   },
   (error: AxiosError) => {
-    console.log('error', error)
-
     const { message } = error
-
     ElMessage.error(message)
   }
 )
@@ -48,7 +47,7 @@ request.interceptors.response.use(
         // 同一种类型错误只提示一次
         ElMessage({
           type: 'error',
-          message: responseData.message
+          message: responseData.message,
         })
       }
       status = loginEnum.InvalidToken
@@ -56,7 +55,7 @@ request.interceptors.response.use(
     } else if (responseData.code == loginEnum.ERROR) {
       ElMessage({
         type: 'error',
-        message: responseData.message
+        message: responseData.message,
       })
       return Promise.reject(responseData)
     } else if (responseData.code == loginEnum.SUCCESS) {

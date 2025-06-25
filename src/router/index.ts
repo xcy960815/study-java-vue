@@ -66,7 +66,6 @@ eventEmitter.on('get-routes', () => {
         routeList.forEach((route) => {
           router.addRoute(route)
         })
-        console.log('get-routes', router.getRoutes())
         systemInfoStore.setHasAddedRoutes(true)
       }
     }
@@ -89,21 +88,7 @@ router.beforeEach(async (to, _from, next) => {
     if (!token) {
       next(LOGIN_PATH)
     } else {
-      // const result = await eventEmitter.emit('get-routes')
-      const systemInfoStore = useSystemInfoStore()
-      const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
-      if (!hasAddedRoutes) {
-        const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
-        if (routesRes.code === 200) {
-          const routes = routesRes.data
-          const routeList = buildRoute(routes)
-          routeList.forEach((route) => {
-            router.addRoute(route)
-          })
-          console.log('get-routes', router.getRoutes())
-          systemInfoStore.setHasAddedRoutes(true)
-        }
-      }
+      await eventEmitter.emitAsync('get-routes')
       next()
     }
   }

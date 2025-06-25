@@ -1,64 +1,115 @@
-const eventNames = ['token-invalid', 'login', 'logout', 'get-routes'] as const
+type EventsList = {
+  'token-invalid': () => void
+  login: () => void
+  logout: () => void
+  'get-routes': () => Promise<void>
+}
 
-// 定义事件名称
-type EventNames = (typeof eventNames)[number]
+type Listener<T extends (...args: any[]) => any> = {
+  fn: T
+  once?: boolean
+}
 
-// 定义事件与回调参数的映射
-interface EventMap {
-  'token-invalid': [] // 无参数
-  login: [] // 示例参数为数字
-  logout: []
-  'get-routes': []
+class TypedEventEmitter<Events extends Record<string, (...args: any[]) => any>> {
+  private events: { [K in keyof Events]?: Listener<Events[K]>[] } = {}
+  private errorHandler?: (err: unknown, eventName: keyof Events) => void
+
+  // 注册监听
+  on<K extends keyof Events>(eventName: K, listener: Events[K]): void {
+    this.addListener(eventName, listener)
+  }
+
+  // 一次性监听器
+  once<K extends keyof Events>(eventName: K, listener: Events[K]): void {
+    this.addListener(eventName, listener, true)
+  }
+
+  // 添加到队列头部
+  prependListener<K extends keyof Events>(eventName: K, listener: Events[K]): void {
+    this.addListener(eventName, listener, false, true)
+  }
+
+  // 通用添加监听器方法
+  private addListener<K extends keyof Events>(
+    eventName: K,
+    fn: Events[K],
+    once = false,
+    prepend = false
+  ): void {
+    const wrapper: Listener<Events[K]> = { fn, once }
+    if (!this.events[eventName]) {
+      this.events[eventName] = []
+    }
+    if (prepend) {
+      this.events[eventName]!.unshift(wrapper)
+    } else {
+      this.events[eventName]!.push(wrapper)
+    }
+  }
+
+  // 注销监听器
+  off<K extends keyof Events>(eventName: K, listener: Events[K]): void {
+    const list = this.events[eventName]
+    if (list) {
+      this.events[eventName] = list.filter((l) => l.fn !== listener)
+    }
+  }
+
+  // 设置错误处理函数
+  onError(handler: (err: unknown, eventName: keyof Events) => void): void {
+    this.errorHandler = handler
+  }
+
+  // emit 同步事件，返回所有 listener 的返回值
+  emit<K extends keyof Events>(
+    eventName: K,
+    ...args: Parameters<Events[K]>
+  ): ReturnType<Events[K]>[] {
+    const results: ReturnType<Events[K]>[] = []
+    const listeners = this.events[eventName]?.slice() ?? []
+
+    for (const { fn, once } of listeners) {
+      try {
+        const result = fn(...args)
+        results.push(result)
+      } catch (err) {
+        this.errorHandler?.(err, eventName)
+      }
+      if (once) {
+        this.off(eventName, fn)
+      }
+    }
+
+    return results
+  }
+
+  // emit 异步事件，返回所有 Promise<返回值>
+  async emitAsync<K extends keyof Events>(
+    eventName: K,
+    ...args: Parameters<Events[K]>
+  ): Promise<Awaited<ReturnType<Events[K]>>[]> {
+    const results: Awaited<ReturnType<Events[K]>>[] = []
+    const listeners = this.events[eventName]?.slice() ?? []
+
+    for (const { fn, once } of listeners) {
+      try {
+        const result = await fn(...args)
+        results.push(result)
+      } catch (err) {
+        this.errorHandler?.(err, eventName)
+      }
+      if (once) {
+        this.off(eventName, fn)
+      }
+    }
+
+    return results
+  }
 }
 
 export const BASE_REDIRECT_PATH = '/system/user'
 export const LOGIN_PATH = '/login'
 export const WHITELIST_PATHS = [LOGIN_PATH]
-
-// 自定义事件发射器类
-class CustomEventEmitter {
-  private listeners: Map<EventNames, Set<(...args: any[]) => void>> = new Map()
-
-  /**
-   * 监听事件
-   * @param eventName
-   * @param listener
-   * @returns
-   */
-  public on<T extends EventNames>(eventName: T, listener: (...args: EventMap[T]) => void): this {
-    if (!this.listeners.has(eventName)) {
-      this.listeners.set(eventName, new Set())
-    }
-    this.listeners.get(eventName)!.add(listener as (...args: any[]) => void)
-    return this
-  }
-
-  /**
-   * 触发事件
-   * @param eventName {T extends EventNames}
-   * @param args
-   * @returns
-   */
-  public emit<T extends EventNames>(eventName: T, ...args: EventMap[T]): boolean {
-    const listeners = this.listeners.get(eventName)
-    if (!listeners || listeners.size === 0) return false
-    listeners.forEach((listener) => listener(...args))
-    return true
-  }
-
-  /**
-   * 移除监听
-   * @param {T extends EventNames} eventName
-   * @param {Function} listener
-   * @returns {this}
-   */
-  public off<T extends EventNames>(eventName: T, listener: (...args: EventMap[T]) => void): this {
-    this.listeners.get(eventName)?.delete(listener as (...args: any[]) => void)
-    return this
-  }
-}
-
-// 使用示例
-const eventEmitter = new CustomEventEmitter()
+const eventEmitter = new TypedEventEmitter<EventsList>()
 
 export { eventEmitter }

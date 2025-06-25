@@ -15,7 +15,7 @@
 import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
 import { useSystemInfoStore } from '@store'
 import MenuItem from './menu-item.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router'
 const viteAppTitle = import.meta.env.VITE_APP_TITLE
 const route = useRoute()
@@ -81,10 +81,7 @@ function filterRoutes<T extends RouteRecordRaw>(data: ReadonlyArray<T>): T[] {
 
 const menuData = computed(() => {
   const routes = router.getRoutes()
-  console.log('menuData-getRoutes', routes)
   const treeRoutes = restoreRouteTree(routes)
-  console.log('menuData-treeRoutes', treeRoutes)
-
   return filterRoutes(treeRoutes)
 })
 
