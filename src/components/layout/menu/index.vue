@@ -81,9 +81,9 @@ function filterRoutes<T extends RouteRecordRaw>(data: ReadonlyArray<T>): T[] {
 
 const menuData = computed(() => {
   const routes = router.getRoutes()
-  console.log('getRoutes', routes)
+  console.log('menuData-getRoutes', routes)
   const treeRoutes = restoreRouteTree(routes)
-  console.log('treeRoutes', treeRoutes)
+  console.log('menuData-treeRoutes', treeRoutes)
 
   return filterRoutes(treeRoutes)
 })

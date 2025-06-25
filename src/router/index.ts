@@ -54,20 +54,26 @@ eventEmitter.on('logout', () => {
 /**
  * 获取路由
  */
-eventEmitter.on('get-routes', async () => {
-  const systemInfoStore = useSystemInfoStore()
-  const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
-  if (!hasAddedRoutes) {
-    const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
-    if (routesRes.code === 200) {
-      const routes = routesRes.data
-      const routeList = buildRoute(routes)
-      routeList.forEach((route) => {
-        router.addRoute(route)
-      })
-      systemInfoStore.setHasAddedRoutes(true)
+eventEmitter.on('get-routes', () => {
+  return new Promise<void>(async (resolve) => {
+    const systemInfoStore = useSystemInfoStore()
+    const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
+    if (!hasAddedRoutes) {
+      const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
+      if (routesRes.code === 200) {
+        const routes = routesRes.data
+        const routeList = buildRoute(routes)
+        routeList.forEach((route) => {
+          router.addRoute(route)
+        })
+        console.log('get-routes', router.getRoutes())
+        systemInfoStore.setHasAddedRoutes(true)
+      }
     }
-  }
+    setTimeout(() => {
+      resolve()
+    }, 3000)
+  })
 })
 
 /*************** 统一管理通用路由跳转 *****************/
@@ -83,7 +89,21 @@ router.beforeEach(async (to, _from, next) => {
     if (!token) {
       next(LOGIN_PATH)
     } else {
-      await eventEmitter.emit('get-routes')
+      // const result = await eventEmitter.emit('get-routes')
+      const systemInfoStore = useSystemInfoStore()
+      const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
+      if (!hasAddedRoutes) {
+        const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
+        if (routesRes.code === 200) {
+          const routes = routesRes.data
+          const routeList = buildRoute(routes)
+          routeList.forEach((route) => {
+            router.addRoute(route)
+          })
+          console.log('get-routes', router.getRoutes())
+          systemInfoStore.setHasAddedRoutes(true)
+        }
+      }
       next()
     }
   }
