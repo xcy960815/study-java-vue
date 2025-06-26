@@ -69,9 +69,7 @@ eventEmitter.on('get-routes', () => {
         systemInfoStore.setHasAddedRoutes(true)
       }
     }
-    setTimeout(() => {
-      resolve()
-    }, 3000)
+    resolve()
   })
 })
 
