@@ -1,15 +1,14 @@
 import { request } from '@/utils/request'
 
-const baseUrl = '/dataDictionary' /**
+const baseUrl = '/dataDict' /**
  * 获取数据字典列表
  * @param { DataDictionaryDto } dataDictionaryDto
  * @returns { Promise<ResponseResult<T>> }
  */
-
-export function getDataDictionaryList<T extends ListResponseResult<DataDictionaryVo>>(
+export function getDataDictList<T extends ListResponseResult<DataDictionaryVo>>(
   dataDictionaryDto: Partial<DataDictionaryDto> & BaseListDto
 ): Promise<ResponseResult<T>> {
-  return request.get<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/list`, {
+  return request.get<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/getDataDictList`, {
     params: dataDictionaryDto,
   })
 }
@@ -19,10 +18,10 @@ export function getDataDictionaryList<T extends ListResponseResult<DataDictionar
  * @param { number } id
  * @returns { Promise<ResponseResult<T>> }
  */
-export function getDataDictionaryDetail<T extends DataDictionaryVo>(
+export function getDataDictDetail<T extends DataDictionaryVo>(
   id: number
 ): Promise<ResponseResult<T>> {
-  return request.get<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/detail`, {
+  return request.get<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/getDataDictDetail`, {
     params: { id },
   })
 }
@@ -32,10 +31,10 @@ export function getDataDictionaryDetail<T extends DataDictionaryVo>(
  * @param { DataDictionaryDto } data
  * @returns { Promise<ResponseResult<T>> }
  */
-export function addDataDictionary<T extends boolean>(
+export function insertDataDict<T extends boolean>(
   data: DataDictionaryDto
 ): Promise<ResponseResult<T>> {
-  return request.post<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/add`, data)
+  return request.post<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/insertDataDict`, data)
 }
 
 /**
@@ -43,10 +42,10 @@ export function addDataDictionary<T extends boolean>(
  * @param { DataDictionaryDto } data
  * @returns { Promise<ResponseResult<T>> }
  */
-export function updateDataDictionary<T extends boolean>(
+export function updateDataDict<T extends boolean>(
   data: DataDictionaryDto
 ): Promise<ResponseResult<T>> {
-  return request.put<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/update`, data)
+  return request.put<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/updateDataDict`, data)
 }
 
 /**
@@ -54,6 +53,6 @@ export function updateDataDictionary<T extends boolean>(
  * @param { number } id
  * @returns { Promise<ResponseResult<T>> }
  */
-export function deleteDataDictionary<T extends boolean>(id: number): Promise<ResponseResult<T>> {
-  return request.delete<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/delete/${id}`)
+export function deleteDataDict<T extends boolean>(id: number): Promise<ResponseResult<T>> {
+  return request.delete<ResponseResult<T>, ResponseResult<T>>(`${baseUrl}/deleteDataDict/${id}`)
 }

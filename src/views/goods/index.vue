@@ -111,7 +111,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { goodsCategoryModule } from '@apis'
+import { goodsModule } from '@apis'
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -159,7 +159,7 @@ const handlePageNumChange = (pageNum: number) => {
 const getGoodsCategoryList = async () => {
   const pageSize = goodsCategoryInfo.pageSize
   const pageNum = goodsCategoryInfo.pageNum
-  const result = await goodsCategoryModule.getGoodsCategoryList({
+  const result = await goodsModule.getGoodsCategoryList({
     pageSize,
     pageNum,
     ...queryFormData,
@@ -253,9 +253,9 @@ const handleClickAddOrEditConfirm = async () => {
   if (!valid) return
   let result
   if (addOrEditGoodsCategoryDialogTitle.value === '新增商品') {
-    result = await goodsCategoryModule.insertGoodsCategory(addOrEditGoodsCategoryFormData)
+    result = await goodsModule.insertGoodsCategory(addOrEditGoodsCategoryFormData)
   } else {
-    result = await goodsCategoryModule.updateGoodsCategory(addOrEditGoodsCategoryFormData)
+    result = await goodsModule.updateGoodsCategory(addOrEditGoodsCategoryFormData)
   }
 
   if (result.code === 200) {
@@ -274,7 +274,7 @@ const handleClickDeleteGoodsCategory = (row: GoodsCategoryVo) => {
     type: 'warning',
   })
     .then(async () => {
-      const result = await goodsCategoryModule.deleteGoodsCategory<boolean>(row.categoryId)
+      const result = await goodsModule.deleteGoodsCategory<boolean>(row.categoryId)
       if (result.code !== 200) return
       getGoodsCategoryList()
       ElMessage({

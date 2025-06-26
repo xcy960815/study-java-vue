@@ -4,9 +4,11 @@ export * as sysMenuModule from './system/menu'
 
 export * as roleModule from './system/role'
 
+export * as dataDictModule from './system/dataDict'
+
 export * as loginModule from './login'
 
-export * as goodsCategoryModule from './goodsCategory'
+export * as goodsModule from './goods'
 
 export * as ollamaModule from './ollama'
 
