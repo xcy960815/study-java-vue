@@ -1,7 +1,7 @@
 import { defineAsyncComponent } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 
-export const routes: RouteRecordRaw[] = [
+export const baseRoutes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
@@ -83,6 +83,9 @@ export const routes: RouteRecordRaw[] = [
       },
     ],
   },
+]
+
+export const redirectRoutes: RouteRecordRaw[] = [
   {
     path: '/404',
     name: 'not-found',

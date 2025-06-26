@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-category-list-container h-full w-full relative">
-    <!-- 商品列表 -->
+  <!-- 商品列表 -->
+  <div class="goods-list-container h-full w-full relative">
     <el-form :model="queryFormData" label-width="auto" inline v-show="showSearch">
       <el-form-item label="商品id">
         <el-input
@@ -68,6 +68,8 @@
       @size-change="handlePageSizeChange"
       @current-change="handlePageNumChange"
     />
+
+    <!-- 新增或编辑商品 -->
     <el-dialog
       v-model="addOrEditGoodsCategoryDialogVisible"
       :title="addOrEditGoodsCategoryDialogTitle"

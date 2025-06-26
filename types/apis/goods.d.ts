@@ -10,7 +10,7 @@ declare interface GoodsCategoryVo {
   /**
    * 分类级别(1-一级分类 2-二级分类 3-三级分类)
    */
-  categoryLevel: string
+  categoryLevel: string | null
 
   /**
    * 父分类id

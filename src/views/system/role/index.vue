@@ -42,13 +42,16 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="remark" label="备注" />
+      <el-table-column prop="remark" label="备注" width="250" />
       <el-table-column prop="createTime" label="创建时间" width="260" />
       <el-table-column fixed="right" label="操作" min-width="150">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditRole(row)"
             >编辑</el-button
           >
+          <!-- <el-button link type="primary" size="small" @click="handleClickViewPermission(row)"
+            >查看权限</el-button
+          > -->
           <el-button link type="danger" size="small" @click="handleClickDeleteRole(row)"
             >删除</el-button
           >
@@ -83,6 +86,7 @@
       class="pagination"
     />
 
+    <!-- 新增或编辑角色 -->
     <el-dialog
       v-model="addOrEditRoleDialogVisible"
       :title="addOrEditRoleDialogTitle"
@@ -100,7 +104,11 @@
           <el-input v-model="addOrEditRoleFormData.roleName" placeholder="请输入角色名称" />
         </el-form-item>
         <el-form-item label="角色编码" prop="roleCode">
-          <el-input v-model="addOrEditRoleFormData.roleCode" placeholder="请输入角色编码" />
+          <el-input
+            v-model="addOrEditRoleFormData.roleCode"
+            :disabled="Boolean(addOrEditRoleFormData.id)"
+            placeholder="请输入角色编码"
+          />
         </el-form-item>
         <el-form-item label="显示顺序" prop="roleSort">
           <el-input-number v-model="addOrEditRoleFormData.roleSort" :min="0" :max="999" />
@@ -173,7 +181,6 @@ const queryFormData = reactive({
  */
 const menuTreeData = useAsyncComputed(async () => {
   const result = await getAllMenuTree()
-
   const menuTree = useFilterMenuTree(result.data)
   return menuTree
 })
@@ -348,7 +355,6 @@ const handleClickDisableRole = (row: RoleInfoVo) => {
  * 启用角色
  */
 const handleClickEnableRole = (row: RoleInfoVo) => {
-  console.log(row)
   ElMessageBox.confirm(`确认要启用角色 【${row.roleName}】 吗?`, '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
@@ -367,12 +373,20 @@ const handleClickEnableRole = (row: RoleInfoVo) => {
 
 const showSearch = ref(true)
 
+/**
+ * 分页大小改变
+ * @param pageSize 分页大小
+ */
 const handlePageSizeChange = (pageSize: number) => {
   roleListInfo.pageNum = 1
   roleListInfo.pageSize = pageSize
   getRoleList()
 }
 
+/**
+ * 分页页码改变
+ * @param pageNum 分页页码
+ */
 const handlePageNumChange = (pageNum: number) => {
   roleListInfo.pageNum = pageNum
   getRoleList()

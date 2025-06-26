@@ -1,7 +1,12 @@
 import { defineStore } from 'pinia'
 import { StoreNames } from '@enums'
 import router from '@router'
-
+// import { getRoutes as getRoutesApi } from '@apis/system/menu'
+// import { buildRoute } from '@/utils/build-route'
+// import { redirectRoutes } from '@router/routes'
+/**
+ * 系统信息
+ */
 export const systemInfoStore = defineStore<
   StoreNames.SYSTEM,
   BaseStore.State<SystemStore.State>,
@@ -11,6 +16,7 @@ export const systemInfoStore = defineStore<
   state: () => {
     return {
       hasAddedRoutes: false,
+      routes: [],
       openMenuFlag: true,
       historyList: [],
       keepLiveList: [],
@@ -28,6 +34,9 @@ export const systemInfoStore = defineStore<
     },
     getHasAddedRoutes(state) {
       return state.hasAddedRoutes
+    },
+    getRoutes(state) {
+      return state.routes
     },
   },
   actions: {
@@ -98,6 +107,25 @@ export const systemInfoStore = defineStore<
     },
     setHasAddedRoutes(flag) {
       this.hasAddedRoutes = flag
+    },
+    setRoutes(routes) {
+      // return new Promise<void>(async (resolve) => {
+      //   if (!this.hasAddedRoutes) {
+      //     const routesRes = await getRoutesApi<StudyJavaSysMenuVo[]>()
+      //     if (routesRes.code === 200) {
+      //       const routes = routesRes.data
+      //       const routeList = buildRoute(routes)
+      //       const allRoutes = [...routeList, ...redirectRoutes]
+      //       allRoutes.forEach((route) => {
+      //         router.addRoute(route)
+      //       })
+      //       this.routes = routes
+      //       this.setHasAddedRoutes(true)
+      //     }
+      //   }
+      //   resolve()
+      // })
+      this.routes = routes
     },
   },
   // persist: true,

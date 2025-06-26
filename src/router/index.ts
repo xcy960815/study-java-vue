@@ -1,16 +1,15 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { routes } from '@router/routes'
+import { baseRoutes, redirectRoutes } from '@router/routes'
 import { getToken } from '@/utils/token'
 import { changeTabIcon } from '@/utils/system-style'
 import { eventEmitter, BASE_REDIRECT_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@/utils/event-emits'
 import { getRoutes } from '@apis/system/menu'
 import { useSystemInfoStore } from '@store'
 import { buildRoute } from '@/utils/build-route'
-
 const router = createRouter({
   history: createWebHashHistory(), // hash 模式
   // history: createWebHistory(),  // history 模式
-  routes,
+  routes: baseRoutes,
 })
 
 /**
@@ -63,7 +62,8 @@ eventEmitter.on('get-routes', () => {
       if (routesRes.code === 200) {
         const routes = routesRes.data
         const routeList = buildRoute(routes)
-        routeList.forEach((route) => {
+        const allRoutes = [...routeList, ...redirectRoutes]
+        allRoutes.forEach((route) => {
           router.addRoute(route)
         })
         systemInfoStore.setHasAddedRoutes(true)
@@ -73,23 +73,19 @@ eventEmitter.on('get-routes', () => {
   })
 })
 
-/*************** 统一管理通用路由跳转 *****************/
-
-// 全局路由守卫
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to) => {
   changeTabIcon(to)
-  const isIgnorePath = WHITELIST_PATHS.includes(to.path)
-  if (isIgnorePath) {
-    next()
-  } else {
-    const token = await getToken()
-    if (!token) {
-      next(LOGIN_PATH)
-    } else {
-      await eventEmitter.emitAsync('get-routes')
-      next()
-    }
+  if (WHITELIST_PATHS.includes(to.path)) return true
+  const token = await getToken()
+  if (!token) return LOGIN_PATH
+  const systemInfoStore = useSystemInfoStore()
+  if (!systemInfoStore.getHasAddedRoutes) {
+    await eventEmitter.emitAsync('get-routes')
+    // await systemInfoStore.setRoutes()
+    // 关键：动态路由注册后，重新进入当前路由
+    return to.fullPath
   }
+  return true
 })
 
 export default router
