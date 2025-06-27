@@ -10,6 +10,8 @@ export * as loginModule from './login'
 
 export * as goodsModule from './goods'
 
+export * as orderModule from './order'
+
 export * as ollamaModule from './ollama'
 
 export * as deepseekModule from './deepseek'

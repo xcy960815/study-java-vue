@@ -120,7 +120,7 @@ defineOptions({
   name: 'goods-category-list',
 })
 interface GoodsCategoryInfo {
-  tableData: GoodsCategoryVo[]
+  tableData: GoodsVo[]
   total: number | undefined
   pageSize: number
   pageNum: number
@@ -202,7 +202,7 @@ const addOrEditGoodsCategoryFormData = reactive<GoodsCategoryDto>({
   categoryRank: 0,
 })
 
-const addOrEditGoodsCategoryFormRules: FormRules<GoodsCategoryVo> = {}
+const addOrEditGoodsCategoryFormRules: FormRules<GoodsVo> = {}
 
 /**
  * @description 新增商品
@@ -267,7 +267,7 @@ const handleClickAddOrEditConfirm = async () => {
 /**
  * @description 删除商品
  */
-const handleClickDeleteGoodsCategory = (row: GoodsCategoryVo) => {
+const handleClickDeleteGoodsCategory = (row: GoodsVo) => {
   ElMessageBox.confirm('确认要删除吗?', '警告⚠️', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',

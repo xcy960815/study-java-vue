@@ -5,7 +5,7 @@ import { request } from '@utils/request'
  * @param requestParams
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsCategoryVo>>(
+export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsVo>>(
   requestParams: GoodsCategoryDto & BaseListDto
 ) => {
   const url = `/goodsCategory/list`
@@ -19,7 +19,7 @@ export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsCat
  * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getGoodsCategoryDetail = async <T extends GoodsCategoryVo>(
+export const getGoodsCategoryDetail = async <T extends GoodsVo>(
   goodsCategoryDto: GoodsCategoryDto
 ) => {
   const url = `/goodsCategory/getGoodsCategoryDetail`
