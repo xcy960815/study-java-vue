@@ -192,6 +192,14 @@ const getOrderList = async () => {
 
 const addOrEditOrderFormRef = ref<FormInstance>()
 
+/**
+ * 工具函数：保证值为 string 或 undefined，避免 el-date-picker 绑定 null
+ */
+function ensureStringOrUndefined(val: any): string | Date | undefined {
+  if (val === null || val === undefined || val === '') return undefined
+  return val instanceof Date ? val : String(val)
+}
+
 const addOrEditOrderFormData = reactive<OrderDto>({
   userId: undefined,
   totalPrice: undefined,
@@ -222,6 +230,7 @@ const handleClickAddOrder = () => {
   addOrEditOrderDialogVisible.value = true
   nextTick(() => {
     addOrEditOrderFormRef.value?.resetFields()
+    addOrEditOrderFormData.payTime = undefined
   })
 }
 
@@ -230,7 +239,10 @@ const handleClickEditOrder = (row: OrderVo) => {
   addOrEditOrderDialogVisible.value = true
   nextTick(() => {
     addOrEditOrderFormRef.value?.resetFields()
-    Object.assign(addOrEditOrderFormData, row)
+    Object.assign(addOrEditOrderFormData, {
+      ...row,
+      payTime: ensureStringOrUndefined(row.payTime),
+    })
   })
 }
 

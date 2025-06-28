@@ -5,10 +5,10 @@ import { request } from '@utils/request'
  * @param requestParams
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsVo>>(
-  requestParams: GoodsCategoryDto & BaseListDto
+export const getGoodsList = async <T extends ListResponseResult<GoodsVo>>(
+  requestParams: GoodsDto & BaseListDto
 ) => {
-  const url = `/goodsCategory/list`
+  const url = `/goods/getGoodsList`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
     params: requestParams,
   })
@@ -19,12 +19,10 @@ export const getGoodsCategoryList = async <T extends ListResponseResult<GoodsVo>
  * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
-export const getGoodsCategoryDetail = async <T extends GoodsVo>(
-  goodsCategoryDto: GoodsCategoryDto
-) => {
-  const url = `/goodsCategory/getGoodsCategoryDetail`
+export const getGoodsInfo = async <T extends GoodsVo>(goodsDto: GoodsDto) => {
+  const url = `/goods/getGoodsInfo`
   return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
-    params: goodsCategoryDto,
+    params: goodsDto,
   })
 }
 
@@ -33,11 +31,9 @@ export const getGoodsCategoryDetail = async <T extends GoodsVo>(
  * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
-export const insertGoodsCategory = async <T extends boolean>(
-  goodsCategoryDto: GoodsCategoryDto
-) => {
-  const url = `/goodsCategory/insertGoodsCategory`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsCategoryDto)
+export const insertGoods = async <T extends boolean>(goodsDto: GoodsDto) => {
+  const url = `/goods/insertGoods`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsDto)
 }
 
 /**
@@ -45,11 +41,9 @@ export const insertGoodsCategory = async <T extends boolean>(
  * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
-export const updateGoodsCategory = async <T extends boolean>(
-  goodsCategoryDto: GoodsCategoryDto
-) => {
-  const url = `/goodsCategory/updateGoodsCategory`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsCategoryDto)
+export const updateGoods = async <T extends boolean>(goodsDto: GoodsDto) => {
+  const url = `/goods/updateGoods`
+  return request.post<ResponseResult<T>, ResponseResult<T>>(url, goodsDto)
 }
 
 /**
@@ -57,9 +51,9 @@ export const updateGoodsCategory = async <T extends boolean>(
  * @param goodsCategoryDto
  * @returns {Promise<ResponseResult<T>>}
  */
-export const deleteGoodsCategory = async <T extends boolean>(goodsCategoryDto: number) => {
-  const url = `/goodsCategory/deleteGoodsCategory`
+export const deleteGoods = async <T extends boolean>(id: number) => {
+  const url = `/goods/deleteGoods`
   return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
-    params: goodsCategoryDto,
+    params: { id },
   })
 }
