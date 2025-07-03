@@ -9,7 +9,7 @@ export const getOrderList = async <T extends ListResponseResult<OrderVo>>(
   requestParams: OrderDto & BaseListDto
 ) => {
   const url = `/order/getOrderList`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.get<ResponseResult<T>, OrderDto & BaseListDto>(url, {
     params: requestParams,
   })
 }
@@ -21,7 +21,7 @@ export const getOrderList = async <T extends ListResponseResult<OrderVo>>(
  */
 export const getOrderDetail = async <T extends OrderVo>(orderDto: OrderDto) => {
   const url = `/order/getOrderDetail`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.get<ResponseResult<T>, OrderDto>(url, {
     params: orderDto,
   })
 }
@@ -33,7 +33,7 @@ export const getOrderDetail = async <T extends OrderVo>(orderDto: OrderDto) => {
  */
 export const insertOrder = async <T extends boolean>(orderDto: OrderDto) => {
   const url = `/order/insertOrder`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, orderDto)
+  return request.post<ResponseResult<T>, OrderDto>(url, orderDto)
 }
 
 /**
@@ -43,7 +43,7 @@ export const insertOrder = async <T extends boolean>(orderDto: OrderDto) => {
  */
 export const updateOrder = async <T extends boolean>(orderDto: OrderDto) => {
   const url = `/order/updateOrder`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, orderDto)
+  return request.post<ResponseResult<T>, OrderDto>(url, orderDto)
 }
 
 /**
@@ -53,7 +53,7 @@ export const updateOrder = async <T extends boolean>(orderDto: OrderDto) => {
  */
 export const deleteOrder = async <T extends boolean>(orderId: number) => {
   const url = `/order/deleteOrder`
-  return request.delete<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.delete<ResponseResult<T>, number>(url, {
     params: { orderId },
   })
 }

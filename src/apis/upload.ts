@@ -15,7 +15,7 @@ export const uploadFile = <T extends string>(
   formData: FormData,
   onUploadProgress: OnUploadProgress
 ) => {
-  return request.post<ResponseResult<T>, ResponseResult<T>>('/file/upload', formData, {
+  return request.post<ResponseResult<T>, FormData>('/file/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
