@@ -45,12 +45,3 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # 常规构建指令
 # docker build -t xcy960815/study-java-web:1.x .
-# 
-# 1. 创建并启用 buildx 构建器
-# docker buildx create --use
-#
-# 2. 构建并推送多平台镜像
-# docker buildx build --platform linux/amd64,linux/arm64 -t xcy960815/study-java-web:1.0 --push .
-#
-# 3. 运行容器（根据平台自动选择对应镜像）
-# docker run --name study-java-web-container -dp 12315:80 xcy960815/study-java-web:1.0
