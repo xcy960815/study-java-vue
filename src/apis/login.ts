@@ -7,7 +7,7 @@ import { request } from '@utils/request'
  */
 export function login<T extends LoginResponseVo>(requestParams: LoginRequestDto) {
   const url = `/login`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url, requestParams)
+  return request.post<ResponseResult<T>, LoginRequestDto>(url, requestParams)
 }
 
 /**
@@ -16,7 +16,7 @@ export function login<T extends LoginResponseVo>(requestParams: LoginRequestDto)
  */
 export function logout<T extends null>() {
   const url = `/logout`
-  return request.post<ResponseResult<T>, ResponseResult<T>>(url)
+  return request.post<ResponseResult<T>, null>(url)
 }
 
 /**
@@ -24,5 +24,5 @@ export function logout<T extends null>() {
  */
 export function getCaptcha<T extends string>() {
   const url = `/captcha`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+  return request.get<ResponseResult<T>>(url)
 }
