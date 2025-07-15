@@ -103,7 +103,7 @@ networks:
     driver: bridge
 
 # 执行指令
-# docker-compose -f study-java-docker-compose.yml up -d --remove-orphans
+# docker-compose -p study-java -f study-java-docker-compose.yml up -d --remove-orphans
 
 # 停止 study-java-web 项目的容器
 # docker-compose -p study-java -f study-java-docker-compose.yml down
