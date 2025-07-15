@@ -1,6 +1,4 @@
 # 第一阶段：node 镜像打包前端
-# 使用多平台支持的 node 镜像
-# FROM --platform=$BUILDPLATFORM node:18 AS frontend-builder
 FROM node:18 AS frontend-builder
 
 # 设置工作目录
@@ -21,15 +19,13 @@ RUN pnpm install
 RUN pnpm run build-prod
 
 # 第二阶段：用 nginx 运行构建好的前端
-# 使用多平台支持的 nginx 镜像
-# FROM --platform=$TARGETPLATFORM nginx:1.21
 FROM nginx:1.21
 
 # 容器监听端口
 EXPOSE 80
 
 # 设置工作目录
-WORKDIR /app
+WORKDIR /study-java-web
 
 # 替换 nginx 配置
 COPY nginx.conf /etc/nginx/conf.d/default.conf
