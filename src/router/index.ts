@@ -6,6 +6,10 @@ import { eventEmitter, BASE_REDIRECT_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@
 import { getRoutes } from '@apis/system/menu'
 import { useSystemInfoStore } from '@store'
 import { buildRoute } from '@/utils/build-route'
+import NProgress from 'nprogress'
+
+NProgress.configure({ showSpinner: false })
+
 const router = createRouter({
   history: createWebHashHistory(), // hash 模式
   // history: createWebHistory(),  // history 模式
@@ -74,6 +78,7 @@ eventEmitter.on('get-routes', () => {
 })
 
 router.beforeEach(async (to) => {
+  NProgress.start()
   changeTabIcon(to)
   if (WHITELIST_PATHS.includes(to.path)) return true
   const token = await getToken()
@@ -85,7 +90,10 @@ router.beforeEach(async (to) => {
     // 关键：动态路由注册后，重新进入当前路由
     return to.fullPath
   }
+  NProgress.done()
   return true
 })
-
+router.afterEach(() => {
+  NProgress.done()
+})
 export default router
