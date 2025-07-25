@@ -4,6 +4,7 @@ import { eventEmitter } from './event-emits'
 import { getToken, removeToken } from './token'
 import { loginEnum } from '@/enums'
 
+// 直接使用相对路径，依赖 nginx 代理
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 
 const withoutAuthorizationUrls = ['/login']
