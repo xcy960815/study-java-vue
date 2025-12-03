@@ -13,6 +13,14 @@
     "tzdata",
     "Buildx",
     "buildx",
-    "DOCKERHUB"
+    "DOCKERHUB",
+    "deepseek",
+    "ollama",
+    "themen",
+    "uitils",
+    "unplugin",
+    "katex",
+    "parentname",
+    "Suffixs"
   ]
 }
