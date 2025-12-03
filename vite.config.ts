@@ -12,7 +12,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import ElementPlus from 'unplugin-element-plus/vite'
-import { createHtmlPlugin } from 'vite-plugin-html'
+
 import { visualizer } from 'rollup-plugin-visualizer'
 import { fileStructurePlugin } from './src/plugins/file-structure'
 /**
@@ -169,14 +169,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       vueDevTools(),
-      createHtmlPlugin({
-        inject: {
-          data: {
-            VITE_APP_TITLE,
-            VITE_BASE_URL,
-          },
-        },
-      }),
+
       AutoImport({
         resolvers: [
           ElementPlusResolver({
