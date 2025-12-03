@@ -1,5 +1,5 @@
 # 第一阶段：node 镜像打包前端
-FROM node:18 AS frontend-builder
+FROM node:18-alpine AS builder
 
 # 设置工作目录
 WORKDIR /study-java-web
@@ -34,7 +34,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html && mkdir -p /usr/share/nginx/html
 
 # 拷贝构建结果
-COPY --from=frontend-builder /study-java-web/dist /usr/share/nginx/html
+COPY --from=builder /study-java-web/dist /usr/share/nginx/html
 
 # 启动 nginx
 CMD ["nginx", "-g", "daemon off;"]
