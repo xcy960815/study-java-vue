@@ -10,6 +10,9 @@
     "jdbc",
     "VITE",
     "uniapp",
-    "tzdata"
+    "tzdata",
+    "Buildx",
+    "buildx",
+    "DOCKERHUB"
   ]
 }
