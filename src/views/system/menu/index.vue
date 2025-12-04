@@ -35,7 +35,7 @@
       :data="menuListInfo.treeData"
       row-key="id"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-      style="width: 100%"
+      :style="{ width: '100%' }"
     >
       <el-table-column prop="menuName" label="菜单名称" width="120" />
       <el-table-column prop="path" label="菜单路径" width="250" />
