@@ -4,16 +4,29 @@ FROM node:18-alpine AS builder
 # 设置工作目录
 WORKDIR /study-java-web
 
-# 拷贝项目文件
-COPY . .
-
 # 安装pnpm
 RUN npm install pnpm -g
 
-RUN rm -rf node_modules package-lock.json dist
+# 先拷贝依赖文件，利用 Docker 缓存层
+COPY package.json pnpm-lock.yaml ./
 
-# 安装依赖
-RUN pnpm install
+# 清理并安装依赖
+RUN rm -rf node_modules package-lock.json dist && \
+    pnpm install --frozen-lockfile
+
+# 拷贝项目文件（在安装依赖之后，利用缓存）
+COPY . .
+
+# 确保 env 目录存在，如果不存在则创建并写入默认环境变量
+RUN mkdir -p env && \
+    if [ ! -f env/.env.prod ]; then \
+        echo "VITE_PORT=80" > env/.env.prod && \
+        echo "VITE_APP_TITLE=study-java-web" >> env/.env.prod && \
+        echo "VITE_BASE_URL=/" >> env/.env.prod && \
+        echo "VITE_API_DOMAIN_PREFIX=/prod-api" >> env/.env.prod && \
+        echo "VITE_API_SERVER_DOMAIN=http://study-java-container:8084" >> env/.env.prod && \
+        echo "VITE_API_SERVER_DOMAIN_PREFIX=/prod-api" >> env/.env.prod; \
+    fi
 
 # 构建生产环境包
 RUN pnpm run build-prod

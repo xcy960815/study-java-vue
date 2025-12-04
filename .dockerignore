@@ -12,13 +12,13 @@ build
 .nuxt
 .next
 
-# 环境文件
+# 环境文件（注意：env/ 目录在构建时需要，所以不排除）
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-env/
+# env/ 目录不排除，因为 vite.config.ts 需要从 ./env/ 加载环境变量
 
 # 日志文件
 logs
@@ -96,12 +96,17 @@ coverage
 # Yarn Integrity file
 .yarn-integrity
 
-# 开发工具配置
-*.config.js
-*.config.ts
-*.config.cjs
-tsconfig.json
-tsconfig.*.json
+# 开发工具配置（注意：构建配置文件不能排除）
+# *.config.js
+# *.config.ts
+# *.config.cjs
+# tsconfig.json
+# tsconfig.*.json
+# 只排除特定的开发配置文件
+.prettierrc*
+.eslintrc*
+.eslintignore
+.prettierignore
 
 # 文档和说明文件
 README.md
@@ -116,11 +121,10 @@ Dockerfile
 docker-compose*.yml
 .dockerignore
 
-# 其他配置文件
-.prettierrc*
-.eslintrc*
-stylelint.config.js
-commitlint.config.cjs
-postcss.config.cjs
-tailwind.config.cjs
+# 其他配置文件（构建时需要的配置文件不能排除）
+# stylelint.config.js - 构建可能需要
+# commitlint.config.cjs - 构建不需要，可以排除
+# postcss.config.cjs - 构建需要，不能排除
+# tailwind.config.cjs - 构建需要，不能排除
+# vitest.config.ts - 测试配置，可以排除
 vitest.config.ts
