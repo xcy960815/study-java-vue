@@ -15,6 +15,7 @@ import ElementPlus from 'unplugin-element-plus/vite'
 
 import { visualizer } from 'rollup-plugin-visualizer'
 import { fileStructurePlugin } from './src/plugins/file-structure'
+import { createHtmlPlugin } from 'vite-plugin-html'
 /**
  * @type {import('vite').UserConfig}
  * @link https://vitejs.dev/config/
@@ -169,7 +170,14 @@ export default defineConfig(({ mode }) => {
     plugins: [
       vue(),
       vueDevTools(),
-
+      // HTML 模板变量替换
+      createHtmlPlugin({
+        inject: {
+          data: {
+            VITE_APP_TITLE: VITE_APP_TITLE,
+          },
+        },
+      }),
       AutoImport({
         resolvers: [
           ElementPlusResolver({
