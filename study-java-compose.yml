@@ -56,7 +56,7 @@ services:
 
   # 后端配置
   springboot:
-    image: xcy960815/study-java:1.5
+    image: xcy960815/study-java:${IMAGE_VERSION:-latest}
     container_name: study-java-container
     depends_on:
       redis:
@@ -80,7 +80,7 @@ services:
 
   # 前端配置
   vue:
-    image: xcy960815/study-java-web:${IMAGE_VERSION:-latest}
+    image: xcy960815/study-java-web:${WEB_IMAGE_VERSION:-latest}
     container_name: study-java-web-container
     #    build: ./frontend  # 假设有前端代码的目录
     ports:
