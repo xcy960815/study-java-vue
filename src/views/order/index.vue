@@ -194,7 +194,7 @@ const addOrEditOrderFormRef = ref<FormInstance>()
 /**
  * 工具函数：保证值为 string 或 undefined，避免 el-date-picker 绑定 null
  */
-function ensureStringOrUndefined(val: any): string | undefined {
+function ensureStringOrUndefined(val: string | null | undefined): string | undefined {
   if (val === null || val === undefined || val === '') return undefined
   return String(val)
 }
