@@ -3,7 +3,7 @@ import { StoreNames } from '@enums'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from '@/utils/event-emits'
 import { loginModule } from '@apis'
-import { setToken, removeToken } from '@utils/token'
+import { setToken, removeToken, setRefreshToken } from '@utils/token'
 
 export const loginStore = defineStore<
   StoreNames.LOGIN,
@@ -22,8 +22,9 @@ export const loginStore = defineStore<
         message: '登入成功',
         type: 'success',
       })
-      const { token } = response
+      const { token, refreshToken } = response
       await setToken(token)
+      await setRefreshToken(refreshToken)
       eventEmitter.emit('login')
     },
     /**

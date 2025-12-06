@@ -1,7 +1,7 @@
-import axios, { type AxiosError, type AxiosResponse } from 'axios'
+import axios, { type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
-import { getToken, removeToken } from './token'
+import { getToken, removeToken, getRefreshToken, setToken, setRefreshToken } from './token'
 import { loginEnum } from '@/enums'
 
 // 直接使用相对路径，依赖 nginx 代理
@@ -10,6 +10,12 @@ const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 const withoutAuthorizationUrls = ['/login']
 
 let status = 0
+let isRefreshing = false
+let requests: Function[] = []
+
+interface RetryRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 
 axios.defaults.withCredentials = false
 const request = axios.create({
@@ -52,16 +58,58 @@ request.interceptors.response.use(
 
       // 401: Token 无效
       if (statusCode === loginEnum.InvalidToken) {
-        await removeToken()
-        eventEmitter.emit('token-invalid')
-        if (status !== loginEnum.InvalidToken) {
-          // 同一种类型错误只提示一次
-          ElMessage({
-            type: 'error',
-            message: errorData?.message || '登录已过期，请重新登录',
-          })
+        const originalRequest = error.config as RetryRequestConfig
+
+        // 排除 /refreshToken 接口本身的错误，防止死循环
+        if (originalRequest.url?.includes('/refreshToken')) {
+          await removeToken()
+          eventEmitter.emit('token-invalid')
+          return Promise.reject(error)
         }
-        status = loginEnum.InvalidToken
+
+        if (!originalRequest._retry) {
+          if (isRefreshing) {
+            // 如果正在刷新，将当前请求加入队列，等待刷新完成后执行
+            return new Promise((resolve) => {
+              requests.push((token: string) => {
+                originalRequest.headers['Authorization'] = `Bearer ${token}`
+                resolve(request(originalRequest))
+              })
+            })
+          }
+
+          originalRequest._retry = true
+          isRefreshing = true
+
+          try {
+            // 调用刷新 Token 接口
+            const refreshToken = await getRefreshToken()
+
+            // 使用 axios 直接请求，避免走拦截器
+            const { data } = await axios.post(baseUrl + '/refreshToken', { refreshToken })
+
+            if (data && data.token) {
+              // 1. 更新本地存储
+              await setToken(data.token)
+              await setRefreshToken(data.refreshToken)
+
+              // 2. 执行队列中的请求
+              requests.forEach((cb) => cb(data.token))
+              requests = []
+
+              // 3. 重试当前请求
+              originalRequest.headers['Authorization'] = `Bearer ${data.token}`
+              return request(originalRequest)
+            }
+          } catch (refreshError) {
+            // 刷新失败
+            await removeToken()
+            eventEmitter.emit('token-invalid')
+            return Promise.reject(refreshError)
+          } finally {
+            isRefreshing = false
+          }
+        }
       }
       // 400/500 等其他错误
       else {

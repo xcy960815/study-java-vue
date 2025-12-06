@@ -9,6 +9,7 @@ declare interface LoginResponseVo {
   loginName: string
   nickName: string
   token: string
+  refreshToken: string
 }
 
 /**
