@@ -5,7 +5,7 @@ import { request } from '@utils/request'
  * @returns
  */
 export const getModels = <T extends DeepSeekVo.Models>() => {
-  return request.get<ResponseResult<T>, ResponseResult<T>>('/deepseek/models')
+  return request.get<T, T>('/deepseek/models')
 }
 
 /**
@@ -13,5 +13,5 @@ export const getModels = <T extends DeepSeekVo.Models>() => {
  * @returns
  */
 export const getBalance = <T extends DeepSeekVo.Balance>() => {
-  return request.get<ResponseResult<T>, ResponseResult<T>>('/deepseek/balance')
+  return request.get<T, T>('/deepseek/balance')
 }

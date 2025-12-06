@@ -8,7 +8,13 @@
       <el-main class="layout-main-container flex-1 p-1.5">
         <!-- https://element-plus.org/zh-CN/guide/i18n.html -->
         <el-config-provider :locale="locale">
-          <router-view v-if="!props.content"></router-view>
+          <router-view v-if="!props.content" v-slot="{ Component }">
+            <transition name="fade-transform" mode="out-in">
+              <keep-alive :include="keepLiveList">
+                <component :is="Component" :key="route.fullPath" />
+              </keep-alive>
+            </transition>
+          </router-view>
           <component v-else :is="props.content"></component>
         </el-config-provider>
       </el-main>
@@ -17,7 +23,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { useSystemInfoStore } from '@store'
 import LayoutHeader from './header/index.vue'
 import LayoutHistory from './history/index.vue'
 import LayoutMenu from './menu/index.vue'
@@ -25,6 +33,10 @@ import LayoutMenu from './menu/index.vue'
 // @ts-ignore
 import locale from 'element-plus/dist/locale/zh-cn.mjs'
 // let  locale=zhCn
+const route = useRoute()
+const systemInfoStore = useSystemInfoStore()
+const keepLiveList = computed(() => systemInfoStore.getKeepLiveList)
+
 const props = defineProps({
   content: {
     type: Object,

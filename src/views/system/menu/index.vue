@@ -186,7 +186,7 @@ const addOrEditMenuDialogVisible = ref(false)
  */
 const menuTreeData = useAsyncComputed(async () => {
   const result = await getAllMenuTree()
-  return filterMenuTree(result.data)
+  return filterMenuTree(result)
 })
 
 // 递归过滤菜单树
@@ -244,10 +244,8 @@ const fetchMenuList = async () => {
     pageNum: menuListInfo.pageNum,
     ...queryFormData,
   })
-  if (result.code === 200) {
-    menuListInfo.treeData = handleMenuTreeData(result.data.data)
-    menuListInfo.total = result.data.total
-  }
+  menuListInfo.treeData = handleMenuTreeData(result.data)
+  menuListInfo.total = result.total
 }
 
 const handleMenuTreeData = <R extends StudyJavaSysMenuVo>(data?: R[]): Array<R> => {
@@ -393,7 +391,7 @@ const handleClickAddOrEditConfirm = async () => {
     return
   }
 
-  if (result.code === 200) {
+  if (result) {
     fetchMenuList()
     addOrEditMenuDialogVisible.value = false
   }
@@ -411,7 +409,7 @@ const handleClickDeleteMenu = (row: StudyJavaSysMenuVo) => {
   })
     .then(async () => {
       const result = await deleteMenu(row)
-      if (result.code !== 200) return
+      if (!result) return
       fetchMenuList()
       ElMessage({
         type: 'success',

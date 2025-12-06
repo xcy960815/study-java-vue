@@ -4,7 +4,12 @@
     <div class="layout-side-view">
       <!-- text-color="#fff" -->
       <!-- active-text-color="#fff" -->
-      <el-menu class="layout-menu-view" :collapse="isCollapse" :default-active="currentRoute">
+      <el-menu
+        class="layout-menu-view"
+        :collapse="isCollapse"
+        :default-active="currentRoute"
+        :router="true"
+      >
         <menu-item :menu-data="menuData"></menu-item>
       </el-menu>
       <div id="drap-meuline" class="drap-meuline"></div>

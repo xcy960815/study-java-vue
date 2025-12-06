@@ -56,8 +56,8 @@ const fetchFileStructure = async () => {
     const response = await fetch('/api/project/file-structure')
     if (response.ok) {
       const result = await response.json()
-      if (result.code === 200 && result.data) {
-        fileStructureData.value = result.data
+      if (result) {
+        fileStructureData.value = result
         console.log('fileStructureData.value', fileStructureData.value)
       }
     }

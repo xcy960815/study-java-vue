@@ -75,9 +75,7 @@ const ollamaModelsListInfo = reactive<{
  */
 const getOllamaModelsList = async () => {
   const result = await ollamaModule.models()
-  if (result.code === 200) {
-    ollamaModelsListInfo.tableData = result.data.data
-  }
+  ollamaModelsListInfo.tableData = result.data
 }
 
 /**
@@ -96,8 +94,8 @@ const handleStartChat = (row?: OllamaVo.ModelOption) => {
  */
 const version = async () => {
   const result = await ollamaModule.version()
-  if (result.code === 200) {
-    ElMessage(`当前ollama版本是${result.data.version}`)
+  if (result) {
+    ElMessage(`当前ollama版本是${result.version}`)
   }
 }
 
@@ -109,11 +107,11 @@ const psModelsList = ref<Array<OllamaVo.PsModelOption>>([])
  */
 const ps = async () => {
   const result = await ollamaModule.ps()
-  if (result.code === 200) {
+  if (result) {
     psDialogVisible.value = true
-    console.log('result.data.models', result.data.models)
+    console.log('result.models', result.models)
 
-    psModelsList.value = result.data.models.map((item) => {
+    psModelsList.value = result.models.map((item) => {
       return {
         ...item,
         expires_at: item.expires_at ? dayjs(item.expires_at).format('YYYY-MM-DD HH:mm:ss') : '',
@@ -136,7 +134,7 @@ const handleClickDeleteModel = (row: OllamaVo.ModelOption) => {
       const result = await ollamaModule.deleteModel<boolean>({
         name: row.id,
       })
-      if (result.code !== 200) return
+      if (!result) return
       getOllamaModelsList()
       ElMessage({
         type: 'success',

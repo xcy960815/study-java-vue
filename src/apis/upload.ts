@@ -9,13 +9,13 @@ const CHUNK_SIZE = 10 * 1024 * 1024 // 10 MB 每片
 /**
  * 普通文件上传
  * @param {FormData} formData
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const uploadFile = <T extends string>(
   formData: FormData,
   onUploadProgress: OnUploadProgress
 ) => {
-  return request.post<ResponseResult<T>, FormData>('/file/upload', formData, {
+  return request.post<T, T>('/file/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

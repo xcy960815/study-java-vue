@@ -1,4 +1,4 @@
-import axios, { type AxiosError } from 'axios'
+import axios, { type AxiosError, type AxiosResponse } from 'axios'
 import { ElMessage } from 'element-plus'
 import { eventEmitter } from './event-emits'
 import { getToken, removeToken } from './token'
@@ -37,35 +37,44 @@ request.interceptors.request.use(
 )
 /**
  * 响应拦截器
+ * 直接返回 response，调用方需要访问 response.data 获取业务数据
  */
 request.interceptors.response.use(
-  async (response) => {
-    const responseData = response.data
-    if (responseData.code === loginEnum.InvalidToken) {
-      await removeToken()
-      eventEmitter.emit('token-invalid')
-      if (status !== loginEnum.InvalidToken) {
-        // 同一种类型错误只提示一次
+  (response: AxiosResponse) => {
+    // 直接返回 response.data
+    return response.data
+  },
+  async (error: AxiosError) => {
+    // 处理 HTTP 错误状态码
+    if (error.response) {
+      const statusCode = error.response.status
+      const errorData = error.response.data as { message?: string } | undefined
+
+      // 401: Token 无效
+      if (statusCode === loginEnum.InvalidToken) {
+        await removeToken()
+        eventEmitter.emit('token-invalid')
+        if (status !== loginEnum.InvalidToken) {
+          // 同一种类型错误只提示一次
+          ElMessage({
+            type: 'error',
+            message: errorData?.message || '登录已过期，请重新登录',
+          })
+        }
+        status = loginEnum.InvalidToken
+      }
+      // 400/500 等其他错误
+      else {
         ElMessage({
           type: 'error',
-          message: responseData.message,
+          message: errorData?.message || error.message || '请求失败',
         })
       }
-      status = loginEnum.InvalidToken
-      return Promise.reject(responseData)
-    } else if (responseData.code == loginEnum.ERROR) {
-      ElMessage({
-        type: 'error',
-        message: responseData.message,
-      })
-      return Promise.reject(responseData)
-    } else if (responseData.code == loginEnum.SUCCESS) {
-      return Promise.resolve(responseData)
+    } else {
+      // 网络错误或其他错误
+      ElMessage.error(error.message || '网络错误')
     }
-  },
-  (error) => {
-    const { message } = error
-    ElMessage.error(message)
+
     return Promise.reject(error)
   }
 )

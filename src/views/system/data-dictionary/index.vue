@@ -193,10 +193,8 @@ const handleGetDataDictionaryList = async () => {
   const res = await getDataDictList(dataDictionaryQueryParams).finally(() => {
     dataDictionaryListInfo.loading = false
   })
-  if (res.code === 200) {
-    dataDictionaryListInfo.tableData = res.data.data
-    dataDictionaryListInfo.total = res.data.total
-  }
+  dataDictionaryListInfo.tableData = res.data
+  dataDictionaryListInfo.total = res.total
 }
 
 // 搜索按钮操作
@@ -259,7 +257,7 @@ const handleDeleteDictionary = (row: DataDictionaryVo) => {
     type: 'warning',
   }).then(async () => {
     const result = await deleteDataDict(row.id)
-    if (result.code === 200) {
+    if (result) {
       ElMessage.success('删除成功')
       handleGetDataDictionaryList()
     }

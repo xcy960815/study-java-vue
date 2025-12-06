@@ -63,8 +63,8 @@ eventEmitter.on('get-routes', () => {
     const hasAddedRoutes = systemInfoStore.getHasAddedRoutes
     if (!hasAddedRoutes) {
       const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
-      if (routesRes.code === 200) {
-        const routes = routesRes.data
+      if (routesRes) {
+        const routes = routesRes
         const routeList = buildRoute(routes)
         const allRoutes = [...routeList, ...redirectRoutes]
         allRoutes.forEach((route) => {

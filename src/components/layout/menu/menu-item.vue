@@ -9,7 +9,7 @@
       </template>
       <menu-item :menu-data="menuItem.children"></menu-item>
     </el-sub-menu>
-    <el-menu-item v-else :index="menuItem.path" @click="handleMenuClick(menuItem)">
+    <el-menu-item v-else :index="menuItem.path">
       <icon v-if="menuItem.meta?.icon" :name="menuItem.meta?.icon" class="icon"></icon>
       <!-- 占位符 -->
       <span class="icon" v-else></span>
@@ -39,12 +39,6 @@ const menuData = computed(() => {
 
 const hasSubMenu = (menuItem: RouteRecordRaw) => {
   return menuItem.children && menuItem.children.length
-}
-
-const handleMenuClick = (menuItem: RouteRecordRaw) => {
-  if (menuItem.path) {
-    router.push(menuItem.path)
-  }
 }
 
 defineOptions({

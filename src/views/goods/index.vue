@@ -173,10 +173,8 @@ const getGoodsList = async () => {
     pageSize: goodsInfo.pageSize,
     pageNum: goodsInfo.pageNum,
   })
-  if (result.code === 200) {
-    goodsInfo.tableData = result.data.data
-    goodsInfo.total = result.data.total
-  }
+  goodsInfo.tableData = result.data
+  goodsInfo.total = result.total
 }
 
 const addOrEditGoodsFormRef = ref<FormInstance>()

@@ -163,9 +163,7 @@ const roleList = ref<RoleInfoVo[]>([])
 
 const getRoleList = async () => {
   const result = await roleModule.getAllRoleList()
-  if (result.code === 200) {
-    roleList.value = result.data.data
-  }
+  roleList.value = result.data
 }
 /**
  * 获取用户列表
@@ -178,10 +176,8 @@ const getUserList = async () => {
     pageNum,
     ...queryFormData,
   })
-  if (result.code === 200) {
-    userListInfo.tableData = result.data.data
-    userListInfo.total = result.data.total
-  }
+  userListInfo.tableData = result.data
+  userListInfo.total = result.total
 }
 
 const addOrEditUserFormRef = ref<FormInstance>()
@@ -276,7 +272,7 @@ const handleClickAddOrEditConfirm = async () => {
     result = await userModule.updateUser<boolean>(addOrEditUserFormData)
   }
 
-  if (result.code === 200) {
+  if (result) {
     getUserList()
     addOrEditUserDialogVisible.value = false
   }
@@ -293,7 +289,7 @@ const handleClickDeleteUser = (row: UserInfoVo) => {
   })
     .then(async () => {
       const result = await userModule.deleteUser<boolean>(row)
-      if (result.code !== 200) return
+      if (!result) return
       getUserList()
       ElMessage({
         type: 'success',

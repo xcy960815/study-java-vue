@@ -99,6 +99,7 @@
             v-model="addOrEditOrderFormData.payTime"
             type="datetime"
             placeholder="请选择支付时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
           />
         </el-form-item>
         <el-form-item label="订单状态" prop="orderStatus">
@@ -184,10 +185,8 @@ const getOrderList = async () => {
     pageSize: orderInfo.pageSize,
     pageNum: orderInfo.pageNum,
   })
-  if (result.code === 200) {
-    orderInfo.tableData = result.data.data
-    orderInfo.total = result.data.total
-  }
+  orderInfo.tableData = result.data
+  orderInfo.total = result.total
 }
 
 const addOrEditOrderFormRef = ref<FormInstance>()
@@ -195,12 +194,16 @@ const addOrEditOrderFormRef = ref<FormInstance>()
 /**
  * 工具函数：保证值为 string 或 undefined，避免 el-date-picker 绑定 null
  */
-function ensureStringOrUndefined(val: any): string | Date | undefined {
+function ensureStringOrUndefined(val: any): string | undefined {
   if (val === null || val === undefined || val === '') return undefined
-  return val instanceof Date ? val : String(val)
+  return String(val)
 }
 
-const addOrEditOrderFormData = reactive<OrderDto>({
+type OrderForm = Omit<OrderDto, 'payTime'> & {
+  payTime?: string
+}
+
+const addOrEditOrderFormData = reactive<OrderForm>({
   userId: undefined,
   totalPrice: undefined,
   payStatus: undefined,
@@ -262,7 +265,7 @@ const handleClickAddOrEditConfirm = async () => {
   } else {
     result = await orderModule.updateOrder(addOrEditOrderFormData)
   }
-  if (result.code === 200) {
+  if (result) {
     getOrderList()
     addOrEditOrderDialogVisible.value = false
   }
@@ -280,7 +283,7 @@ const handleClickDeleteOrder = (row: OrderVo) => {
   })
     .then(async () => {
       const result = await orderModule.deleteOrder<boolean>(row.orderId)
-      if (result.code !== 200) return
+      if (!result) return
       getOrderList()
       ElMessage({
         type: 'success',

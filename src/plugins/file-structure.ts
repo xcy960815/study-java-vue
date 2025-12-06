@@ -12,7 +12,7 @@ const scanDirectory = (dir: string, basePath: string = '') => {
     children?: FileNode[]
   }
   const result: Array<FileNode> = []
-  const files = fs.readdirSync(dir)
+  const files = fs.readdirSync(dir).filter((file) => file !== '.DS_Store')
 
   files.forEach((file) => {
     const filePath = path.join(dir, file)

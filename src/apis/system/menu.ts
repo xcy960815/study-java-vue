@@ -3,69 +3,69 @@ const baseUrl = '/studyJavaSysMenu'
 /**
  * 获取菜单列表
  * @param {BaseListDto} queryFormData
- * @returns {Promise<ResponseResult<ListResponseResult<StudyJavaSysMenuVo>>>}
+ * @returns {Promise<T>}
  */
 export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
-): Promise<ResponseResult<T>> {
+): Promise<T> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `${baseUrl}/getMenuList?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.get<T, T>(url, {
     params: otherQueryFormData,
   })
 }
 
 /**
  * 获取菜单树
- * @returns {Promise<ResponseResult<StudyJavaSysMenuVo[]>>}
+ * @returns {Promise<T>}
  */
 export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
-): Promise<ResponseResult<T>> {
+): Promise<T> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
   const url = `${baseUrl}/getMenuTree?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.get<T, T>(url, {
     params: otherQueryFormData,
   })
 }
 
 /**
  * 获取所有菜单树
- * @returns {Promise<ResponseResult<StudyJavaSysMenuVo[]>>}
+ * @returns {Promise<T>}
  */
-export function getAllMenuTree<T extends Array<StudyJavaSysMenuVo>>(): Promise<ResponseResult<T>> {
+export function getAllMenuTree<T extends Array<StudyJavaSysMenuVo>>(): Promise<T> {
   const url = `${baseUrl}/getAllMenuTree`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+  return request.get<T, T>(url)
 }
 
 /**
  * 更新菜单信息
  * @param {StudyJavaSysMenuDto} menuInfo
- * @returns {Promise<ResponseResult<boolean>>}
+ * @returns {Promise<boolean>}
  */
-export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/updateMenu`
-  return request.put<ResponseResult<boolean>, ResponseResult<boolean>>(url, menuInfo)
+  return request.put<boolean, boolean>(url, menuInfo)
 }
 
 /**
  * 新增菜单
  * @param {StudyJavaSysMenuDto} menuInfo
- * @returns {Promise<ResponseResult<boolean>>}
+ * @returns {Promise<boolean>}
  */
-export function insertMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+export function insertMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/insertMenu`
-  return request.post<ResponseResult<boolean>, ResponseResult<boolean>>(url, menuInfo)
+  return request.post<boolean, boolean>(url, menuInfo)
 }
 
 /**
  * 删除菜单
  * @param {StudyJavaSysMenuVo} menuInfo
- * @returns {Promise<ResponseResult<boolean>>}
+ * @returns {Promise<boolean>}
  */
-export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResult<boolean>> {
+export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/deleteMenu`
-  return request.delete<ResponseResult<boolean>, ResponseResult<boolean>>(url, {
+  return request.delete<boolean, boolean>(url, {
     data: menuInfo,
   })
 }
@@ -73,11 +73,11 @@ export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<ResponseResul
 /**
  * 获取菜单详情
  * @param {number} menuId
- * @returns {Promise<ResponseResult<StudyJavaSysMenuVo>>}
+ * @returns {Promise<T>}
  */
-export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<ResponseResult<T>> {
+export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<T> {
   const url = `${baseUrl}/getMenuInfo`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url, {
+  return request.get<T, T>(url, {
     params: {
       id,
     },
@@ -86,9 +86,9 @@ export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<R
 
 /**
  * 获取当前登录用户所拥有的路由列表
- * @returns {Promise<ResponseResult<Array<StudyJavaSysMenuVo>>>>}
+ * @returns {Promise<T>}
  */
 export const getRoutes = <T extends Array<StudyJavaSysMenuVo>>() => {
   const url = `${baseUrl}/getRoutes`
-  return request.get<ResponseResult<T>, ResponseResult<T>>(url)
+  return request.get<T, T>(url)
 }

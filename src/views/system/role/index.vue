@@ -181,7 +181,7 @@ const queryFormData = reactive({
  */
 const menuTreeData = useAsyncComputed(async () => {
   const result = await getAllMenuTree()
-  const menuTree = useFilterMenuTree(result.data)
+  const menuTree = useFilterMenuTree(result)
   return menuTree
 })
 
@@ -207,10 +207,8 @@ const getRoleList = async () => {
     pageNum,
     ...queryFormData,
   })
-  if (result.code === 200) {
-    roleListInfo.tableData = result.data.data
-    roleListInfo.total = result.data.total
-  }
+  roleListInfo.tableData = result.data
+  roleListInfo.total = result.total
 }
 
 const addOrEditRoleFormRef = ref<FormInstance>()
@@ -294,7 +292,7 @@ const handleClickAddOrEditConfirm = async () => {
     result = await roleModule.updateRole(addOrEditRoleFormData)
   }
 
-  if (result.code === 200) {
+  if (result) {
     getRoleList()
     addOrEditRoleDialogVisible.value = false
     ElMessage({
@@ -315,7 +313,7 @@ const handleClickDeleteRole = (row: RoleInfoVo) => {
   })
     .then(async () => {
       const result = await roleModule.deleteRole(row)
-      if (result.code !== 200) return
+      if (!result) return
       getRoleList()
       ElMessage({
         type: 'success',
@@ -342,7 +340,7 @@ const handleClickDisableRole = (row: RoleInfoVo) => {
   })
     .then(async () => {
       const result = await roleModule.disableRole(row)
-      if (result.code !== 200) return
+      if (!result) return
       getRoleList()
       ElMessage({ type: 'success', message: '操作成功' })
     })
@@ -362,7 +360,7 @@ const handleClickEnableRole = (row: RoleInfoVo) => {
   })
     .then(async () => {
       const result = await roleModule.enableRole(row)
-      if (result.code !== 200) return
+      if (!result) return
       getRoleList()
       ElMessage({ type: 'success', message: '操作成功' })
     })

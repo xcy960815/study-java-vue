@@ -1,26 +1,10 @@
 <template>
-  <router-view v-slot="{ Component }">
-    <transition name="fade-transform" mode="out-in">
-      <keep-alive include="userList">
-        <component :is="Component" :key="routerViewKey" />
-      </keep-alive>
-    </transition>
-  </router-view>
+  <router-view />
 </template>
 
 <script lang="ts" setup>
-import { useSystemInfoStore } from '@store'
-import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onMounted } from 'vue'
 import { useSystemTheme } from '@/utils/system-style'
-
-const route = useRoute()
-
-const systemInfoStore = useSystemInfoStore()
-
-const keepLiveList = computed(() => systemInfoStore.getKeepLiveList)
-
-const routerViewKey = ref(route.fullPath)
 
 const { initTheme } = useSystemTheme()
 

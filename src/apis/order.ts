@@ -3,13 +3,13 @@ import { request } from '@utils/request'
 /**
  * 获取订单列表
  * @param requestParams
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const getOrderList = async <T extends ListResponseResult<OrderVo>>(
   requestParams: OrderDto & BaseListDto
 ) => {
   const url = `/order/getOrderList`
-  return request.get<ResponseResult<T>, OrderDto & BaseListDto>(url, {
+  return request.get<T, T>(url, {
     params: requestParams,
   })
 }
@@ -17,11 +17,11 @@ export const getOrderList = async <T extends ListResponseResult<OrderVo>>(
 /**
  * 获取订单详情
  * @param orderDto
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const getOrderDetail = async <T extends OrderVo>(orderDto: OrderDto) => {
   const url = `/order/getOrderDetail`
-  return request.get<ResponseResult<T>, OrderDto>(url, {
+  return request.get<T, T>(url, {
     params: orderDto,
   })
 }
@@ -29,31 +29,31 @@ export const getOrderDetail = async <T extends OrderVo>(orderDto: OrderDto) => {
 /**
  * 新增订单
  * @param orderDto
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const insertOrder = async <T extends boolean>(orderDto: OrderDto) => {
   const url = `/order/insertOrder`
-  return request.post<ResponseResult<T>, OrderDto>(url, orderDto)
+  return request.post<T, T>(url, orderDto)
 }
 
 /**
  * 更新订单
  * @param orderDto
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const updateOrder = async <T extends boolean>(orderDto: OrderDto) => {
   const url = `/order/updateOrder`
-  return request.post<ResponseResult<T>, OrderDto>(url, orderDto)
+  return request.post<T, T>(url, orderDto)
 }
 
 /**
  * 删除订单
  * @param orderId
- * @returns {Promise<ResponseResult<T>>}
+ * @returns {Promise<T>}
  */
 export const deleteOrder = async <T extends boolean>(orderId: number) => {
   const url = `/order/deleteOrder`
-  return request.delete<ResponseResult<T>, number>(url, {
+  return request.delete<T, T>(url, {
     params: { orderId },
   })
 }

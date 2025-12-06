@@ -8,13 +8,25 @@
     status-icon
   >
     <el-form-item label="原始密码" prop="originalPassword">
-      <el-input type="password" v-model="changePasswordFormData.originalPassword" placeholder="请输入原始密码" />
+      <el-input
+        type="password"
+        v-model="changePasswordFormData.originalPassword"
+        placeholder="请输入原始密码"
+      />
     </el-form-item>
     <el-form-item label="新密码" prop="newPassword">
-      <el-input type="password" v-model="changePasswordFormData.newPassword" placeholder="请输入新密码" />
+      <el-input
+        type="password"
+        v-model="changePasswordFormData.newPassword"
+        placeholder="请输入新密码"
+      />
     </el-form-item>
     <el-form-item label="确认新密码" prop="confirmNewPasswordMd5">
-      <el-input type="password" v-model="changePasswordFormData.confirmNewPasswordMd5" placeholder="请确认新密码" />
+      <el-input
+        type="password"
+        v-model="changePasswordFormData.confirmNewPasswordMd5"
+        placeholder="请确认新密码"
+      />
     </el-form-item>
   </el-form>
 </template>
@@ -37,7 +49,7 @@ const changePasswordFormRef = ref<FormInstance>()
 const changePasswordFormData = reactive<ChangePasswordFormData>({
   originalPassword: '123456',
   newPassword: '12345678',
-  confirmNewPasswordMd5: '12345678'
+  confirmNewPasswordMd5: '12345678',
 })
 
 const changePasswordFormRules: FormRules<ChangePasswordFormData> = {
@@ -45,15 +57,15 @@ const changePasswordFormRules: FormRules<ChangePasswordFormData> = {
     {
       required: true,
       message: '请输入原始密码',
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
 
   newPassword: [
     {
       required: true,
       message: '请输入新密码',
-      trigger: 'blur'
+      trigger: 'blur',
     },
     {
       // 自定义验证
@@ -73,17 +85,17 @@ const changePasswordFormRules: FormRules<ChangePasswordFormData> = {
         } else {
           callback()
         }
-      }
-    }
+      },
+    },
   ],
 
   confirmNewPasswordMd5: [
     {
       required: true,
       message: '请再次输入新密码',
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 }
 
 /**
@@ -95,13 +107,13 @@ const handleChangePasswordConfirm = async () => {
   const requestParams = {
     passwordMd5: Md5(changePasswordFormData.originalPassword),
     newPasswordMd5: Md5(changePasswordFormData.newPassword),
-    confirmNewPasswordMd5: Md5(changePasswordFormData.confirmNewPasswordMd5)
+    confirmNewPasswordMd5: Md5(changePasswordFormData.confirmNewPasswordMd5),
   }
   const result = await userModule.updateUserPassword(requestParams)
-  if (result.code === 200) {
+  if (result) {
     ElMessage({
       type: 'success',
-      message: '修改密码成功'
+      message: '修改密码成功',
     })
     eventEmitter.emit('logout')
   }

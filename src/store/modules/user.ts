@@ -34,15 +34,13 @@ export const userInfoStore = defineStore<
      */
     async getUserInfo() {
       const result = await userModule.getUserInfo()
-      if (result.code === 200) {
-        this.address = result.data.address
-        this.createTime = result.data.createTime
-        this.id = result.data.id
-        this.introduceSign = result.data.introduceSign
-        this.loginName = result.data.loginName
-        this.nickName = result.data.nickName
-        this.avatar = result.data.avatar
-      }
+      this.address = result.address
+      this.createTime = result.createTime
+      this.id = result.id
+      this.introduceSign = result.introduceSign
+      this.loginName = result.loginName
+      this.nickName = result.nickName
+      this.avatar = result.avatar
     },
     setId(value: number | null) {
       this.id = value

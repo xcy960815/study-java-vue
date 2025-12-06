@@ -172,12 +172,12 @@ const captchaUrl = ref('')
 const captchaLoading = ref(false)
 const handleGetCaptcha = async () => {
   captchaLoading.value = true
-  const result = await loginModule.getCaptcha().finally(() => {
+  const captchaRes = await loginModule.getCaptcha().finally(() => {
     captchaLoading.value = false
   })
-  if (result.code === 200) {
-    captchaUrl.value = result.data
-  }
+  console.log('captchaRes', captchaRes)
+
+  captchaUrl.value = captchaRes
 }
 
 onMounted(() => {

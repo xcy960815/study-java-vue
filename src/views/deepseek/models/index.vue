@@ -66,9 +66,7 @@ const handleStartChat = (row: DeepSeekVo.ModelOption) => {
 const handleGetModels = async () => {
   loadingModel.value = true
   const result = await deepseekModule.getModels<DeepSeekVo.Models>()
-  if (result.code === 200) {
-    deepseekModelsListInfo.tableData = result.data.data
-  }
+  deepseekModelsListInfo.tableData = result.data
   loadingModel.value = false
 }
 
@@ -77,8 +75,8 @@ const handleGetModels = async () => {
  */
 const handleGetBalance = async () => {
   const result = await deepseekModule.getBalance<DeepSeekVo.Balance>()
-  if (result.code === 200) {
-    const totalBalance = result.data.balance_infos[0].total_balance
+  if (result) {
+    const totalBalance = result.balance_infos[0].total_balance
     ElMessage({
       type: 'success',
       message: `当前余额：${totalBalance}`,
