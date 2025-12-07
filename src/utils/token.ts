@@ -10,11 +10,16 @@ const VITE_BASE_URL = import.meta.env.VITE_BASE_URL
  */
 export const getToken = async () => {
   if (hasCookieStore()) {
-    const tokenOption = await cookieStore.get(TOKENNAME)
-    return tokenOption?.value || ''
-  } else {
-    return localStorage.getItem(TOKENNAME)
+    try {
+      const tokenOption = await cookieStore.get(TOKENNAME)
+      if (tokenOption?.value) {
+        return tokenOption.value
+      }
+    } catch (error) {
+      console.warn('Failed to get token from cookieStore:', error)
+    }
   }
+  return localStorage.getItem(TOKENNAME)
 }
 
 /**
@@ -24,14 +29,17 @@ export const getToken = async () => {
  */
 export const setToken = async (token: string) => {
   if (hasCookieStore()) {
-    return await cookieStore.set({
-      name: TOKENNAME,
-      value: token,
-      // path: VITE_BASE_URL
-    })
-  } else {
-    return localStorage.setItem(TOKENNAME, token)
+    try {
+      return await cookieStore.set({
+        name: TOKENNAME,
+        value: token,
+        // path: VITE_BASE_URL
+      })
+    } catch (error) {
+      console.warn('Failed to set token to cookieStore:', error)
+    }
   }
+  return localStorage.setItem(TOKENNAME, token)
 }
 
 /**
@@ -40,17 +48,20 @@ export const setToken = async (token: string) => {
  */
 export const removeToken = async () => {
   if (hasCookieStore()) {
-    await cookieStore.delete({
-      name: TOKENNAME,
-      // path: VITE_BASE_URL
-    })
-    return await cookieStore.delete({
-      name: REFRESH_TOKEN_NAME,
-    })
-  } else {
-    localStorage.removeItem(TOKENNAME)
-    return localStorage.removeItem(REFRESH_TOKEN_NAME)
+    try {
+      await cookieStore.delete({
+        name: TOKENNAME,
+        // path: VITE_BASE_URL
+      })
+      await cookieStore.delete({
+        name: REFRESH_TOKEN_NAME,
+      })
+    } catch (error) {
+      console.warn('Failed to remove token from cookieStore:', error)
+    }
   }
+  localStorage.removeItem(TOKENNAME)
+  return localStorage.removeItem(REFRESH_TOKEN_NAME)
 }
 
 /**
@@ -59,11 +70,16 @@ export const removeToken = async () => {
  */
 export const getRefreshToken = async () => {
   if (hasCookieStore()) {
-    const tokenOption = await cookieStore.get(REFRESH_TOKEN_NAME)
-    return tokenOption?.value || ''
-  } else {
-    return localStorage.getItem(REFRESH_TOKEN_NAME)
+    try {
+      const tokenOption = await cookieStore.get(REFRESH_TOKEN_NAME)
+      if (tokenOption?.value) {
+        return tokenOption.value
+      }
+    } catch (error) {
+      console.warn('Failed to get refresh token from cookieStore:', error)
+    }
   }
+  return localStorage.getItem(REFRESH_TOKEN_NAME)
 }
 
 /**
@@ -73,14 +89,17 @@ export const getRefreshToken = async () => {
  */
 export const setRefreshToken = async (token: string) => {
   if (hasCookieStore()) {
-    return await cookieStore.set({
-      name: REFRESH_TOKEN_NAME,
-      value: token,
-      // path: VITE_BASE_URL
-    })
-  } else {
-    return localStorage.setItem(REFRESH_TOKEN_NAME, token)
+    try {
+      return await cookieStore.set({
+        name: REFRESH_TOKEN_NAME,
+        value: token,
+        // path: VITE_BASE_URL
+      })
+    } catch (error) {
+      console.warn('Failed to set refresh token to cookieStore:', error)
+    }
   }
+  return localStorage.setItem(REFRESH_TOKEN_NAME, token)
 }
 
 /**
@@ -89,11 +108,14 @@ export const setRefreshToken = async (token: string) => {
  */
 export const removeRefreshToken = async () => {
   if (hasCookieStore()) {
-    return await cookieStore.delete({
-      name: REFRESH_TOKEN_NAME,
-      // path: VITE_BASE_URL
-    })
-  } else {
-    return localStorage.removeItem(REFRESH_TOKEN_NAME)
+    try {
+      await cookieStore.delete({
+        name: REFRESH_TOKEN_NAME,
+        // path: VITE_BASE_URL
+      })
+    } catch (error) {
+      console.warn('Failed to remove refresh token from cookieStore:', error)
+    }
   }
+  return localStorage.removeItem(REFRESH_TOKEN_NAME)
 }

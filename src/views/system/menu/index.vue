@@ -92,6 +92,7 @@
       class="system-menu-dialog"
       v-model="addOrEditMenuDialogVisible"
       :title="addOrEditMenuDialogTitle"
+      :close-on-click-modal="false"
     >
       <el-form
         ref="addOrEditMenuFormRef"

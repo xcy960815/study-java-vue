@@ -175,7 +175,6 @@ const handleGetCaptcha = async () => {
   const captchaRes = await loginModule.getCaptcha().finally(() => {
     captchaLoading.value = false
   })
-  console.log('captchaRes', captchaRes)
 
   captchaUrl.value = captchaRes
 }
