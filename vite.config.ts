@@ -36,6 +36,9 @@ export default defineConfig(({ mode }) => {
   return {
     base: VITE_BASE_URL,
     envDir: './env', // 环境变量目录 若不设置会在 import.meta.env 中取不到变量
+    define: {
+      global: 'window', // 修复 sockjs-client 等库在浏览器环境中找不到 global 对象的问题
+    },
     build: {
       chunkSizeWarningLimit: 1024, // 将警告体积变成1MB
       rollupOptions: {

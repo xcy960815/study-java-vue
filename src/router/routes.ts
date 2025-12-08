@@ -83,6 +83,37 @@ export const baseRoutes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/monitor',
+    name: 'monitor',
+    component: () => import(`../components/layout/index.vue`),
+    meta: {
+      title: '系统监控',
+      icon: 'Monitor',
+    },
+    children: [
+      {
+        path: '/monitor/operlog',
+        name: 'monitor-operlog',
+        component: () => import(`../views/monitor/operlog/index.vue`),
+        meta: {
+          title: '操作日志',
+          icon: 'FileText',
+          keepAlive: true,
+        },
+      },
+      {
+        path: '/monitor/server',
+        name: 'monitor-server',
+        component: () => import(`../views/monitor/server/index.vue`),
+        meta: {
+          title: '服务监控',
+          icon: 'TrendTwo',
+          keepAlive: false,
+        },
+      },
+    ],
+  },
 ]
 
 export const redirectRoutes: RouteRecordRaw[] = [
