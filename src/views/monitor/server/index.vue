@@ -437,8 +437,14 @@ const startMonitor = async () => {
     await startServerMonitor()
 
     // 连接 WebSocket
-    const baseUrl = import.meta.env.VITE_BASE_URL || '/dev-api'
-    const wsUrl = `${window.location.protocol}//${window.location.host}${baseUrl}/ws/server-monitor`
+    // 连接 WebSocket
+    const apiPrefix = import.meta.env.VITE_API_DOMAIN_PREFIX || '/dev-api'
+    // 处理前缀可能不以 / 开头的情况（虽然通常都会有）
+    const prefix = apiPrefix.startsWith('/') ? apiPrefix : `/${apiPrefix}`
+    // 移除末尾的 / 以免双斜杠（虽然双斜杠通常浏览器能处理，但为了美观）
+    const cleanPrefix = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix
+
+    const wsUrl = `${window.location.protocol}//${window.location.host}${cleanPrefix}/ws/server-monitor`
 
     wsClient = new WebSocketClient(wsUrl)
     wsClient.connect(
