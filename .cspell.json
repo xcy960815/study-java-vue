@@ -21,6 +21,8 @@
     "unplugin",
     "katex",
     "parentname",
-    "Suffixs"
+    "Suffixs",
+    "operlog",
+    "requirepass"
   ]
 }
