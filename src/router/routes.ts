@@ -112,6 +112,16 @@ export const baseRoutes: RouteRecordRaw[] = [
           keepAlive: false,
         },
       },
+      {
+        path: '/monitor/report',
+        name: 'monitor-report',
+        component: () => import(`../views/monitor/report/index.vue`),
+        meta: {
+          title: '经营报表',
+          icon: 'ChartLine',
+          keepAlive: false,
+        },
+      },
     ],
   },
 ]
