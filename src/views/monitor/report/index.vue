@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6">
+  <div class="monitor-report-page p-6">
     <h2 class="text-2xl font-bold mb-6">经营报表 (昨日数据)</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -23,7 +23,7 @@
         </div>
         <div>
           <p class="text-gray-500 text-sm">昨日订单总数</p>
-          <p class="text-3xl font-bold text-gray-800">{{ stats.totalOrders }}</p>
+          <p class="text-3xl font-bold text-gray-800">{{ dailyReportData.totalOrders }}</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@
         </div>
         <div>
           <p class="text-gray-500 text-sm">昨日销售总额</p>
-          <p class="text-3xl font-bold text-gray-800">¥ {{ stats.totalRevenue }}</p>
+          <p class="text-3xl font-bold text-gray-800">¥ {{ dailyReportData.totalRevenue }}</p>
         </div>
       </div>
     </div>
@@ -56,20 +56,18 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getDailyReport } from '@/apis/report'
+import { getDailyReportData } from '@/apis/report'
 
-const stats = ref({
+const dailyReportData = ref<DailyReportVo>({
   totalOrders: 0,
   totalRevenue: 0,
 })
 
-const fetchData = async () => {
+const fetchDailyReportData = async () => {
   try {
-    const res = await getDailyReport()
-    // ResponseEntity.ok(body) 返回的直接是 body 内容，没有 code/msg 包装
-    // 除非全局拦截器做了处理。假设这里直接返回数据对象。
+    const res = await getDailyReportData()
     if (res) {
-      stats.value = res as any
+      dailyReportData.value = res
     }
   } catch (error) {
     console.error('获取报表数据失败:', error)
@@ -77,6 +75,6 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  fetchData()
+  fetchDailyReportData()
 })
 </script>
