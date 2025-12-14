@@ -29,7 +29,7 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
-    restart: on-failure:5 # 遇到异常最多重启5次
+    restart: always # 无论退出状态如何，容器总是自动重启
 
   # mysql配置
   mysql:
@@ -66,7 +66,7 @@ services:
       timeout: 3s
       retries: 5
       start_period: 10s
-    restart: on-failure:5 # 遇到异常最多重启5次
+    restart: always # 无论退出状态如何，容器总是自动重启
 
   # 后端配置
   springboot:
@@ -104,7 +104,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
-    restart: on-failure:5 # 遇到异常最多重启5次
+    restart: always # 无论退出状态如何，容器总是自动重启
 
   # 前端配置
   vue:
@@ -125,7 +125,7 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
-    restart: on-failure:5 # 遇到异常最多重启5次
+    restart: always # 无论退出状态如何，容器总是自动重启
 
 volumes:
   mysql-data:
