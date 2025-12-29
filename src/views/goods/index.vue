@@ -15,40 +15,70 @@
       <el-form-item label="上架状态">
         <el-select
           v-model="queryFormData.goodsSellStatus"
+          clearable
           placeholder="上架状态"
           @change="getGoodsList"
+          class="!w-60"
         >
-          <el-option label="上架" :value="1" />
-          <el-option label="下架" :value="0" />
+          <el-option
+            v-for="item in goodsSellStatusOptions"
+            :key="item.id"
+            :label="item.dictName"
+            :value="Number(item.dictValue)"
+          />
         </el-select>
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getGoodsList">
-      <el-button size="small" type="primary" @click="handleClickAddGoods">新增商品</el-button>
+      <el-button type="primary" @click="handleClickAddGoods">新增商品</el-button>
     </Handle-ToolBar>
 
     <!-- 商品表格 -->
     <el-table border :data="goodsInfo.tableData" style="width: 100%">
-      <el-table-column prop="goodsId" label="商品ID" width="100" />
-      <el-table-column prop="goodsName" label="商品名称" width="150" />
-      <el-table-column prop="goodsIntro" label="商品简介" />
-      <el-table-column prop="goodsCategoryId" label="分类ID" />
-      <el-table-column prop="goodsCoverImg" label="封面图" />
-      <el-table-column prop="goodsCarousel" label="轮播图" />
-      <el-table-column prop="originalPrice" label="原价" />
-      <el-table-column prop="sellingPrice" label="售价" />
-      <el-table-column prop="stockNum" label="库存" />
-      <el-table-column prop="tag" label="标签" />
-      <el-table-column prop="goodsSellStatus" label="上架状态">
+      <el-table-column align="center" prop="goodsId" label="商品ID" width="100" />
+      <el-table-column align="center" prop="goodsName" label="商品名称" width="150" />
+      <el-table-column align="center" prop="goodsIntro" label="商品简介" width="200" />
+      <el-table-column align="center" prop="goodsCategoryId" label="分类ID" width="100" />
+      <el-table-column align="center" prop="goodsCoverImg" label="封面图" width="120">
         <template #default="{ row }">
-          {{ row.goodsSellStatus === 1 ? '上架' : '下架' }}
+          <el-image
+            v-if="row.goodsCoverImg"
+            :src="row.goodsCoverImg"
+            fit="cover"
+            style="width: 80px; height: 80px"
+            :preview-src-list="[row.goodsCoverImg]"
+          />
+          <span v-else>无图片</span>
         </template>
       </el-table-column>
-      <el-table-column prop="createUser" label="创建人" />
-      <el-table-column prop="createTime" label="创建时间" />
-      <el-table-column prop="updateUser" label="更新人" />
-      <el-table-column prop="updateTime" label="更新时间" />
-      <el-table-column fixed="right" label="操作" width="150">
+      <el-table-column align="center" prop="goodsCarousel" label="轮播图" width="120">
+        <template #default="{ row }">
+          <el-image
+            v-if="row.goodsCarousel"
+            :src="row.goodsCarousel"
+            fit="cover"
+            style="width: 80px; height: 80px"
+            :preview-src-list="getCarouselImageList(row.goodsCarousel)"
+          />
+          <span v-else>无图片</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="originalPrice" label="原价" width="100" />
+      <el-table-column align="center" prop="sellingPrice" label="售价" width="100" />
+      <el-table-column align="center" prop="stockNum" label="库存" width="100" />
+      <el-table-column align="center" prop="tag" label="标签" width="100" />
+      <el-table-column align="center" prop="goodsSellStatus" label="上架状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="getGoodsSellStatusTagType(row.goodsSellStatus)">
+            {{ getGoodsSellStatusName(row.goodsSellStatus) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="createUser" label="创建人" width="100" />
+      <el-table-column align="center" prop="createTime" label="创建时间" width="200" />
+      <el-table-column align="center" prop="updateUser" label="更新人" width="100" />
+      <el-table-column align="center" prop="updateTime" label="更新时间" width="200" />
+      <el-table-column align="center" fixed="right" label="操作" width="150">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditGoods(row)"
             >编辑</el-button
@@ -114,8 +144,12 @@
         </el-form-item>
         <el-form-item label="上架状态" prop="goodsSellStatus">
           <el-select v-model="addOrEditGoodsFormData.goodsSellStatus" placeholder="请选择上架状态">
-            <el-option label="上架" :value="1" />
-            <el-option label="下架" :value="0" />
+            <el-option
+              v-for="item in goodsSellStatusOptions"
+              :key="item.id"
+              :label="item.dictName"
+              :value="Number(item.dictValue)"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -134,6 +168,7 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { goodsModule } from '@apis'
+import { getDataDictList } from '@/apis/system/dataDict'
 
 interface GoodsInfo {
   tableData: GoodsVo[]
@@ -260,7 +295,67 @@ const handleClickDeleteGoods = (row: GoodsVo) => {
 
 const showSearch = ref(true)
 
+// 商品上架状态选项
+const goodsSellStatusOptions = ref<DataDictionaryVo[]>([])
+
+/**
+ * 获取商品上架状态字典
+ */
+const getGoodsSellStatusDict = async () => {
+  try {
+    const res = await getDataDictList({
+      dictType: 'goods_sell_status',
+      status: 1,
+      pageNum: 1,
+      pageSize: 100,
+    })
+    goodsSellStatusOptions.value = res.data
+  } catch (error) {
+    console.error('获取商品上架状态字典失败:', error)
+  }
+}
+
+/**
+ * 根据上架状态值获取状态名称
+ */
+const getGoodsSellStatusName = (statusValue: number): string => {
+  const status = goodsSellStatusOptions.value.find((item) => Number(item.dictValue) === statusValue)
+  return status?.dictName || String(statusValue)
+}
+
+/**
+ * 根据上架状态值获取标签类型
+ */
+const getGoodsSellStatusTagType = (
+  statusValue: number
+): 'success' | 'primary' | 'warning' | 'info' | 'danger' | undefined => {
+  if (statusValue === 1) return 'success' // 上架
+  if (statusValue === 0) return 'info' // 下架
+  return undefined
+}
+
+/**
+ * 获取轮播图第一张图片
+ */
+const getFirstCarouselImage = (carousel: string): string => {
+  if (!carousel) return ''
+  const images = carousel.split(',')
+  return images[0]?.trim() || ''
+}
+
+/**
+ * 获取轮播图所有图片列表（用于预览）
+ */
+const getCarouselImageList = (carousel: string): string[] => {
+  if (!carousel) return []
+  return carousel
+    .split(',')
+    .map((img) => img.trim())
+    .filter(Boolean)
+}
+
 onMounted(() => {
+  getGoodsSellStatusDict()
   getGoodsList()
 })
 </script>

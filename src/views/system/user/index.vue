@@ -23,7 +23,7 @@
           style="width: 200px"
         >
           <el-option
-            v-for="role of roleList"
+            v-for="role in roleList"
             :key="role.id"
             :label="role.roleName"
             :value="role.id"
@@ -32,21 +32,28 @@
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getUserList">
-      <el-button size="small" type="primary" @click="handleClickAddUser"> 新增用户 </el-button>
+      <el-button
+        v-hasPermi="['system:user:add']"
+        size="small"
+        type="primary"
+        @click="handleClickAddUser"
+      >
+        新增用户
+      </el-button>
     </Handle-ToolBar>
 
     <el-table border :data="userListInfo.tableData" style="width: 100%" class="system-user-table">
-      <el-table-column prop="nickName" label="用户昵称" min-width="100" />
-      <el-table-column prop="age" label="用户年龄" min-width="100" />
-      <el-table-column prop="loginName" label="登陆账号" min-width="150" />
-      <el-table-column prop="roleNames" label="角色" min-width="200">
+      <el-table-column align="center" prop="nickName" label="用户昵称" min-width="100" />
+      <el-table-column align="center" prop="age" label="用户年龄" min-width="100" />
+      <el-table-column align="center" prop="loginName" label="登陆账号" min-width="150" />
+      <el-table-column align="center" prop="roleNames" label="角色" min-width="200">
         <template #default="{ row }">
           <el-tag class="mr-1" v-for="roleName of row.roleNames" :key="roleName" size="small">{{
             roleName
           }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="roleCode" label="角色编码" min-width="200">
+      <el-table-column align="center" prop="roleCode" label="角色编码" min-width="200">
         <template #default="{ row }">
           <el-tag class="mr-1" v-for="roleCode of row.roleCodes" :key="roleCode" size="small">{{
             roleCode
@@ -54,15 +61,25 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="introduceSign" label="个性签名" min-width="200" />
-      <el-table-column prop="address" label="收货地址" min-width="200" />
-      <el-table-column prop="createTime" label="注册时间" min-width="200" />
+      <el-table-column align="center" prop="introduceSign" label="个性签名" min-width="150" />
+      <el-table-column align="center" prop="address" label="收货地址" min-width="220" />
+      <el-table-column align="center" prop="createTime" label="注册时间" min-width="200" />
       <el-table-column fixed="right" label="操作" width="120">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleClickEditUser(row)"
+          <el-button
+            v-hasPermi="['system:user:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEditUser(row)"
             >编辑</el-button
           >
-          <el-button link type="danger" size="small" @click="handleClickDeleteUser(row)"
+          <el-button
+            v-hasPermi="['system:user:remove']"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDeleteUser(row)"
             >删除</el-button
           >
         </template>
@@ -79,6 +96,8 @@
       @current-change="handlePageNumChange"
       class="pagination"
     />
+
+    <!-- 添加或编辑用户 -->
     <el-dialog
       v-model="addOrEditUserDialogVisible"
       :title="addOrEditUserDialogTitle"
@@ -130,11 +149,10 @@ import { onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-import { useRouter } from 'vue-router'
 defineOptions({
   name: 'userList',
 })
-const router = useRouter()
+
 interface UserListInfo {
   tableData: UserInfoVo[]
   total: number | undefined
@@ -159,11 +177,14 @@ const userListInfo = reactive<UserListInfo>({
   pageSize: 10,
   pageNum: 1,
 })
+/**
+ * 角色列表
+ */
 const roleList = ref<RoleInfoVo[]>([])
 
 const getRoleList = async () => {
   const result = await roleModule.getAllRoleList()
-  roleList.value = result.data
+  roleList.value = result
 }
 /**
  * 获取用户列表
@@ -232,6 +253,7 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
 
 /**
  * 新增用户
+ * @returns {Promise<void>}
  */
 const handleClickAddUser = async () => {
   await getRoleList()
@@ -244,6 +266,8 @@ const handleClickAddUser = async () => {
 
 /**
  * 编辑用户
+ * @param {UserInfoVo} row
+ * @returns {Promise<void>}
  */
 const handleClickEditUser = async (row: UserInfoVo) => {
   await getRoleList()
@@ -257,6 +281,7 @@ const handleClickEditUser = async (row: UserInfoVo) => {
 
 /**
  * 确认新增或编辑
+ * @returns {Promise<void>}
  */
 const handleClickAddOrEditConfirm = async () => {
   const valid = await addOrEditUserFormRef.value
@@ -280,6 +305,8 @@ const handleClickAddOrEditConfirm = async () => {
 
 /**
  * 删除用户
+ * @param {UserInfoVo} row
+ * @returns {Promise<void>}
  */
 const handleClickDeleteUser = (row: UserInfoVo) => {
   ElMessageBox.confirm(`确认要删除【${row.nickName}】吗?`, '警告', {

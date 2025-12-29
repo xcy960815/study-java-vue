@@ -6,10 +6,10 @@ declare module 'katex/contrib/auto-render/splitAtDelimiters' {
   }
 
   interface DelimitersOption {
-    type: string
+    type: 'text' | 'math'
     data: string
-    rawData: string
-    display: boolean
+    rawData?: string
+    display?: boolean
   }
 
   const splitAtDelimiters: (content: string, delimiters: Delimiter[]) => DelimitersOption[]

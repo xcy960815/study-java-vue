@@ -10,6 +10,7 @@ import store from './store'
 import router from '@/router'
 import { registerGlobalComponents } from './components'
 import { simulateLoadingProgress } from './utils/loading-progress'
+import permission from './plugins/permission'
 
 // 开始模拟加载进度
 simulateLoadingProgress()
@@ -19,6 +20,6 @@ app
   // .use(ElementPlus)
   .use(registerGlobalComponents)
   .use(store)
-
+  .use(permission)
   .use(router)
   .mount('#app')

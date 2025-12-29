@@ -21,7 +21,7 @@ export function getRoleList<T extends ListResponseResult<RoleInfoVo>>(
  * 获取所有角色列表
  * @returns {Promise<T>}
  */
-export function getAllRoleList<T extends ListResponseResult<RoleInfoVo>>(): Promise<T> {
+export function getAllRoleList<T extends Array<RoleInfoVo>>(): Promise<T> {
   const url = `${baseUrl}/getAllRoleList`
   return request.get<T, T>(url)
 }

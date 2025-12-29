@@ -26,7 +26,13 @@
     </el-form>
 
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="fetchMenuList">
-      <el-button size="small" type="primary" @click="handleClickAddMenu">新增菜单</el-button>
+      <el-button
+        v-hasPermi="['system:menu:add']"
+        size="small"
+        type="primary"
+        @click="handleClickAddMenu"
+        >新增菜单</el-button
+      >
     </Handle-ToolBar>
 
     <el-table
@@ -37,33 +43,44 @@
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
       :style="{ width: '100%' }"
     >
-      <el-table-column prop="menuName" label="菜单名称" width="120" />
-      <el-table-column prop="path" label="菜单路径" width="250" />
-      <el-table-column prop="component" label="组件路径" min-width="260" />
-      <el-table-column prop="icon" label="图标" width="80" align="center">
+      <el-table-column align="center" prop="menuName" label="菜单名称" width="120" />
+      <el-table-column align="center" prop="path" label="菜单路径" width="250" />
+      <el-table-column align="center" prop="component" label="组件路径" min-width="260" />
+      <el-table-column align="center" prop="icon" label="图标" width="80">
         <template #default="{ row }">
           <icon v-if="row.icon" :name="row.icon" />
           <span v-else>无icon</span>
         </template>
       </el-table-column>
-      <el-table-column prop="menuType" label="类型" width="80">
+      <el-table-column align="center" prop="menuType" label="类型" width="80">
         <template #default="{ row }">
           <el-tag :type="row.menuType === 0 ? 'success' : row.menuType === 1 ? 'warning' : 'info'">
             {{ row.menuType === 0 ? '目录' : row.menuType === 1 ? '菜单' : '按钮' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="perms" label="权限标识" />
-      <el-table-column prop="createTime" label="创建时间" min-width="180" />
-      <el-table-column fixed="right" label="操作" width="300">
+      <el-table-column align="center" prop="perms" label="权限标识" min-width="120" />
+      <el-table-column align="center" prop="createTime" label="创建时间" min-width="220" />
+      <el-table-column align="center" fixed="right" label="操作" width="250">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleClickEditMenu(row)"
+          <el-button
+            v-hasPermi="['system:menu:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEditMenu(row)"
             >编辑</el-button
           >
-          <el-button link type="primary" size="small" @click="handleClickCopyMenu(row)"
+          <el-button
+            v-hasPermi="['system:menu:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickCopyMenu(row)"
             >复制</el-button
           >
           <el-button
+            v-hasPermi="['system:menu:add']"
             link
             type="primary"
             size="small"
@@ -71,7 +88,12 @@
             @click="handleClickCreateSubMenu(row)"
             >创建子菜单</el-button
           >
-          <el-button link type="danger" size="small" @click="handleClickDeleteMenu(row)"
+          <el-button
+            v-hasPermi="['system:menu:remove']"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDeleteMenu(row)"
             >删除</el-button
           >
         </template>
@@ -496,6 +518,7 @@ onMounted(() => {
     }
   }
 }
+
 .system-menu-dialog {
   :deep(.el-dialog__header) {
     border-bottom: 1px solid var(--el-border-color-light);

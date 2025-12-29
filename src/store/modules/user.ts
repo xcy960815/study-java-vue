@@ -17,6 +17,7 @@ export const userInfoStore = defineStore<
       loginName: '',
       nickName: '',
       avatar: '',
+      permissions: [],
     }
   },
   getters: {
@@ -27,6 +28,7 @@ export const userInfoStore = defineStore<
     getLoginName: (state) => state.loginName,
     getNickName: (state) => state.nickName,
     getAvatar: (state) => state.avatar,
+    getPermissions: (state) => state.permissions,
   },
   actions: {
     /**
@@ -41,6 +43,7 @@ export const userInfoStore = defineStore<
       this.loginName = result.loginName
       this.nickName = result.nickName
       this.avatar = result.avatar
+      this.permissions = result.permissions || []
     },
     setId(value: number | null) {
       this.id = value
@@ -62,6 +65,9 @@ export const userInfoStore = defineStore<
     },
     setAvatar(value: string) {
       this.avatar = value
+    },
+    setPermissions(value: string[]) {
+      this.permissions = value
     },
   },
   // persist: true

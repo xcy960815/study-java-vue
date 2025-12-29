@@ -51,6 +51,11 @@ declare interface UserInfoVo {
    * 头像 （base64）
    */
   avatar: string
+
+  /**
+   * 权限列表
+   */
+  permissions: Array<string> | undefined
 }
 
 /**

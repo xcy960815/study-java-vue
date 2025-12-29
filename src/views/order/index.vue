@@ -11,18 +11,17 @@
       <el-form-item label="订单状态">
         <el-select
           v-model="queryFormData.orderStatus"
+          clearable
           style="width: 200px"
           placeholder="订单状态"
           @change="getOrderList"
         >
-          <el-option label="待支付" :value="0" />
-          <el-option label="已支付" :value="1" />
-          <el-option label="配货完成" :value="2" />
-          <el-option label="出库成功" :value="3" />
-          <el-option label="交易成功" :value="4" />
-          <el-option label="手动关闭" :value="-1" />
-          <el-option label="超时关闭" :value="-2" />
-          <el-option label="商家关闭" :value="-3" />
+          <el-option
+            v-for="item in orderStatusOptions"
+            :key="item.id"
+            :label="item.dictName"
+            :value="Number(item.dictValue)"
+          />
         </el-select>
       </el-form-item>
     </el-form>
@@ -31,19 +30,35 @@
     </Handle-ToolBar>
 
     <el-table border :data="orderInfo.tableData" style="width: 100%">
-      <el-table-column prop="orderId" label="订单ID" width="100" />
-      <el-table-column prop="orderNo" label="订单号" width="150" />
-      <el-table-column prop="userId" label="用户ID" width="100" />
-      <el-table-column prop="totalPrice" label="总价" width="100" />
-      <el-table-column prop="payStatus" label="支付状态" />
-      <el-table-column prop="payType" label="支付方式" />
-      <el-table-column prop="payTime" label="支付时间" />
-      <el-table-column prop="orderStatus" label="订单状态" />
-      <el-table-column prop="userName" label="收货人" />
-      <el-table-column prop="userPhone" label="手机号" />
-      <el-table-column prop="userAddress" label="收货地址" />
-      <el-table-column prop="createTime" label="创建时间" />
-      <el-table-column prop="updateTime" label="更新时间" />
+      <el-table-column align="center" prop="orderId" label="订单ID" width="100" />
+      <el-table-column align="center" prop="orderNo" label="订单号" width="200" />
+      <el-table-column align="center" prop="userId" label="用户ID" width="100" />
+      <el-table-column align="center" prop="totalPrice" label="总价" width="100" />
+      <el-table-column align="center" prop="payStatus" label="支付状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="getPayStatusTagType(row.payStatus)">
+            {{ getPayStatusName(row.payStatus) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="payType" label="支付方式" width="100">
+        <template #default="{ row }">
+          {{ getPayTypeName(row.payType) }}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="payTime" label="支付时间" width="250" />
+      <el-table-column align="center" prop="orderStatus" label="订单状态" width="100">
+        <template #default="{ row }">
+          <el-tag :type="getOrderStatusTagType(row.orderStatus)">
+            {{ getOrderStatusName(row.orderStatus) }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" prop="userName" label="收货人" width="100" />
+      <el-table-column align="center" prop="userPhone" label="手机号" width="100" />
+      <el-table-column align="center" prop="userAddress" label="收货地址" width="250" />
+      <el-table-column align="center" prop="createTime" label="创建时间" width="250" />
+      <el-table-column align="center" prop="updateTime" label="更新时间" width="250" />
       <el-table-column fixed="right" label="操作" width="150">
         <template #default="{ row }">
           <el-button link type="primary" size="small" @click="handleClickEditOrder(row)"
@@ -104,14 +119,12 @@
         </el-form-item>
         <el-form-item label="订单状态" prop="orderStatus">
           <el-select v-model="addOrEditOrderFormData.orderStatus" placeholder="请选择订单状态">
-            <el-option label="待支付" :value="0" />
-            <el-option label="已支付" :value="1" />
-            <el-option label="配货完成" :value="2" />
-            <el-option label="出库成功" :value="3" />
-            <el-option label="交易成功" :value="4" />
-            <el-option label="手动关闭" :value="-1" />
-            <el-option label="超时关闭" :value="-2" />
-            <el-option label="商家关闭" :value="-3" />
+            <el-option
+              v-for="item in orderStatusOptions"
+              :key="item.id"
+              :label="item.dictName"
+              :value="Number(item.dictValue)"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="收货人姓名" prop="userName">
@@ -141,7 +154,8 @@
 import { onMounted, reactive, ref, nextTick } from 'vue'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
-import { orderModule } from '@apis' // 你需要实现订单相关接口
+import { orderModule } from '@apis'
+import { getDataDictList } from '@/apis/system/dataDict'
 
 interface OrderInfo {
   tableData: OrderVo[]
@@ -300,7 +314,116 @@ const handleClickDeleteOrder = (row: OrderVo) => {
 
 const showSearch = ref(true)
 
+// 订单状态选项
+const orderStatusOptions = ref<DataDictionaryVo[]>([])
+// 支付状态选项
+const payStatusOptions = ref<DataDictionaryVo[]>([])
+// 支付方式选项
+const payTypeOptions = ref<DataDictionaryVo[]>([])
+
+/**
+ * 获取订单状态字典
+ */
+const getOrderStatusDict = async () => {
+  try {
+    const res = await getDataDictList({
+      dictType: 'order_status',
+      status: 1,
+      pageNum: 1,
+      pageSize: 100,
+    })
+    orderStatusOptions.value = res.data
+  } catch (error) {
+    console.error('获取订单状态字典失败:', error)
+  }
+}
+
+/**
+ * 获取支付状态字典
+ */
+const getPayStatusDict = async () => {
+  try {
+    const res = await getDataDictList({
+      dictType: 'pay_status',
+      status: 1,
+      pageNum: 1,
+      pageSize: 100,
+    })
+    payStatusOptions.value = res.data
+  } catch (error) {
+    console.error('获取支付状态字典失败:', error)
+  }
+}
+
+/**
+ * 获取支付方式字典
+ */
+const getPayTypeDict = async () => {
+  try {
+    const res = await getDataDictList({
+      dictType: 'pay_type',
+      status: 1,
+      pageNum: 1,
+      pageSize: 100,
+    })
+    payTypeOptions.value = res.data
+  } catch (error) {
+    console.error('获取支付方式字典失败:', error)
+  }
+}
+
+/**
+ * 根据订单状态值获取状态名称
+ */
+const getOrderStatusName = (statusValue: number): string => {
+  const status = orderStatusOptions.value.find((item) => Number(item.dictValue) === statusValue)
+  return status?.dictName || String(statusValue)
+}
+
+/**
+ * 根据订单状态值获取标签类型
+ */
+const getOrderStatusTagType = (
+  statusValue: number
+): 'success' | 'primary' | 'warning' | 'info' | 'danger' | undefined => {
+  if (statusValue < 0) return 'info' // 关闭状态
+  if (statusValue === 0) return 'warning' // 待支付
+  if (statusValue === 4) return 'success' // 交易成功
+  return undefined // 其他状态使用默认样式
+}
+
+/**
+ * 根据支付状态值获取状态名称
+ */
+const getPayStatusName = (statusValue: number): string => {
+  const status = payStatusOptions.value.find((item) => Number(item.dictValue) === statusValue)
+  return status?.dictName || String(statusValue)
+}
+
+/**
+ * 根据支付状态值获取标签类型
+ */
+const getPayStatusTagType = (
+  statusValue: number
+): 'success' | 'primary' | 'warning' | 'info' | 'danger' | undefined => {
+  if (statusValue === -1) return 'danger' // 支付失败
+  if (statusValue === 0) return 'warning' // 未支付
+  if (statusValue === 1) return 'success' // 支付成功
+  return undefined
+}
+
+/**
+ * 根据支付方式值获取方式名称
+ */
+const getPayTypeName = (typeValue: number): string => {
+  const type = payTypeOptions.value.find((item) => Number(item.dictValue) === typeValue)
+  return type?.dictName || String(typeValue)
+}
+
 onMounted(() => {
+  getOrderStatusDict()
+  getPayStatusDict()
+  getPayTypeDict()
   getOrderList()
 })
 </script>

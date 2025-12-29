@@ -45,24 +45,24 @@
       v-loading="dataDictionaryListInfo.loading"
       :data="dataDictionaryListInfo.tableData"
     >
-      <el-table-column type="index" label="序号" width="55" />
-      <el-table-column prop="dictType" label="字典类型" />
-      <el-table-column prop="dictCode" label="字典编码" />
-      <el-table-column prop="dictName" label="字典名称" />
-      <el-table-column prop="dictValue" label="字典值" />
-      <el-table-column prop="sortOrder" label="排序号" width="80" />
-      <el-table-column prop="status" label="状态" width="80">
+      <el-table-column align="center" type="index" label="序号" width="55" />
+      <el-table-column align="center" prop="dictType" label="字典类型" width="150" />
+      <el-table-column align="center" prop="dictCode" label="字典编码" width="150" />
+      <el-table-column align="center" prop="dictName" label="字典名称" width="150" />
+      <el-table-column align="center" prop="dictValue" label="字典值" width="100" />
+      <el-table-column align="center" prop="sortOrder" label="排序号" width="80" />
+      <el-table-column align="center" prop="status" label="状态" width="80">
         <template #default="scope">
           <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'">
             {{ scope.row.status === 1 ? '启用' : '禁用' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="createdTime" label="创建时间" width="180" />
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column align="center" prop="createdTime" label="创建时间" width="280" />
+      <el-table-column align="center" label="操作" width="180" fixed="right">
         <template #default="scope">
           <el-button type="primary" link @click="handleUpdateDictionary(scope.row)">修改</el-button>
-          <el-button type="primary" link @click="handleDeleteDictionary(scope.row)">删除</el-button>
+          <el-button type="danger" link @click="handleDeleteDictionary(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -87,7 +87,7 @@
         ref="dataDictionaryFormRef"
         :model="dataDictionaryFormData"
         :rules="dataDictionaryFormRules"
-        label-width="80px"
+        label-width="100px"
       >
         <el-form-item label="字典类型" prop="dictType">
           <el-input v-model="dataDictionaryFormData.dictType" placeholder="请输入字典类型" />

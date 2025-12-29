@@ -12,7 +12,7 @@
           v-model="queryFormData.title"
           placeholder="请输入系统模块"
           clearable
-          class="w-[240px]"
+          class="!w-60"
           @keyup.enter="handleSearch"
         />
       </el-form-item>
@@ -21,7 +21,7 @@
           v-model="queryFormData.operName"
           placeholder="请输入操作人员"
           clearable
-          class="w-[240px]"
+          class="!w-60"
           @keyup.enter="handleSearch"
         />
       </el-form-item>
@@ -30,27 +30,18 @@
           v-model="queryFormData.businessType"
           placeholder="操作类型"
           clearable
-          class="w-[240px]"
+          class="!w-60"
         >
-          <el-option label="新增" :value="1" />
-          <el-option label="修改" :value="2" />
-          <el-option label="删除" :value="3" />
-          <el-option label="授权" :value="4" />
-          <el-option label="导出" :value="5" />
-          <el-option label="导入" :value="6" />
-          <el-option label="强退" :value="7" />
-          <el-option label="生成代码" :value="8" />
-          <el-option label="清空数据" :value="9" />
-          <el-option label="查询" :value="10" />
+          <el-option
+            v-for="item in businessTypeOptions"
+            :key="item.id"
+            :label="item.dictName"
+            :value="Number(item.dictValue)"
+          />
         </el-select>
       </el-form-item>
       <el-form-item label="状态" prop="status">
-        <el-select
-          v-model="queryFormData.status"
-          placeholder="操作状态"
-          clearable
-          class="w-[240px]"
-        >
+        <el-select v-model="queryFormData.status" placeholder="操作状态" clearable class="!w-60">
           <el-option label="正常" :value="0" />
           <el-option label="异常" :value="1" />
         </el-select>
@@ -271,6 +262,7 @@
 
 <script setup name="Operlog" lang="ts">
 import { getOperLogList, deleteOperLog, cleanOperLog } from '@/apis/monitor/operlog'
+import { getDataDictList } from '@/apis/system/dataDict'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { ref, reactive, onMounted } from 'vue'
 import dayjs from 'dayjs'
@@ -294,6 +286,7 @@ const showSearch = ref(true)
 const operLogDetail = ref<OperLogVo>({} as OperLogVo)
 const detailVisible = ref(false)
 const queryFormRef = ref<FormInstance>()
+const businessTypeOptions = ref<DataDictionaryVo[]>([])
 
 interface TableInfo {
   tableData: OperLogVo[]
@@ -461,7 +454,25 @@ const formatJsonWithSyntax = (json: string) => {
   }
 }
 
+/**
+ * 获取业务类型字典
+ */
+const fetchBusinessTypeDict = async () => {
+  try {
+    const res = await getDataDictList({
+      dictType: 'sys_oper_type',
+      status: 1,
+      pageNum: 1,
+      pageSize: 100,
+    })
+    businessTypeOptions.value = res.data
+  } catch (error) {
+    console.error('获取业务类型字典失败:', error)
+  }
+}
+
 onMounted(() => {
+  fetchBusinessTypeDict()
   fetchOperLogList()
 })
 </script>

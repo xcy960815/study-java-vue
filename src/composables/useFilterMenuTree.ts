@@ -1,4 +1,4 @@
-const ALLOW_MENU_TYPE = [0, 1] // 0: 目录, 1: 菜单
+const ALLOW_MENU_TYPE = [0, 1, 2] // 0: 目录, 1: 菜单, 2: 按钮
 
 // 递归过滤菜单树
 export const useFilterMenuTree = <R extends StudyJavaSysMenuVo>(tree: R[]): R[] => {
