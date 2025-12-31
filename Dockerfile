@@ -18,7 +18,7 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # 构建生产环境包
-RUN pnpm run build-prod
+RUN pnpm run build:prod
 
 # 第二阶段：运行阶段
 # 使用 alpine 版本减小体积

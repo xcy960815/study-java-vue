@@ -5,6 +5,7 @@
 ## 🚀 技术栈
 
 ### 核心框架
+
 - Vue 3.4.x - 渐进式 JavaScript 框架
 - TypeScript 5.4.x - JavaScript 的超集
 - Vite 5.3.x - 下一代前端构建工具
@@ -12,12 +13,14 @@
 - Vue Router 4.4.x - Vue.js 的官方路由
 
 ### UI 框架
+
 - Element Plus 2.9.x - 基于 Vue 3 的组件库
 - Icon Park - 图标库
 - Tailwind CSS 3.1.x - 实用优先的 CSS 框架
 - PostCSS - CSS 转换工具
 
 ### 开发工具
+
 - pnpm - 包管理工具
 - ESLint - 代码检查
 - Prettier - 代码格式化
@@ -26,76 +29,90 @@
 - Conventional Changelog - 自动生成 CHANGELOG
 
 ### 测试框架
+
 - Vitest - 单元测试框架
 - Vue Test Utils - Vue 组件测试工具
 
 ## 📦 包管理工具
+
     pnpm
 
 ## 🛠️ 开发环境要求
+
 - Node.js >= 18.20.4
 - pnpm >= 8.x
 
 ## 🚀 快速开始
 
 ### 安装依赖
+
 ```sh
 pnpm install
 ```
 
 ### 开发环境启动指令
+
 ```sh
 pnpm run dev
 ```
 
 ### 预发环境启动指令
+
 ```sh
-pnpm run dev-pre
+pnpm run dev:pre
 ```
 
 ### 线上环境启动指令
+
 ```sh
-pnpm run dev-prod
+pnpm run dev:prod
 ```
 
 ### 日常环境打包
+
 ```sh
 pnpm run build
 ```
 
 ### 预发环境打包
+
 ```sh
-pnpm run build-pre
+pnpm run build:pre
 ```
 
 ### 线上环境打包
+
 ```sh
-pnpm run build-prod
+pnpm run build:prod
 ```
 
 ### 预览打包结果
+
 ```sh
 # 日常环境
 pnpm run preview
 
 # 预发环境
-pnpm run preview-pre
+pnpm run preview:pre
 
 # 生产环境
-pnpm run preview-prod
+pnpm run preview:prod
 ```
 
 ### 运行测试
+
 ```sh
 pnpm run test:unit
 ```
 
 ### 类型检查
+
 ```sh
 pnpm run type-check
 ```
 
 ### 代码格式化
+
 ```sh
 pnpm run format
 ```
@@ -132,7 +149,9 @@ pnpm run format
 ## 🔧 开发规范
 
 ### Git 提交规范
+
 项目使用 Conventional Commits 规范，提交信息格式如下：
+
 ```
 <type>(<scope>): <subject>
 
@@ -142,12 +161,15 @@ pnpm run format
 ```
 
 ### 代码风格
+
 - 使用 ESLint 进行代码检查
 - 使用 Prettier 进行代码格式化
 - 使用 EditorConfig 统一编辑器配置
 
 ## 📝 更新日志
+
 详细的更新日志请查看 [CHANGELOG.md](./CHANGELOG.md)
 
 ## 📄 许可证
+
 [MIT](./LICENSE)
