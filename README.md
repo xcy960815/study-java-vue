@@ -1,4 +1,4 @@
-# study-java-web
+# study-java-vue
 
 该项目是前身是配合学习 spring-boot3 所搭建的，随着能不再满足后端的正删改查，于是该项目变成了常规的curd项目，该项目使用了vue3 + vite + typescript + pina + vue-router 开发，ui库使用 element-plus + icon-park + postcss + tailwind 等ui库
 

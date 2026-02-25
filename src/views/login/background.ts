@@ -52,12 +52,12 @@ export const initBackground = () => {
     '#FFBB33',
     '#FF8800',
     '#FF4444',
-    '#CCO000'
+    '#CCO000',
   ]
   /**
    * @description: 初始化代码雨
    */
-  const charSet = 'study-java-web'
+  const charSet = 'study-java-vue'
 
   /**
    * 获取随机颜色
