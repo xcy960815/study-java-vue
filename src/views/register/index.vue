@@ -1,11 +1,11 @@
 <template>
-  <div class="login-container w-screen h-screen flex items-center justify-center">
-    <canvas class="login-backage" id="cvs"></canvas>
-    <el-form ref="loginFormRef" :model="loginFormData" class="login-form">
-      <h3 class="login-title">{{ viteAppTitle }}</h3>
+  <div class="register-container w-screen h-screen flex items-center justify-center">
+    <canvas class="register-backage" id="cvs"></canvas>
+    <el-form ref="registerFormRef" :model="registerFormData" class="register-form">
+      <h3 class="register-title">用户注册</h3>
       <el-form-item prop="username">
         <el-input
-          v-model="loginFormData.username"
+          v-model="registerFormData.username"
           type="text"
           auto-complete="off"
           size="large"
@@ -20,12 +20,11 @@
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-          v-model="loginFormData.password"
+          v-model="registerFormData.password"
           :type="passwordInputType"
           size="large"
           auto-complete="off"
           placeholder="密码"
-          @keyup.enter.native="handleLogin"
         >
           <template #prefix>
             <el-icon class="el-input__icon">
@@ -41,13 +40,29 @@
         </el-input>
       </el-form-item>
 
+      <el-form-item prop="confirmPassword">
+        <el-input
+          v-model="registerFormData.confirmPassword"
+          :type="passwordInputType"
+          size="large"
+          auto-complete="off"
+          placeholder="确认密码"
+        >
+          <template #prefix>
+            <el-icon class="el-input__icon">
+              <Lock />
+            </el-icon>
+          </template>
+        </el-input>
+      </el-form-item>
+
       <el-form-item prop="captcha">
         <el-input
           class="captcha-input flex-1"
-          v-model="loginFormData.captcha"
+          v-model="registerFormData.captcha"
           size="large"
           placeholder="验证码"
-          @keyup.enter.native="handleLogin"
+          @keyup.enter.native="handleRegister"
         >
         </el-input>
         <el-image
@@ -61,27 +76,25 @@
           </template>
         </el-image>
       </el-form-item>
+
       <div class="flex justify-between items-center mb-[25px] text-sm">
-        <!-- 记住密码 -->
-        <el-checkbox class="remember-checkbox" v-model="loginFormData.rememberMe"
-          >记住密码</el-checkbox
-        >
-        <router-link to="/register" class="text-blue-500 hover:text-blue-600 leading-loose"
-          >注册账号</router-link
+        <router-link to="/login" class="text-blue-500 hover:text-blue-600 ml-auto leading-loose"
+          >已有账号? 去登录</router-link
         >
       </div>
+
       <el-form-item style="width: 100%">
         <el-button
-          ref="loginButtonRef"
-          :disabled="loginButtonDisabled"
-          :loading="logining"
+          ref="registerButtonRef"
+          :disabled="registerButtonDisabled"
+          :loading="registering"
           size="default"
           type="primary"
           style="width: 100%"
-          @click="handleLogin"
+          @click="handleRegister"
         >
-          <span v-if="!logining">登 录</span>
-          <span v-else>登 录 中...</span>
+          <span v-if="!registering">注 册</span>
+          <span v-else>注 册 中...</span>
         </el-button>
       </el-form-item>
     </el-form>
@@ -89,27 +102,27 @@
 </template>
 
 <script lang="ts" setup>
-import { useLoginStore } from '@/store'
 import type { FormInstance, ButtonInstance } from 'element-plus'
-import { onMounted, onUnmounted, reactive, ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { onMounted, reactive, ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { Lock, User, View, Hide } from '@element-plus/icons-vue'
-// import { useEncryptByRsa } from '@/composables/useEncryption'
 import MD5 from 'MD5'
-import { initBackground } from './background'
+import { initBackground } from '../login/background'
 import { loginModule } from '@apis'
 import { useLoginButtonAnimation } from '@/composables/useLoginButtonAnimation'
+import type { RegisterRequestDto } from '@/apis/login'
 
 initBackground()
 
-const viteAppTitle = import.meta.env.VITE_APP_TITLE
+const router = useRouter()
+const registering = ref(false)
 
-const logining = ref(false)
-
-const loginFormData = reactive<LoginRequestDto>({
-  username: '13700002703',
-  password: '123456',
+const registerFormData = reactive<RegisterRequestDto>({
+  username: '',
+  password: '',
+  confirmPassword: '',
   captcha: '',
-  rememberMe: false,
 })
 
 const passwordInputType = ref('password')
@@ -117,12 +130,13 @@ const passwordInputType = ref('password')
 const showHideIcon = computed(() => passwordInputType.value === 'text')
 const showVievIcon = computed(() => passwordInputType.value === 'password')
 
-const loginButtonDisabled = computed(() => {
+const registerButtonDisabled = computed(() => {
   return (
-    loginFormData.username === '' ||
-    loginFormData.password === '' ||
-    loginFormData.captcha === '' ||
-    loginFormData.captcha.length !== 4
+    !registerFormData.username ||
+    !registerFormData.password ||
+    !registerFormData.confirmPassword ||
+    !registerFormData.captcha ||
+    registerFormData.captcha.length !== 4
   )
 })
 
@@ -130,24 +144,35 @@ const handleClickPasswordIcon = () => {
   passwordInputType.value = passwordInputType.value === 'password' ? 'text' : 'password'
 }
 
-const loginFormRef = ref<FormInstance>()
-const loginButtonRef = ref<ButtonInstance>()
+const registerFormRef = ref<FormInstance>()
+const registerButtonRef = ref<ButtonInstance>()
 
-const loginStore = useLoginStore()
 /**
- * 登入
+ * 注册
  */
-const handleLogin = async () => {
-  logining.value = true
-  const loginData = { ...loginFormData }
+const handleRegister = async () => {
+  if (registerFormData.password !== registerFormData.confirmPassword) {
+    ElMessage.error('两次输入的密码不一致')
+    return
+  }
 
-  // loginData.password = encryptByRsa(loginFormData.password) || loginData.password
+  registering.value = true
+  const registerData = { ...registerFormData }
 
-  loginData.password = loginData.password ? MD5(loginFormData.password) : loginData.password
+  registerData.password = registerData.password ? MD5(registerData.password) : registerData.password
+  registerData.confirmPassword = registerData.confirmPassword
+    ? MD5(registerData.confirmPassword)
+    : registerData.confirmPassword
 
-  loginStore.login(loginData).finally(() => {
-    logining.value = false
-  })
+  try {
+    await loginModule.register(registerData)
+    ElMessage.success('注册成功，请登录')
+    router.replace('/login')
+  } catch (err) {
+    handleGetCaptcha()
+  } finally {
+    registering.value = false
+  }
 }
 
 const captchaUrl = ref('')
@@ -161,20 +186,20 @@ const handleGetCaptcha = async () => {
   captchaUrl.value = captchaRes
 }
 
-useLoginButtonAnimation(loginButtonDisabled, loginButtonRef)
+useLoginButtonAnimation(registerButtonDisabled, registerButtonRef)
 
 onMounted(() => {
   handleGetCaptcha()
 })
 </script>
 <style lang="less" scoped>
-.login-container {
+.register-container {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  .login-form {
+  .register-form {
     border-radius: 6px;
     background: #ffffff;
     width: 400px;
@@ -188,7 +213,7 @@ onMounted(() => {
       cursor: pointer;
     }
 
-    .login-title {
+    .register-title {
       margin: 0px auto 30px auto;
       text-align: center;
       color: #707070;
@@ -201,7 +226,7 @@ onMounted(() => {
     }
   }
 
-  .login-backage {
+  .register-backage {
     z-index: -1;
     position: absolute;
     top: 0;

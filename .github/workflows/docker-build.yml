@@ -7,7 +7,7 @@ on:
 
 env:
   # 替换为你的 Docker Hub 用户名/组织名
-  IMAGE_NAME: xcy960815/study-java-web
+  IMAGE_NAME: xcy960815/study-java-vue
 
 jobs:
   build-and-push:

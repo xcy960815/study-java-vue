@@ -2,9 +2,15 @@ import { request } from '@utils/request'
 
 /**
  * 登入接口
- * @param {LoginRequestDto} requestParams
  * @returns {Promise<T>} 直接返回业务数据
  */
+export interface RegisterRequestDto {
+  username?: string
+  password?: string
+  confirmPassword?: string
+  captcha?: string
+}
+
 export function login<
   T extends LoginResponseVo = LoginResponseVo,
   D extends LoginRequestDto = LoginRequestDto,
@@ -20,6 +26,16 @@ export function login<
 export function logout(): Promise<void> {
   const url = `/logout`
   return request.post<void, void>(url)
+}
+
+/**
+ * 注册接口
+ * @param {RegisterRequestDto} requestParams
+ * @returns {Promise<boolean>}
+ */
+export function register(requestParams: RegisterRequestDto): Promise<boolean> {
+  const url = `/register`
+  return request.post<boolean, boolean>(url, requestParams)
 }
 
 /**
