@@ -1,7 +1,7 @@
 <template>
   <div class="login-container w-screen h-screen flex items-center justify-center">
     <canvas class="login-backage" id="cvs"></canvas>
-    <el-form ref="loginFormRef" :model="loginFormData" :rules="loginFormRules" class="login-form">
+    <el-form ref="loginFormRef" :model="loginFormData" class="login-form">
       <h3 class="login-title">{{ viteAppTitle }}</h3>
       <el-form-item prop="username">
         <el-input
@@ -68,7 +68,6 @@
       <el-form-item style="width: 100%">
         <el-button
           ref="loginButtonRef"
-          :disabled="loginButtonDisabled"
           :loading="logining"
           size="default"
           type="primary"
@@ -85,7 +84,7 @@
 
 <script lang="ts" setup>
 import { useLoginStore } from '@/store'
-import type { FormRules, FormInstance } from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import { onMounted, onUnmounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View, Hide } from '@element-plus/icons-vue'
 // import { useEncryptByRsa } from '@/composables/useEncryption'
@@ -127,37 +126,11 @@ const handleClickPasswordIcon = () => {
 const loginFormRef = ref<FormInstance>()
 const loginButtonRef = ref()
 
-const loginFormRules: FormRules<LoginRequestDto> = {
-  username: [
-    {
-      required: true,
-      message: '请输入用户名',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  password: [
-    {
-      required: true,
-      message: '请输入密码',
-      trigger: ['blur', 'change'],
-    },
-  ],
-  captcha: [
-    {
-      required: true,
-      message: '请输入验证码',
-      trigger: ['blur', 'change'],
-    },
-  ],
-}
-
 const loginStore = useLoginStore()
 /**
  * 登入
  */
 const handleLogin = async () => {
-  const valid = await loginFormRef.value?.validate().catch(() => false)
-  if (!valid) return
   logining.value = true
   const loginData = { ...loginFormData }
 
@@ -193,8 +166,13 @@ onMounted(() => {
     return Math.sqrt(dx * dx + dy * dy)
   }
 
+  let currentOx = 0
+  let currentOy = 0
+
   const handleMouseMove = (event: MouseEvent) => {
     if (!loginButtonDisabled.value) {
+      currentOx = 0
+      currentOy = 0
       button.style.transform = ''
       button.style.boxShadow = ''
       return
@@ -202,14 +180,17 @@ onMounted(() => {
 
     const radius = Math.max(button.offsetWidth * 0.75, button.offsetHeight * 0.75, 100)
     const rect = button.getBoundingClientRect()
-    const bx = rect.left + rect.width / 2
-    const by = rect.top + rect.height / 2
+    const bx = rect.left - currentOx + rect.width / 2
+    const by = rect.top - currentOy + rect.height / 2
 
     const dist = distanceBetween(event.clientX, event.clientY, bx, by) * 2
     const angle = Math.atan2(event.clientY - by, event.clientX - bx)
 
     const ox = -1 * Math.cos(angle) * Math.max(radius - dist, 0)
     const oy = -1 * Math.sin(angle) * Math.max(radius - dist, 0)
+
+    currentOx = ox
+    currentOy = oy
 
     const rx = oy / 2
     const ry = -ox / 2
