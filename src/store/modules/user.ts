@@ -2,24 +2,25 @@ import { defineStore } from 'pinia'
 import { StoreNames } from '@enums'
 import { userModule } from '@apis'
 
+const createDefaultState = (): UserStore.State => ({
+  address: '',
+  id: null,
+  createTime: '',
+  introduceSign: '',
+  loginName: '',
+  nickName: '',
+  avatar: '',
+  permissions: [],
+  loaded: false,
+})
+
 export const userInfoStore = defineStore<
   StoreNames.USER,
   BaseStore.State<UserStore.State>,
   BaseStore.Getters<UserStore.State, UserStore.Getters>,
   BaseStore.Actions<UserStore.State, UserStore.Actions>
 >(StoreNames.USER, {
-  state: () => {
-    return {
-      address: '',
-      id: null,
-      createTime: '',
-      introduceSign: '',
-      loginName: '',
-      nickName: '',
-      avatar: '',
-      permissions: [],
-    }
-  },
+  state: () => createDefaultState(),
   getters: {
     getId: (state) => state.id,
     getAddress: (state) => state.address,
@@ -29,6 +30,7 @@ export const userInfoStore = defineStore<
     getNickName: (state) => state.nickName,
     getAvatar: (state) => state.avatar,
     getPermissions: (state) => state.permissions,
+    getLoaded: (state) => state.loaded,
   },
   actions: {
     /**
@@ -44,6 +46,7 @@ export const userInfoStore = defineStore<
       this.nickName = result.nickName
       this.avatar = result.avatar
       this.permissions = result.permissions || []
+      this.loaded = true
     },
     setId(value: number | null) {
       this.id = value
@@ -68,6 +71,12 @@ export const userInfoStore = defineStore<
     },
     setPermissions(value: string[]) {
       this.permissions = value
+    },
+    setLoaded(value: boolean) {
+      this.loaded = value
+    },
+    resetState() {
+      Object.assign(this, createDefaultState())
     },
   },
   // persist: true

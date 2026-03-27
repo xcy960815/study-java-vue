@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed } from 'vue'
 import { useUserInfoStore, useSystemInfoStore, useLoginStore } from '@store'
 import { useRouter } from 'vue-router'
 import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
@@ -77,10 +77,6 @@ const handleChooseItem = (command: string) => {
       break
   }
 }
-
-onMounted(() => {
-  userInfoStore.getUserInfo()
-})
 </script>
 
 <style lang="less" scoped>

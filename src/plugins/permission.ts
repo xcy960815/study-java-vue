@@ -1,5 +1,38 @@
 import type { App, DirectiveBinding } from 'vue'
-import { useUserInfoStore } from '@/store'
+import { hasAllPermissions, hasPermission } from '@/composables/usePermission'
+
+const PERMISSION_ERROR_MESSAGE = '请设置操作权限标签值'
+
+const updateElementVisibility = (el: HTMLElement, visible: boolean) => {
+  if (!visible) {
+    if (el.dataset.permissionDisplay === undefined) {
+      el.dataset.permissionDisplay = el.style.display || ''
+    }
+    el.style.display = 'none'
+    return
+  }
+
+  if (el.dataset.permissionDisplay !== undefined) {
+    el.style.display = el.dataset.permissionDisplay
+    delete el.dataset.permissionDisplay
+    return
+  }
+
+  el.style.removeProperty('display')
+}
+
+const checkPermission = (binding: DirectiveBinding) => {
+  const { value, modifiers } = binding
+  if (!value || (Array.isArray(value) && value.length === 0)) {
+    throw new Error(PERMISSION_ERROR_MESSAGE)
+  }
+
+  if (modifiers.all) {
+    return hasAllPermissions(value)
+  }
+
+  return hasPermission(value)
+}
 
 /**
  * 按钮权限校验指令
@@ -7,23 +40,10 @@ import { useUserInfoStore } from '@/store'
  */
 const hasPermi = {
   mounted(el: HTMLElement, binding: DirectiveBinding) {
-    const { value } = binding
-    const userStore = useUserInfoStore()
-    const permissions = userStore.permissions
-
-    if (value && value instanceof Array && value.length > 0) {
-      const permissionFlag = value
-
-      const hasPermissions = permissions.some((permission) => {
-        return permission === '*:*:*' || permissionFlag.includes(permission)
-      })
-
-      if (!hasPermissions) {
-        el.parentNode && el.parentNode.removeChild(el)
-      }
-    } else {
-      throw new Error(`请设置操作权限标签值`)
-    }
+    updateElementVisibility(el, checkPermission(binding))
+  },
+  updated(el: HTMLElement, binding: DirectiveBinding) {
+    updateElementVisibility(el, checkPermission(binding))
   },
 }
 

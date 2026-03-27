@@ -26,7 +26,14 @@
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getOrderList">
-      <el-button size="small" type="primary" @click="handleClickAddOrder"> 新增订单 </el-button>
+      <el-button
+        v-hasPermi="['order:add']"
+        size="small"
+        type="primary"
+        @click="handleClickAddOrder"
+      >
+        新增订单
+      </el-button>
     </Handle-ToolBar>
 
     <el-table border :data="orderInfo.tableData" style="width: 100%">
@@ -59,12 +66,22 @@
       <el-table-column align="center" prop="userAddress" label="收货地址" width="250" />
       <el-table-column align="center" prop="createTime" label="创建时间" width="250" />
       <el-table-column align="center" prop="updateTime" label="更新时间" width="250" />
-      <el-table-column fixed="right" label="操作" width="150">
+      <el-table-column v-if="showActionColumn" fixed="right" label="操作" width="150">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleClickEditOrder(row)"
+          <el-button
+            v-hasPermi="['order:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEditOrder(row)"
             >编辑</el-button
           >
-          <el-button link type="danger" size="small" @click="handleClickDeleteOrder(row)"
+          <el-button
+            v-hasPermi="['order:remove']"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDeleteOrder(row)"
             >删除</el-button
           >
         </template>
@@ -151,11 +168,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, nextTick } from 'vue'
+import { computed, onMounted, reactive, ref, nextTick } from 'vue'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { orderModule } from '@apis'
 import { getDataDictList } from '@/apis/system/dataDict'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasAnyPermi } = usePermission()
+const showActionColumn = computed(() => hasAnyPermi(['order:edit', 'order:remove']))
 
 interface OrderInfo {
   tableData: OrderVo[]

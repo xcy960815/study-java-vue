@@ -30,7 +30,9 @@
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getGoodsList">
-      <el-button type="primary" @click="handleClickAddGoods">新增商品</el-button>
+      <el-button v-hasPermi="['goods:add']" type="primary" @click="handleClickAddGoods">
+        新增商品
+      </el-button>
     </Handle-ToolBar>
 
     <!-- 商品表格 -->
@@ -78,12 +80,28 @@
       <el-table-column align="center" prop="createTime" label="创建时间" width="200" />
       <el-table-column align="center" prop="updateUser" label="更新人" width="100" />
       <el-table-column align="center" prop="updateTime" label="更新时间" width="200" />
-      <el-table-column align="center" fixed="right" label="操作" width="150">
+      <el-table-column
+        v-if="showActionColumn"
+        align="center"
+        fixed="right"
+        label="操作"
+        width="150"
+      >
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleClickEditGoods(row)"
+          <el-button
+            v-hasPermi="['goods:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEditGoods(row)"
             >编辑</el-button
           >
-          <el-button link type="danger" size="small" @click="handleClickDeleteGoods(row)"
+          <el-button
+            v-hasPermi="['goods:remove']"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDeleteGoods(row)"
             >删除</el-button
           >
         </template>
@@ -164,11 +182,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, nextTick } from 'vue'
+import { computed, onMounted, reactive, ref, nextTick } from 'vue'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { goodsModule } from '@apis'
 import { getDataDictList } from '@/apis/system/dataDict'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasAnyPermi } = usePermission()
+const showActionColumn = computed(() => hasAnyPermi(['goods:edit', 'goods:remove']))
 
 interface GoodsInfo {
   tableData: GoodsVo[]

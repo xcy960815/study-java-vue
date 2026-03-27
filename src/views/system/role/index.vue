@@ -28,7 +28,14 @@
     </el-form>
 
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getRoleList">
-      <el-button size="small" type="primary" @click="handleClickAddRole"> 新增角色 </el-button>
+      <el-button
+        v-hasPermi="['system:role:add']"
+        size="small"
+        type="primary"
+        @click="handleClickAddRole"
+      >
+        新增角色
+      </el-button>
     </Handle-ToolBar>
 
     <el-table border :data="roleListInfo.tableData" style="width: 100%" class="role-table">
@@ -44,18 +51,29 @@
       </el-table-column>
       <el-table-column prop="remark" label="备注" width="250" />
       <el-table-column prop="createTime" label="创建时间" width="260" />
-      <el-table-column fixed="right" label="操作" min-width="150">
+      <el-table-column v-if="showActionColumn" fixed="right" label="操作" min-width="150">
         <template #default="{ row }">
-          <el-button link type="primary" size="small" @click="handleClickEditRole(row)"
+          <el-button
+            v-hasPermi="['system:role:edit']"
+            link
+            type="primary"
+            size="small"
+            @click="handleClickEditRole(row)"
             >编辑</el-button
           >
           <!-- <el-button link type="primary" size="small" @click="handleClickViewPermission(row)"
             >查看权限</el-button
           > -->
-          <el-button link type="danger" size="small" @click="handleClickDeleteRole(row)"
+          <el-button
+            v-hasPermi="['system:role:remove']"
+            link
+            type="danger"
+            size="small"
+            @click="handleClickDeleteRole(row)"
             >删除</el-button
           >
           <el-button
+            v-hasPermi="['system:role:edit']"
             v-if="row.status === 1"
             link
             type="danger"
@@ -64,6 +82,7 @@
             >禁用</el-button
           >
           <el-button
+            v-hasPermi="['system:role:edit']"
             v-if="row.status === 0"
             link
             type="primary"
@@ -152,16 +171,20 @@
 
 <script setup lang="ts">
 import { roleModule } from '@apis'
-import { onMounted, reactive, ref, nextTick } from 'vue'
+import { computed, onMounted, reactive, ref, nextTick } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { getAllMenuTree } from '@/apis/system/menu'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { useAsyncComputed } from '@/composables/useAsyncComputed'
 import { useFilterMenuTree } from '@/composables/useFilterMenuTree'
+import { usePermission } from '@/composables/usePermission'
 defineOptions({
   name: 'roleList',
 })
+
+const { hasAnyPermi } = usePermission()
+const showActionColumn = computed(() => hasAnyPermi(['system:role:edit', 'system:role:remove']))
 
 interface RoleListInfo {
   tableData: RoleInfoVo[]

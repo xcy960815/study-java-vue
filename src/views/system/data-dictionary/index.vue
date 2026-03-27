@@ -37,7 +37,14 @@
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="handleGetDataDictionaryList">
-      <el-button size="small" type="primary" @click="handleAddDictionary">新增字典</el-button>
+      <el-button
+        v-hasPermi="['system:data-dict:add']"
+        size="small"
+        type="primary"
+        @click="handleAddDictionary"
+      >
+        新增字典
+      </el-button>
     </Handle-ToolBar>
     <el-table
       border
@@ -59,10 +66,30 @@
         </template>
       </el-table-column>
       <el-table-column align="center" prop="createdTime" label="创建时间" width="280" />
-      <el-table-column align="center" label="操作" width="180" fixed="right">
+      <el-table-column
+        v-if="showActionColumn"
+        align="center"
+        label="操作"
+        width="180"
+        fixed="right"
+      >
         <template #default="scope">
-          <el-button type="primary" link @click="handleUpdateDictionary(scope.row)">修改</el-button>
-          <el-button type="danger" link @click="handleDeleteDictionary(scope.row)">删除</el-button>
+          <el-button
+            v-hasPermi="['system:data-dict:edit']"
+            type="primary"
+            link
+            @click="handleUpdateDictionary(scope.row)"
+          >
+            修改
+          </el-button>
+          <el-button
+            v-hasPermi="['system:data-dict:remove']"
+            type="danger"
+            link
+            @click="handleDeleteDictionary(scope.row)"
+          >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -129,7 +156,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { computed, ref, reactive, onMounted, nextTick } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import {
@@ -139,6 +166,12 @@ import {
   deleteDataDict,
 } from '@/apis/system/dataDict'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
+import { usePermission } from '@/composables/usePermission'
+
+const { hasAnyPermi } = usePermission()
+const showActionColumn = computed(() =>
+  hasAnyPermi(['system:data-dict:edit', 'system:data-dict:remove'])
+)
 
 interface DataDictionaryListInfo {
   tableData: DataDictionaryVo[]

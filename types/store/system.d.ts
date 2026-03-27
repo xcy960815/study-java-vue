@@ -24,5 +24,6 @@ declare namespace SystemStore {
     addHistoryItem: (historyItem: RouteLocationNormalizedLoadedGeneric) => void
     removeHistoryItem: (historyItem: RouteLocationNormalizedLoadedGeneric) => void
     setRoutes: (routes: Array<StudyJavaSysMenuVo>) => void
+    resetDynamicState: () => void
   }
 }

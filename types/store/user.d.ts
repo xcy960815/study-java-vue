@@ -8,10 +8,13 @@ declare namespace UserStore {
     nickName: string
     avatar: string
     permissions: string[]
+    loaded: boolean
   }
   type Getters = {}
   type Actions = {
     getUserInfo: () => Promise<void>
     setPermissions: (value: string[]) => void
+    setLoaded: (value: boolean) => void
+    resetState: () => void
   }
 }

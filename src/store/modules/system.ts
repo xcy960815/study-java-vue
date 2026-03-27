@@ -127,6 +127,12 @@ export const systemInfoStore = defineStore<
       // })
       this.routes = routes
     },
+    resetDynamicState() {
+      this.hasAddedRoutes = false
+      this.routes = []
+      this.historyList = []
+      this.keepLiveList = []
+    },
   },
   // persist: true,
 })

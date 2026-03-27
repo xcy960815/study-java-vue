@@ -4,7 +4,7 @@ import { getToken } from '@/utils/token'
 import { changeTabIcon } from '@/utils/system-style'
 import { eventEmitter, BASE_REDIRECT_PATH, LOGIN_PATH, WHITELIST_PATHS } from '@/utils/event-emits'
 import { getRoutes } from '@apis/system/menu'
-import { useSystemInfoStore } from '@store'
+import { useSystemInfoStore, useUserInfoStore } from '@store'
 import { buildRoute } from '@/utils/build-route'
 import NProgress from 'nprogress'
 
@@ -16,10 +16,18 @@ const router = createRouter({
   routes: baseRoutes,
 })
 
+const resetAuthState = () => {
+  const userInfoStore = useUserInfoStore()
+  const systemInfoStore = useSystemInfoStore()
+  userInfoStore.resetState()
+  systemInfoStore.resetDynamicState()
+}
+
 /**
  * token过期
  */
 eventEmitter.on('token-invalid', () => {
+  resetAuthState()
   const route = router.currentRoute.value
   const redirect = route.fullPath
   router.replace({
@@ -44,6 +52,7 @@ eventEmitter.on('login', () => {
  * 退出登录
  */
 eventEmitter.on('logout', () => {
+  resetAuthState()
   const route = router.currentRoute.value
   const redirect = route.fullPath
   router.replace({
@@ -65,6 +74,7 @@ eventEmitter.on('get-routes', () => {
       const routesRes = await getRoutes<StudyJavaSysMenuVo[]>()
       if (routesRes) {
         const routes = routesRes
+        systemInfoStore.setRoutes(routes)
         const routeList = buildRoute(routes)
         const allRoutes = [...routeList, ...redirectRoutes]
         allRoutes.forEach((route) => {
@@ -83,6 +93,10 @@ router.beforeEach(async (to) => {
   if (WHITELIST_PATHS.includes(to.path)) return true
   const token = await getToken()
   if (!token) return LOGIN_PATH
+  const userInfoStore = useUserInfoStore()
+  if (!userInfoStore.getLoaded) {
+    await userInfoStore.getUserInfo()
+  }
   const systemInfoStore = useSystemInfoStore()
   if (!systemInfoStore.getHasAddedRoutes) {
     await eventEmitter.emitAsync('get-routes')
