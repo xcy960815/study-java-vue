@@ -63,7 +63,12 @@
       </transition>
     </div>
     <!-- 问题&发送消息按钮 -->
-    <chat-input :conversation="currentConversation" v-bind="$attrs" @send="handleSend" />
+    <chat-input
+      :conversation="currentConversation"
+      v-bind="$attrs"
+      @send="handleSend"
+      @cancel-conversation="handleCancelConversation"
+    />
   </div>
 </template>
 
@@ -78,6 +83,10 @@ import ChatCopy from './chat-copy.vue'
 import ChatInput from './chat-input.vue'
 import '../../plugins/markdown.scss'
 import 'highlight.js/styles/github-dark.css'
+
+defineOptions({
+  inheritAttrs: false,
+})
 
 // 常量定义
 const LOADING_SVG =
@@ -106,7 +115,8 @@ const props = defineProps({
 
 // Emits 定义
 const emit = defineEmits<{
-  (e: 'send', message: string): void
+  (e: 'completions', message: string): void
+  (e: 'cancel-conversation'): void
   (e: 'scroll', event: Event): void
 }>()
 
@@ -156,7 +166,14 @@ const handleScroll = (event: Event) => {
  * 发送消息
  */
 const handleSend = (message: string) => {
-  emit('send', message)
+  emit('completions', message)
+}
+
+/**
+ * 取消会话
+ */
+const handleCancelConversation = () => {
+  emit('cancel-conversation')
 }
 
 // 生命周期钩子

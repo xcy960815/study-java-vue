@@ -62,12 +62,12 @@ class Completions extends CompletionsCore {
     // 构建并保存助手消息
     const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
       ...options,
-      messageId: userMessage.messageId,
+      parentMessageId: userMessage.messageId,
     })
-    // await this.upsertConversation(assistantMessage)
+    this._currentConversation = assistantMessage
 
     // 处理响应
-    const conversationPromise = this.handleAnswerRequest(assistantMessage, options)
+    const conversationPromise = this.handleAnswerRequest(question, assistantMessage, options)
       .then(async (conversation) => {
         await this.upsertConversation(conversation)
         conversation.parentMessageId = conversation.messageId
@@ -76,6 +76,11 @@ class Completions extends CompletionsCore {
       .catch((error) => {
         console.error('AI EventStream error:', error)
         throw error
+      })
+      .finally(() => {
+        if (this._currentConversation === assistantMessage) {
+          this._currentConversation = null
+        }
       })
 
     return this.clearablePromise(conversationPromise, {
@@ -88,11 +93,12 @@ class Completions extends CompletionsCore {
    * 处理回答请求（流式/非流式）
    */
   private async handleAnswerRequest(
+    question: string,
     assistantMessage: AI.Gpt.AssistantConversation,
     options: AI.Gpt.CompletionsOptions
   ): Promise<AI.Gpt.AssistantConversation> {
     const { onProgress, stream = !!onProgress } = options
-    const requestInit = await this.buildFetchRequestInit(assistantMessage.content, options)
+    const requestInit = await this.buildFetchRequestInit(question, options)
 
     if (stream) {
       return this.handleStreamResponse(assistantMessage, requestInit, onProgress)

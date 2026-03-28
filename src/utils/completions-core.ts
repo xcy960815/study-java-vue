@@ -153,8 +153,8 @@ export class CompletionsCore {
     if (role === RoleEnum.Assistant) {
       return {
         role: RoleEnum.Assistant,
-        messageId: '',
-        parentMessageId: messageId,
+        messageId: this.uuid,
+        parentMessageId: option.parentMessageId || option.messageId || this.uuid,
         content,
         detail: null,
         thinking: true,

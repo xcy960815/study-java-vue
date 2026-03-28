@@ -118,7 +118,7 @@ const buttonnConfig: ButtonnConfig = {
 }
 
 const emits = defineEmits<{
-  (event: 'completions', question: string): void
+  (event: 'send', question: string): void
   (event: 'cancel-conversation'): void
 }>()
 
@@ -150,7 +150,7 @@ const handleSubmit = () => {
     ElMessage.warning('问题太短了，请至少输入2个字符')
     return
   }
-  emits('completions', trimmedQuestion)
+  emits('send', trimmedQuestion)
   question.value = '' // 清空输入框
 }
 
