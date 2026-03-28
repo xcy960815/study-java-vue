@@ -53,17 +53,20 @@ const completionsModel = new Completions({
 
 const parentMessageId = ref('')
 
-const currentConversation = ref<AI.Conversation | null>(null)
+const currentConversation = ref<AI.Gpt.AssistantConversation | null>(null)
+
+const isAbortError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) {
+    return false
+  }
+  return error.name === 'AbortError' || error.message.toLowerCase().includes('abort')
+}
 
 /**
  * 流式会话
  */
 const completions = async (question: string) => {
-  setTimeout(async () => {
-    conversationList.value = await completionsModel.getAllConversations()
-    currentConversation.value = completionsModel.buildConversation(RoleEnum.Assistant, '', {})
-  })
-  const response = await completionsModel.completions(question, {
+  const responsePromise = completionsModel.completions(question, {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
     requestParams: {
@@ -73,18 +76,34 @@ const completions = async (question: string) => {
       currentConversation.value = cloneDeep(partialResponse)
     },
   })
-  if (!!response.done) {
+  conversationList.value = await completionsModel.getAllConversations()
+  currentConversation.value = completionsModel.buildConversation(RoleEnum.Assistant, '', {
+    parentMessageId: parentMessageId.value,
+  })
+
+  try {
+    const response = await responsePromise
+    if (!!response.done) {
+      currentConversation.value = null
+      conversationList.value = await completionsModel.getAllConversations()
+      parentMessageId.value = response.parentMessageId
+    }
+  } catch (error) {
+    if (!isAbortError(error)) {
+      console.error('Ollama conversation failed:', error)
+    }
     currentConversation.value = null
     conversationList.value = await completionsModel.getAllConversations()
-    parentMessageId.value = response.parentMessageId
   }
 }
 
 /**
  * 取消当前会话
  */
-const cancelConversation = () => {
-  completionsModel.cancelConversation('用户手动取消会话')
+const cancelConversation = async () => {
+  await completionsModel.cancelConversation('用户手动取消会话')
+  currentConversation.value = null
+  conversationList.value = await completionsModel.getAllConversations()
 }
 </script>
 <style lang="less" scoped>

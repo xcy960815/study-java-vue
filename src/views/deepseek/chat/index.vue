@@ -53,17 +53,19 @@ const roleAlias = ref<Record<AI.Role, string>>({
   system: 'System',
 })
 
-const currentConversation = ref<AI.Conversation | null>(null)
+const currentConversation = ref<AI.Gpt.AssistantConversation | null>(null)
+
+const isAbortError = (error: unknown): boolean => {
+  if (!(error instanceof Error)) {
+    return false
+  }
+  return error.name === 'AbortError' || error.message.toLowerCase().includes('abort')
+}
 /**
  * 流式会话
  * @param {string} question
  */
 const completions = async (question: string) => {
-  setTimeout(async () => {
-    conversationList.value = await deepseekModel.getAllConversations()
-    currentConversation.value = deepseekModel.buildConversation(RoleEnum.Assistant, '', {})
-  })
-
   const questionOption: AI.Gpt.CompletionsOptions = {
     parentMessageId: parentMessageId.value,
     systemMessage: '你是一个聊天机器人',
@@ -75,19 +77,34 @@ const completions = async (question: string) => {
     },
   }
 
-  const response = await deepseekModel.completions(question, questionOption)
+  const responsePromise = deepseekModel.completions(question, questionOption)
+  conversationList.value = await deepseekModel.getAllConversations()
+  currentConversation.value = deepseekModel.buildConversation(RoleEnum.Assistant, '', {
+    parentMessageId: parentMessageId.value,
+  })
 
-  if (!!response.done) {
+  try {
+    const response = await responsePromise
+    if (!!response.done) {
+      currentConversation.value = null
+      conversationList.value = await deepseekModel.getAllConversations()
+      parentMessageId.value = response.parentMessageId
+    }
+  } catch (error) {
+    if (!isAbortError(error)) {
+      console.error('DeepSeek conversation failed:', error)
+    }
     currentConversation.value = null
     conversationList.value = await deepseekModel.getAllConversations()
-    parentMessageId.value = response.parentMessageId
   }
 }
 /**
  * 取消会话
  */
-const cancelConversation = () => {
-  deepseekModel.cancelConversation()
+const cancelConversation = async () => {
+  await deepseekModel.cancelConversation('用户手动取消会话')
+  currentConversation.value = null
+  conversationList.value = await deepseekModel.getAllConversations()
 }
 </script>
 <style lang="less" scoped>
