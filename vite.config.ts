@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
     VITE_API_SERVER_DOMAIN /** 后端接口地址 */,
     VITE_API_SERVER_DOMAIN_PREFIX /** 后端接口 API 前缀 */,
   } = loadEnv(mode, './env/')
-  const isDev = mode === 'dev'
+  const isDaliy = mode === 'daily' || mode === 'development'
   /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(`^${VITE_API_DOMAIN_PREFIX}`)
 
@@ -206,7 +206,7 @@ export default defineConfig(({ mode }) => {
         customDomId: '__svg__icons__dom__', // svg的id
       }),
       // 打包体积分析
-      isDev
+      isDaliy
         ? visualizer({
             // open: true,
             filename: 'visualizer.html', //分析图生成的文件名

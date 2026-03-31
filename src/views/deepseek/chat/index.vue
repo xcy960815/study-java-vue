@@ -17,7 +17,6 @@ import { useCompletions } from '@/composables/useCompletions'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AiChat from '@components/ai-chat/index.vue'
-import { RoleEnum } from '@enums'
 import { cloneDeep } from 'lodash'
 defineOptions({
   name: 'DeepseekChat',
@@ -47,7 +46,7 @@ const deepseekModel = new Completions({
 /**
  * 角色别名
  */
-const roleAlias = ref<Record<AI.Role, string>>({
+const roleAlias = ref<Partial<Record<AI.Role, string>>>({
   user: 'ME',
   assistant: 'DeepSeek',
   system: 'System',
@@ -79,7 +78,7 @@ const completions = async (question: string) => {
 
   const responsePromise = deepseekModel.completions(question, questionOption)
   conversationList.value = await deepseekModel.getAllConversations()
-  currentConversation.value = deepseekModel.buildConversation(RoleEnum.Assistant, '', {
+  currentConversation.value = deepseekModel.buildAssistantConversation('', {
     parentMessageId: parentMessageId.value,
   })
 
@@ -88,7 +87,7 @@ const completions = async (question: string) => {
     if (!!response.done) {
       currentConversation.value = null
       conversationList.value = await deepseekModel.getAllConversations()
-      parentMessageId.value = response.parentMessageId
+      parentMessageId.value = response.messageId
     }
   } catch (error) {
     if (!isAbortError(error)) {

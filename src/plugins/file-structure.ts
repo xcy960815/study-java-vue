@@ -47,6 +47,7 @@ export const fileStructurePlugin = () => {
       const srcPath = path.resolve(process.cwd(), 'src')
       const fileStructure = scanDirectory(srcPath)
       const outputPath = path.resolve(process.cwd(), 'public/file-structure.json')
+      fs.mkdirSync(path.dirname(outputPath), { recursive: true })
       fs.writeFileSync(outputPath, JSON.stringify(fileStructure, null, 2))
     },
     configureServer(server: ViteDevServer) {

@@ -1,285 +1,201 @@
-import { createParser, type EventSourceParser } from 'eventsource-parser'
 import { v4 as uuidv4 } from 'uuid'
-import { encode } from 'gpt-tokenizer'
 import { RoleEnum } from '@enums'
 
-const KEEPALIVE_FLAG = ' : keep-alive'
-const DATA_PREFIX = 'data:'
-const DEFAULT_API_BASE_URL = 'https://api.AI.com'
+import { createContentTransformer } from './ai-content-transformer'
+import { AiError } from './ai-error'
+import { InMemoryConversationStore } from './ai-in-memory-conversation-store'
+import { GptTokenizerTokenCounter } from './ai-token-counter'
+import { FetchOpenAITransport } from './fetch-openai-transport'
+
+const DEFAULT_API_BASE_URL = 'https://api.openai.com'
 const DEFAULT_MAX_MODEL_TOKENS = 4096
 const DEFAULT_MAX_RESPONSE_TOKENS = 1000
 const DEFAULT_TIMEOUT = 1000 * 60
 
 /**
  * AI 聊天核心类
- * 提供基础的对话管理、请求处理、流式响应等功能
+ * 提供传输层、会话存储、超时控制、token 估算等公共能力
  */
 export class CompletionsCore {
-  /** API 密钥 */
-  protected readonly _apiKey: string
-  /** API 基础 URL */
-  protected readonly _apiBaseUrl: string
-  /** 组织 ID */
-  protected readonly _organization?: string
-  /** 是否开启调试模式 */
   protected readonly _debug: boolean
-  /** 是否携带上下文 */
-  protected readonly _withContent: boolean
-  /** 消息存储 */
-  protected readonly _messageStore: Map<string, AI.Conversation>
-  /** 最大模型 token 数 */
+  protected readonly _conversationStore?: AI.ConversationStore
   protected readonly _maxModelTokens: number
-  /** 最大响应 token 数 */
   protected readonly _maxResponseTokens: number
-  /** 系统消息 */
-  protected readonly _systemMessage: string
-  /** 请求超时时间 */
-  protected readonly _milliseconds: number
-  /** 当前模型的请求地址 */
-  private readonly _completionsUrl?: string
-  /** 请求取消控制器 */
+  protected readonly _systemMessage?: string
   protected _abortController: AbortController
-  /** 当前正在处理的会话 */
+  protected readonly _milliseconds: number
   protected _currentConversation: AI.Gpt.AssistantConversation | null = null
+
+  private readonly _transport: AI.OpenAITransport
+  private readonly _contentTransformer: AI.ContentTransformer
+  private readonly _tokenCounter: AI.TokenCounter
+  private readonly _completionsUrl?: string
 
   constructor(options: AI.CoreOptions) {
     const {
       apiKey = '',
-      apiBaseUrl = DEFAULT_API_BASE_URL,
+      apiBaseUrl,
+      baseURL,
       organization,
       debug = false,
       withContent = true,
+      conversationStore,
+      tokenCounter,
+      transport,
       maxModelTokens = DEFAULT_MAX_MODEL_TOKENS,
       maxResponseTokens = DEFAULT_MAX_RESPONSE_TOKENS,
       systemMessage = `你是Ai助手,帮助用户使用代码。您聪明、乐于助人、专业的开发人员，总是给出正确的答案，并且只按照指示执行。你的回答始终如实，不会造假,返回结果用markdown显示`,
       milliseconds = DEFAULT_TIMEOUT,
+      markdown2Html,
+      transformResponseContent,
       completionsUrl,
     } = options
 
-    this._apiKey = apiKey
-    this._apiBaseUrl = apiBaseUrl
-    this._organization = organization
-    this._debug = debug
-    this._withContent = withContent
+    this._debug = !!debug
+    this._conversationStore =
+      conversationStore === false
+        ? undefined
+        : (conversationStore ?? (withContent ? new InMemoryConversationStore() : undefined))
     this._maxModelTokens = maxModelTokens
     this._maxResponseTokens = maxResponseTokens
-    this._systemMessage = systemMessage
-    this._milliseconds = milliseconds
-    this._completionsUrl = completionsUrl
-    this._messageStore = new Map()
+    this._systemMessage = systemMessage?.trim() ? systemMessage : undefined
     this._abortController = new AbortController()
+    this._milliseconds = milliseconds
+    this._transport =
+      transport ??
+      new FetchOpenAITransport({
+        apiKey,
+        apiBaseUrl: apiBaseUrl ?? baseURL ?? DEFAULT_API_BASE_URL,
+        baseURL,
+        organization,
+      })
+    this._contentTransformer = createContentTransformer({
+      markdown2Html,
+      transformResponseContent,
+    })
+    this._tokenCounter = tokenCounter ?? new GptTokenizerTokenCounter()
+    this._completionsUrl = completionsUrl
   }
 
-  /**
-   * 获取模型列表 URL
-   */
-  private get _modelsUrl(): string {
-    return `${this._apiBaseUrl}/v1/models`
-  }
-
-  /**
-   * 获取对话请求 URL
-   */
   protected get completionsUrl(): string {
-    return `${this._apiBaseUrl}${this._completionsUrl ?? '/v1/chat/completions'}`
+    return this._completionsUrl ?? '/chat/completions'
   }
 
-  /**
-   * 生成唯一 ID
-   */
   protected get uuid(): string {
     return uuidv4()
   }
 
-  /**
-   * 获取请求头
-   */
-  protected get headers(): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this._apiKey}`,
+  protected transformContent(text: string): string {
+    return this._contentTransformer(text)
+  }
+
+  protected async request<R extends object>(
+    path: string,
+    requestInit: AI.FetchRequestInit
+  ): Promise<AI.AnswerResponse<R> | void> {
+    return this._transport.request<R>(path, requestInit, this._abortController.signal)
+  }
+
+  protected async getTokenCount(
+    text: string,
+    options?: AI.TokenCountOptions
+  ): Promise<number> {
+    return this._tokenCounter.count(text, options)
+  }
+
+  protected hasConversationStore(): boolean {
+    return !!this._conversationStore
+  }
+
+  protected requireConversationStore(): AI.ConversationStore {
+    if (!this._conversationStore) {
+      throw new AiError(
+        'parentMessageId requires a conversationStore. Pass conversationStore or withContent: true to enable history.'
+      )
     }
 
-    if (this._organization) {
-      headers['AI-Organization'] = this._organization
-    }
-
-    return headers
+    return this._conversationStore
   }
 
-  /**
-   * 计算文本的 token 数量
-   */
-  protected getTokenCount(text: string): number {
-    return encode(text).length
-  }
-
-  /**
-   * 构建用户会话消息
-   */
-  public buildConversation(
-    role: RoleEnum.User,
-    content: string,
-    option: AI.CompletionsOptions
-  ): AI.Conversation
-  /**
-   * 构建助手会话消息
-   */
-  public buildConversation(
-    role: RoleEnum.Assistant,
-    content: string,
-    option: AI.CompletionsOptions
-  ): AI.Gpt.AssistantConversation
-  /**
-   * 构建会话消息
-   */
-  public buildConversation(
-    role: RoleEnum.User | RoleEnum.Assistant,
-    content: string,
-    option: AI.CompletionsOptions
-  ): AI.Conversation | AI.Gpt.AssistantConversation {
-    const messageId = option.messageId || this.uuid
-    const parentMessageId = option.parentMessageId || this.uuid
-
-    if (role === RoleEnum.User) {
-      return {
-        role: RoleEnum.User,
-        messageId,
-        parentMessageId,
-        content,
-      }
-    }
-
-    if (role === RoleEnum.Assistant) {
-      return {
-        role: RoleEnum.Assistant,
-        messageId: this.uuid,
-        parentMessageId: option.parentMessageId || option.messageId || this.uuid,
-        content,
-        detail: null,
-        thinking: true,
-        done: false,
-      }
-    }
-
-    throw new Error('Invalid role type')
-  }
-
-  /**
-   * 获取指定 ID 的会话
-   */
-  protected async getConversation(id: string): Promise<AI.Conversation | undefined> {
-    return this._messageStore.get(id)
-  }
-
-  /**
-   * 获取所有会话
-   */
-  public async getAllConversations(): Promise<AI.Conversation[]> {
-    return Array.from(this._messageStore.values())
-  }
-
-  /**
-   * 更新或插入会话
-   */
-  protected async upsertConversation(message: AI.Conversation): Promise<void> {
-    this._messageStore.set(message.messageId, { ...message })
-  }
-
-  /**
-   * 清空所有会话
-   */
-  protected async _clearConversation(): Promise<void> {
-    this._messageStore.clear()
-  }
-
-  /**
-   * 输出调试日志
-   */
-  protected _debugLog(action: string, ...args: unknown[]): void {
+  protected debugLog(action: string, ...args: Array<unknown>): void {
     if (this._debug) {
       console.log(`AI-apis:DEBUG:${action}`, ...args)
     }
   }
 
-  /**
-   * 将 ReadableStream 转换为异步迭代器
-   */
-  private async *streamAsyncIterable(
-    stream: ReadableStream<Uint8Array>
-  ): AsyncIterable<Uint8Array> {
-    const reader = stream.getReader()
-    try {
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        yield value!
+  public buildConversation(
+    role: AI.Role,
+    content: string,
+    option: AI.CompletionsOptions
+  ): AI.Conversation | AI.Gpt.AssistantConversation {
+    const baseConversation = {
+      role,
+      messageId: option.messageId || this.uuid,
+      parentMessageId: option.parentMessageId,
+      content,
+      tool_call_id: option.tool_call_id,
+      name: option.name,
+    }
+
+    if (role === RoleEnum.Assistant) {
+      return {
+        ...baseConversation,
+        detail: null,
+        thinking: false,
+        done: true,
       }
-    } finally {
-      reader.releaseLock()
+    }
+
+    return baseConversation
+  }
+
+  public buildAssistantConversation(
+    content: string,
+    option: AI.CompletionsOptions
+  ): AI.Gpt.AssistantConversation {
+    return {
+      role: RoleEnum.Assistant,
+      messageId: this.uuid,
+      parentMessageId: option.messageId || option.parentMessageId || this.uuid,
+      content,
+      detail: null,
+      thinking: true,
+      done: false,
     }
   }
 
-  /**
-   * 发送 SSE 请求
-   */
-  protected async _fetchSSE<R extends object>(
-    url: string,
-    requestInit: AI.FetchRequestInit
-  ): Promise<AI.AnswerResponse<R> | void> {
-    const { onMessage, ...fetchOptions } = requestInit
-    const response = (await fetch(url, fetchOptions)) as AI.AnswerResponse<R>
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      const { error } = JSON.parse(errorText)
-      throw new AiError(error.message, {
-        url: response.url,
-        status: response.status,
-        statusText: response.statusText,
-      })
-    }
-
-    if (!onMessage) return response
-
-    const parser = this._createParser(onMessage)
-    const body = response.body
-    if (!body) throw new Error('Response body is null')
-
-    for await (const chunk of this.streamAsyncIterable(body)) {
-      const chunkString = new TextDecoder().decode(chunk)
-      parser.feed(chunkString)
-    }
+  protected getConversation(id: string): Promise<AI.Conversation | undefined> {
+    return this._conversationStore?.get(id) ?? Promise.resolve(undefined)
   }
 
-  /**
-   * 创建 SSE 解析器
-   */
-  private _createParser(onMessage: (data: string) => void): EventSourceParser {
-    return createParser({
-      onEvent: (event) => {
-        const data = event.data.trim()
-        if (!data) return
+  public async getAllConversations(): Promise<Array<AI.Conversation>> {
+    if (!this._conversationStore?.list) {
+      return []
+    }
 
-        // 处理 [DONE] 标记
-        if (data === '[DONE]') {
-          onMessage(data)
-          return
-        }
+    return this._conversationStore.list()
+  }
 
-        if (data.startsWith(DATA_PREFIX) && !data.startsWith(KEEPALIVE_FLAG)) {
-          onMessage(data.slice(DATA_PREFIX.length))
-        } else {
-          onMessage(data)
-        }
-      },
+  protected upsertConversation(message: AI.Conversation): Promise<void> {
+    return this._conversationStore?.set(message) ?? Promise.resolve()
+  }
+
+  protected clearConversation(): Promise<void> {
+    return this._conversationStore?.clear() ?? Promise.resolve()
+  }
+
+  protected serializeConversationForTokenCount(message: Partial<AI.Conversation>): string {
+    return JSON.stringify({
+      role: message.role,
+      content: message.content ?? '',
+      name: message.name,
+      tool_call_id: message.tool_call_id,
+      tool_calls: message.tool_calls,
+      function_call: message.function_call,
     })
   }
 
-  /**
-   * 创建可清除的 Promise
-   */
-  protected clearablePromise<V extends object>(
+  protected clearablePromise<V>(
     inputPromise: PromiseLike<V>,
     options: AI.ClearablePromiseOptions
   ): Promise<V> {
@@ -294,14 +210,18 @@ export class CompletionsCore {
 
       try {
         timer = setTimeout(() => {
-          const errorMessage = message ?? `Promise timed out after ${milliseconds} milliseconds`
-          this._abortController.abort(errorMessage)
+          this._abortController.abort()
+          this._abortController = new AbortController()
+          const errorMessage =
+            message && message.trim()
+              ? message
+              : `Promise timed out after ${milliseconds} milliseconds`
           reject(new AiError(errorMessage))
         }, milliseconds)
-
-        inputPromise.then(resolve, reject)
       } catch (error) {
         reject(error)
+      } finally {
+        inputPromise.then(resolve, reject)
       }
     })
 
@@ -313,9 +233,6 @@ export class CompletionsCore {
     })
   }
 
-  /**
-   * 取消当前会话
-   */
   public async cancelConversation(reason?: string): Promise<void> {
     if (this._currentConversation) {
       const conversation = this._currentConversation
@@ -324,47 +241,16 @@ export class CompletionsCore {
       await this.upsertConversation(conversation)
       this._currentConversation = null
     }
+
     this._abortController.abort(reason)
     this._abortController = new AbortController()
   }
 
-  /**
-   * 获取可用模型列表
-   */
-  public async getModels(): Promise<
-    AI.AnswerResponse<{ data: Array<{ id: string; name: string }> }>
-  > {
-    const requestInit = {
+  public getModels(): Promise<AI.AnswerResponse<AI.ListModelsResponse> | void> {
+    return this.request<AI.ListModelsResponse>('/models', {
       method: 'GET',
-      headers: this.headers,
-    }
-    const response = await this._fetchSSE<{ data: Array<{ id: string; name: string }> }>(
-      this._modelsUrl,
-      requestInit
-    )
-    if (!response) {
-      throw new AiError('Failed to get models')
-    }
-    return response
+    })
   }
 }
 
-/**
- * AI 错误类
- */
-export class AiError extends Error {
-  readonly name = 'AIError'
-  readonly status?: number
-  readonly statusText?: string
-  readonly url?: string
-
-  constructor(message: string, option?: AI.AiErrorOption) {
-    super(message)
-    if (option) {
-      const { status, statusText, url } = option
-      this.status = status
-      this.statusText = statusText
-      this.url = url
-    }
-  }
-}
+export { AiError } from './ai-error'

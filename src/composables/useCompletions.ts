@@ -1,5 +1,6 @@
-import { CompletionsCore } from '../utils/completions-core'
 import { RoleEnum } from '@enums'
+
+import { CompletionsCore } from '../utils/completions-core'
 
 const MODEL = 'deepseek-chat'
 
@@ -8,9 +9,6 @@ const MODEL = 'deepseek-chat'
  * 负责与 AI 模型进行对话请求、流式处理、历史消息拼接等
  */
 class Completions extends CompletionsCore {
-  /**
-   * 请求参数（不包含 messages、n、stream）
-   */
   private readonly _requestParams: Partial<Omit<AI.Gpt.RequestParams, 'messages' | 'n' | 'stream'>>
 
   constructor(options: AI.Gpt.GptCoreOptions) {
@@ -25,57 +23,118 @@ class Completions extends CompletionsCore {
     }
   }
 
-  /**
-   * 构建 fetch 请求参数
-   */
   private async buildFetchRequestInit(
-    question: string,
-    options: AI.Gpt.CompletionsOptions
+    currentMessage: AI.Conversation,
+    options: AI.Gpt.CompletionsOptions = {}
   ): Promise<AI.FetchRequestInit> {
     const { onProgress, stream = !!onProgress, requestParams } = options
-    const { messages, maxTokens } = await this.getConversationHistory(question, options)
+    const mergedRequestParams = {
+      ...this._requestParams,
+      ...requestParams,
+    }
+    const { messages, maxTokens } = await this.getConversationHistory(
+      currentMessage,
+      options,
+      mergedRequestParams.model
+    )
+
     return {
       method: 'POST',
-      headers: this.headers,
       body: JSON.stringify({
-        ...this._requestParams,
-        ...requestParams,
+        ...mergedRequestParams,
         messages,
         stream,
         max_tokens: maxTokens,
       }),
-      signal: this._abortController.signal,
     }
   }
 
-  /**
-   * 主对话入口
-   */
   public async completions(
     question: string,
-    options: AI.Gpt.CompletionsOptions
+    options: AI.Gpt.CompletionsOptions = {}
   ): Promise<AI.Gpt.AssistantConversation> {
-    // 构建并保存用户消息
-    const userMessage = this.buildConversation(RoleEnum.User, question, options)
-    await this.upsertConversation(userMessage)
+    const { onProgress, stream = !!onProgress } = options
+    const role = (options.role || RoleEnum.User) as AI.Role
+    const currentMessage = this.buildConversation(role, question, options)
+    await this.upsertConversation(currentMessage)
 
-    // 构建并保存助手消息
-    const assistantMessage = this.buildConversation(RoleEnum.Assistant, '', {
+    const assistantMessage = this.buildAssistantConversation('', {
       ...options,
-      parentMessageId: userMessage.messageId,
+      parentMessageId: currentMessage.messageId,
     })
     this._currentConversation = assistantMessage
 
-    // 处理响应
-    const conversationPromise = this.handleAnswerRequest(question, assistantMessage, options)
-      .then(async (conversation) => {
-        await this.upsertConversation(conversation)
-        conversation.parentMessageId = conversation.messageId
-        return conversation
-      })
-      .catch((error) => {
+    let rawContent = ''
+    let rawAssistantContent = ''
+
+    const responsePromise = new Promise<AI.Gpt.AssistantConversation>(async (resolve, reject) => {
+      try {
+        const requestInit = await this.buildFetchRequestInit(currentMessage, options)
+
+        if (stream) {
+          requestInit.onMessage = (data: string) => {
+            if (data === '[DONE]') {
+              assistantMessage.content = assistantMessage.content.trim()
+              assistantMessage.done = true
+              assistantMessage.thinking = false
+              resolve(assistantMessage)
+              return
+            }
+
+            try {
+              const response: AI.Gpt.Response = JSON.parse(data)
+              this.applyStreamResponse({
+                response,
+                assistantMessage,
+                rawContent,
+              })
+
+              rawContent = this.getNextRawContent(response, rawContent)
+              rawAssistantContent = rawContent
+              onProgress?.(assistantMessage)
+            } catch (error) {
+              console.error('Failed to parse stream data:', error, 'Raw data:', data)
+            }
+          }
+
+          await this.request<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
+          return
+        }
+
+        const response = await this.request<AI.Gpt.Response>(this.completionsUrl, requestInit)
+        const data = await response?.json()
+
+        if (data) {
+          const message = data.choices?.[0]?.message
+          const content = message?.content ?? ''
+          rawAssistantContent = content
+
+          if (data.id) {
+            assistantMessage.messageId = data.id
+          }
+
+          assistantMessage.content = this.transformContent(content)
+          assistantMessage.role = message?.role || RoleEnum.Assistant
+          assistantMessage.tool_calls = message?.tool_calls
+          assistantMessage.function_call = message?.function_call
+          assistantMessage.detail = data
+        }
+
+        assistantMessage.done = true
+        assistantMessage.thinking = false
+        resolve(assistantMessage)
+      } catch (error) {
         console.error('AI EventStream error:', error)
-        throw error
+        reject(error)
+      }
+    })
+      .then(async (conversation) => {
+        const historyConversation: AI.Conversation = {
+          ...conversation,
+          content: rawAssistantContent,
+        }
+        await this.upsertConversation(historyConversation)
+        return conversation
       })
       .finally(() => {
         if (this._currentConversation === assistantMessage) {
@@ -83,117 +142,136 @@ class Completions extends CompletionsCore {
         }
       })
 
-    return this.clearablePromise(conversationPromise, {
+    return this.clearablePromise(responsePromise, {
       milliseconds: this._milliseconds,
       message: '',
     })
   }
 
-  /**
-   * 处理回答请求（流式/非流式）
-   */
-  private async handleAnswerRequest(
-    question: string,
-    assistantMessage: AI.Gpt.AssistantConversation,
-    options: AI.Gpt.CompletionsOptions
-  ): Promise<AI.Gpt.AssistantConversation> {
-    const { onProgress, stream = !!onProgress } = options
-    const requestInit = await this.buildFetchRequestInit(question, options)
-
-    if (stream) {
-      return this.handleStreamResponse(assistantMessage, requestInit, onProgress)
-    }
-    return this.handleNonStreamResponse(assistantMessage, requestInit)
-  }
-
-  /**
-   * 处理流式响应
-   */
-  private async handleStreamResponse(
-    assistantMessage: AI.Gpt.AssistantConversation,
-    requestInit: AI.FetchRequestInit,
-    onProgress?: AI.Gpt.CompletionsOptions['onProgress']
-  ): Promise<AI.Gpt.AssistantConversation> {
-    return new Promise<AI.Gpt.AssistantConversation>((resolve, reject) => {
-      requestInit.onMessage = (data: string) => {
-        this.processStreamData(assistantMessage, data, resolve, onProgress)
-      }
-      this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
-    })
-  }
-
-  /**
-   * 处理流式数据
-   */
-  private processStreamData(
-    assistantMessage: AI.Gpt.AssistantConversation,
-    data: string,
-    resolve: (value: AI.Gpt.AssistantConversation) => void,
-    onProgress?: AI.Gpt.CompletionsOptions['onProgress']
-  ): void {
-    if (data.trim() === '[DONE]') {
-      assistantMessage.content = assistantMessage.content.trim()
-      assistantMessage.done = true
-      assistantMessage.thinking = false
-      resolve(assistantMessage)
-      return
-    }
-    try {
-      const response: AI.Gpt.Response = JSON.parse(data)
-      this.updateConversationFromResponse(assistantMessage, response)
-      onProgress?.(assistantMessage)
-    } catch (error) {
-      if (data.trim() !== '[DONE]') {
-        console.error('Failed to parse stream data:', error, 'Raw data:', data)
-      }
-    }
-  }
-
-  /**
-   * 处理非流式响应
-   */
-  private async handleNonStreamResponse(
-    assistantMessage: AI.Gpt.AssistantConversation,
-    requestInit: AI.FetchRequestInit
-  ): Promise<AI.Gpt.AssistantConversation> {
-    const response = await this._fetchSSE<AI.Gpt.Response>(this.completionsUrl, requestInit)
-    const data = await response?.json()
-    if (data) {
-      this.updateConversationFromResponse(assistantMessage, data)
-    }
-    return assistantMessage
-  }
-
-  /**
-   * 根据响应更新会话内容
-   */
-  private updateConversationFromResponse(
-    assistantMessage: AI.Gpt.AssistantConversation,
+  private applyStreamResponse({
+    response,
+    assistantMessage,
+    rawContent,
+  }: {
     response: AI.Gpt.Response
-  ): void {
-    if (response?.id) {
+    assistantMessage: AI.Gpt.AssistantConversation
+    rawContent: string
+  }): void {
+    if (response.id) {
       assistantMessage.messageId = response.id
     }
-    if (response?.choices?.length) {
-      const choice = response.choices[0]
-      const messageOrDelta = 'message' in choice ? choice.message : choice.delta
-      if (messageOrDelta?.content) {
-        assistantMessage.content += messageOrDelta.content
-      }
-      if (messageOrDelta?.role) {
-        assistantMessage.role = messageOrDelta.role
+
+    const delta = response.choices?.[0]?.delta
+    if (!delta) {
+      return
+    }
+
+    if (delta.content) {
+      const nextRawContent = rawContent + delta.content
+      assistantMessage.content = this.transformContent(nextRawContent)
+    }
+
+    if (delta.tool_calls) {
+      assistantMessage.tool_calls = this.mergeToolCalls(
+        assistantMessage.tool_calls,
+        delta.tool_calls
+      )
+    }
+
+    if (delta.function_call) {
+      assistantMessage.function_call = {
+        name: `${assistantMessage.function_call?.name || ''}${delta.function_call.name || ''}`,
+        arguments: `${assistantMessage.function_call?.arguments || ''}${delta.function_call.arguments || ''}`,
       }
     }
+
+    if (delta.role) {
+      assistantMessage.role = delta.role
+    }
+
     assistantMessage.detail = response
     assistantMessage.thinking = false
   }
 
-  /**
-   * 获取会话消息历史
-   */
+  private getNextRawContent(response: AI.Gpt.Response, rawContent: string): string {
+    const deltaContent = response.choices?.[0]?.delta?.content
+    if (!deltaContent) {
+      return rawContent
+    }
+
+    return rawContent + deltaContent
+  }
+
+  private mergeToolCalls(
+    currentToolCalls: Array<AI.ToolCall> | undefined,
+    deltaToolCalls: Array<AI.ToolCall>
+  ): Array<AI.ToolCall> {
+    const nextToolCalls = currentToolCalls ? [...currentToolCalls] : []
+
+    deltaToolCalls.forEach((toolCall, index) => {
+      const existingToolCall = nextToolCalls[index]
+
+      if (!existingToolCall) {
+        nextToolCalls[index] = {
+          id: toolCall.id || '',
+          type: toolCall.type || 'function',
+          function: {
+            name: toolCall.function?.name || '',
+            arguments: toolCall.function?.arguments || '',
+          },
+        }
+        return
+      }
+
+      if (toolCall.id) {
+        existingToolCall.id = toolCall.id
+      }
+
+      if (toolCall.type) {
+        existingToolCall.type = toolCall.type
+      }
+
+      if (toolCall.function?.name) {
+        existingToolCall.function.name = `${existingToolCall.function.name || ''}${toolCall.function.name}`
+      }
+
+      if (toolCall.function?.arguments) {
+        existingToolCall.function.arguments = `${existingToolCall.function.arguments || ''}${toolCall.function.arguments}`
+      }
+    })
+
+    return nextToolCalls
+  }
+
+  private toRequestMessage(message: AI.Conversation): AI.Gpt.RequestMessage {
+    const requestMessage: AI.Gpt.RequestMessage = {
+      role: message.role,
+      content: message.content,
+    }
+
+    if (message.name) {
+      requestMessage.name = message.name
+    }
+
+    if (message.tool_call_id) {
+      requestMessage.tool_call_id = message.tool_call_id
+    }
+
+    if (message.tool_calls) {
+      requestMessage.tool_calls = message.tool_calls
+    }
+
+    if (message.function_call) {
+      requestMessage.function_call = message.function_call
+    }
+
+    return requestMessage
+  }
+
   private async getConversationHistory(
-    text: string,
-    options: AI.Gpt.CompletionsOptions
+    currentMessage: AI.Conversation,
+    options: AI.Gpt.CompletionsOptions = {},
+    model = this._requestParams.model
   ): Promise<{
     messages: Array<AI.Gpt.RequestMessage>
     maxTokens: number
@@ -202,37 +280,61 @@ class Completions extends CompletionsCore {
     const maxTokenCount = this._maxModelTokens - this._maxResponseTokens
     let parentMessageId = options.parentMessageId
 
-    const messages: Array<AI.Gpt.RequestMessage> = [
-      {
+    const messages: Array<AI.Gpt.RequestMessage> = []
+    const resolvedSystemMessage = systemMessage ?? this._systemMessage
+
+    if (currentMessage.role !== RoleEnum.System && resolvedSystemMessage) {
+      messages.push({
         role: RoleEnum.System,
-        content: systemMessage || this._systemMessage,
-      },
-      {
-        role: RoleEnum.User,
-        content: text,
-      },
-    ]
+        content: resolvedSystemMessage,
+      })
+    }
+
+    messages.push(this.toRequestMessage(currentMessage))
 
     let tokenCount = 0
-    let prompt = ''
-
-    while (this._withContent) {
-      messages.forEach((item) => {
-        prompt += item.role
-        prompt += item.content
+    for (const message of messages) {
+      tokenCount += await this.getTokenCount(this.serializeConversationForTokenCount(message), {
+        model,
       })
+    }
 
-      tokenCount = this.getTokenCount(prompt)
-      if (prompt && tokenCount > maxTokenCount) break
-      if (!parentMessageId) break
+    const conversationStore = parentMessageId ? this.requireConversationStore() : undefined
+    const historyInsertIndex = messages[0]?.role === RoleEnum.System ? 1 : 0
 
-      const parentMessage = await this.getConversation(parentMessageId)
-      if (!parentMessage) break
+    while (true) {
+      if (tokenCount > maxTokenCount) {
+        break
+      }
 
-      messages.splice(1, 0, {
-        role: parentMessage.role,
-        content: parentMessage.content,
-      })
+      if (!parentMessageId) {
+        break
+      }
+
+      if (!conversationStore) {
+        break
+      }
+
+      const parentMessage = await conversationStore.get(parentMessageId)
+
+      if (!parentMessage) {
+        break
+      }
+
+      const historyConversation = this.toRequestMessage(parentMessage)
+      const historyTokenCount = await this.getTokenCount(
+        this.serializeConversationForTokenCount(historyConversation),
+        {
+          model,
+        }
+      )
+
+      if (tokenCount + historyTokenCount > maxTokenCount) {
+        break
+      }
+
+      messages.splice(historyInsertIndex, 0, historyConversation)
+      tokenCount += historyTokenCount
       parentMessageId = parentMessage.parentMessageId
     }
 
@@ -240,7 +342,11 @@ class Completions extends CompletionsCore {
       1,
       Math.min(this._maxModelTokens - tokenCount, this._maxResponseTokens)
     )
-    return { messages, maxTokens }
+
+    return {
+      messages,
+      maxTokens,
+    }
   }
 }
 

@@ -1,13 +1,13 @@
 <template>
-  <div class="not-found-container">
-    <div class="content">
-      <div class="error-code">404</div>
-      <div class="error-desc">页面不存在</div>
-      <div class="error-info">抱歉，您访问的页面不存在或已被删除</div>
-      <el-button type="primary" @click="goHome">返回首页</el-button>
+  <div class="not-found-page">
+    <div class="not-found-page__content">
+      <div class="not-found-page__code">404</div>
+      <div class="not-found-page__desc">页面不存在</div>
+      <div class="not-found-page__info">抱歉，您访问的页面不存在或已被删除</div>
+      <el-button class="not-found-page__button" type="primary" @click="goHome">返回首页</el-button>
     </div>
-    <div class="illustration">
-      <img src="@/assets/images/404.svg" alt="404图片" class="error-img" />
+    <div class="not-found-page__illustration">
+      <img src="@/assets/images/404.svg" alt="404图片" class="not-found-page__image" />
     </div>
   </div>
 </template>
@@ -22,75 +22,73 @@ const goHome = () => {
 }
 </script>
 
-<style scoped>
-.not-found-container {
+<style lang="less" scoped>
+.not-found-page {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
   padding: 20px;
   background-color: #f5f7fa;
-}
 
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-right: 40px;
-}
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-right: 40px;
+  }
 
-.error-code {
-  font-size: 120px;
-  font-weight: bold;
-  color: #409eff;
-  line-height: 1;
-  margin-bottom: 20px;
-}
+  &__code {
+    margin-bottom: 20px;
+    color: #409eff;
+    font-size: 120px;
+    font-weight: bold;
+    line-height: 1;
+  }
 
-.error-desc {
-  font-size: 32px;
-  font-weight: bold;
-  color: #303133;
-  margin-bottom: 20px;
-}
+  &__desc {
+    margin-bottom: 20px;
+    color: #303133;
+    font-size: 32px;
+    font-weight: bold;
+  }
 
-.error-info {
-  font-size: 16px;
-  color: #606266;
-  margin-bottom: 30px;
-}
+  &__info {
+    margin-bottom: 30px;
+    color: #606266;
+    font-size: 16px;
+  }
 
-.illustration {
-  max-width: 400px;
-}
+  &__illustration {
+    max-width: 400px;
+  }
 
-.error-img {
-  width: 100%;
-  height: auto;
-}
+  &__image {
+    width: 100%;
+    height: auto;
+  }
 
-@media (max-width: 768px) {
-  .not-found-container {
+  @media (max-width: 768px) {
     flex-direction: column;
     text-align: center;
-  }
 
-  .content {
-    align-items: center;
-    margin-right: 0;
-    margin-bottom: 30px;
-  }
+    .not-found-page__content {
+      align-items: center;
+      margin-right: 0;
+      margin-bottom: 30px;
+    }
 
-  .error-code {
-    font-size: 80px;
-  }
+    .not-found-page__code {
+      font-size: 80px;
+    }
 
-  .error-desc {
-    font-size: 24px;
-  }
+    .not-found-page__desc {
+      font-size: 24px;
+    }
 
-  .illustration {
-    max-width: 300px;
+    .not-found-page__illustration {
+      max-width: 300px;
+    }
   }
 }
 </style>

@@ -100,11 +100,11 @@ const props = defineProps({
     validator: (val: AI.Conversation[]) => Array.isArray(val),
   },
   currentConversation: {
-    type: Object as PropType<AI.Conversation | null>,
+    type: Object as PropType<AI.Gpt.AssistantConversation | null>,
     default: null,
   },
   roleAlias: {
-    type: Object as PropType<Record<AI.Role, string>>,
+    type: Object as PropType<Partial<Record<AI.Role, string>>>,
     default: () => ({
       user: 'ME',
       assistant: 'ChatGPT',
@@ -132,13 +132,15 @@ const defaultRoleAlias: Record<AI.Role, string> = {
   user: 'ME',
   assistant: 'ChatGPT',
   system: 'System',
+  tool: 'Tool',
+  function: 'Function',
 }
 
 /**
  * 获取角色别名
  */
 const getRoleAlias = (role: AI.Role): string => {
-  return props.roleAlias[role] || defaultRoleAlias[role]
+  return props.roleAlias[role] || defaultRoleAlias[role] || role
 }
 
 /**

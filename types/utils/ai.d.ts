@@ -1,5 +1,4 @@
 declare namespace AI {
-
   export type ClearablePromiseOptions = {
     milliseconds: number
     message?: string
@@ -10,93 +9,114 @@ declare namespace AI {
     statusText?: string
     url?: string
   }
-  /**
-   * fetch 请求配置
-   */
+
   export interface FetchRequestInit extends RequestInit {
     onMessage?: (message: string) => void
   }
-  /**
-   * 模型公共参数
-   */
+
+  export type ContentTransformer = (text: string) => string
+
+  export interface ConversationStore {
+    get(messageId: string): Promise<Conversation | undefined>
+    set(message: Conversation): Promise<void>
+    clear(): Promise<void>
+    list?(): Promise<Array<Conversation>>
+  }
+
+  export interface TokenCountOptions {
+    model?: string
+  }
+
+  export interface TokenCounter {
+    count(text: string, options?: TokenCountOptions): Promise<number>
+  }
+
+  export interface OpenAITransport {
+    request<R extends object>(
+      path: string,
+      requestInit: FetchRequestInit,
+      abortSignal: AbortSignal
+    ): Promise<AnswerResponse<R> | void>
+  }
+
+  export interface OpenAITransportOptions {
+    apiKey?: string
+    apiBaseUrl?: string
+    baseURL?: string
+    organization?: string
+  }
+
   export interface CoreOptions {
     apiKey?: string
-    /** 请求连接 default https://api.AI.com */
     apiBaseUrl?: string
-    /** 组织 */
+    baseURL?: string
     organization?: string
-    /** 是否开启debug模式 */
     debug?: boolean
-    /**
-     * @defaultValue 4096
-     */
     maxModelTokens?: number
-    /**
-     * @defaultValue 1000
-     */
     maxResponseTokens?: number
-    /** 是否携带上下文 */
     withContent?: boolean
-    /** 系统消息 */
+    conversationStore?: ConversationStore | false
+    tokenCounter?: TokenCounter
+    transport?: OpenAITransport
     systemMessage?: string
-    /** 超时时间 */
     milliseconds?: number
-
-    /** 是否将markdown语法转换成html */
-    // markdown2Html?: boolean
-
-    // 自定义请求地址 要求跟chatgpt 返回的数据一样
+    markdown2Html?: boolean
+    transformResponseContent?: ContentTransformer
     completionsUrl?: string
   }
 
-  /**
-   * 公共返回usage
-   */
   export interface ResponseUsage {
     completion_tokens: number
     prompt_tokens: number
     total_tokens: number
   }
 
-  /**
-   * 公共角色枚举
-   */
-  // export const RoleEnum = {
-  //   System: 'system',
-  //   User: 'user',
-  //   Assistant: 'assistant'
-  // } as const
-  // type Role = (typeof RoleEnum)[keyof typeof RoleEnum]
-  // @link https://blog.csdn.net/wu_xianqiang/article/details/139464560
   export const enum RoleEnum {
     System = 'system',
     User = 'user',
-    Assistant = 'assistant'
+    Assistant = 'assistant',
+    Tool = 'tool',
+    Function = 'function',
   }
 
-  type Role = `${RoleEnum}`
+  export type Role = `${RoleEnum}`
 
   export interface Response {
-    /** id */
     id: string
-    /** example "chat.completion" */
     object: string
-    /** 创建时间（时间戳） */
     created: number
-    /** 本次回答所用到的模型 */
     model: string
-    /** 当用户设置stream:true时，不会返回 usage 字段 */
     usage?: ResponseUsage
   }
 
-
   export type OnProgress<A> = (partialResponse: A) => void
 
-  /**
-   * 公共请求参数
-   */
+  export interface FunctionDef {
+    name: string
+    description?: string
+    parameters?: Record<string, any>
+  }
+
+  export interface Tool {
+    type: 'function'
+    function: FunctionDef
+  }
+
+  export interface ToolCall {
+    id: string
+    type: 'function'
+    function: {
+      name: string
+      arguments: string
+    }
+  }
+
+  export interface FunctionCall {
+    name: string
+    arguments: string
+  }
+
   export interface RequestParams {
-    /** 模型 */
     model: string
     max_tokens?: number
     temperature?: number | null
@@ -108,17 +128,44 @@ declare namespace AI {
     presence_penalty?: number | null
     frequency_penalty?: number | null
     user?: string
+    prompt_cache_key?: string
+    prompt_cache_retention?: string
+    reasoning_effort?: 'none' | 'minimal' | 'low' | 'medium' | 'high' | 'xhigh'
+    verbosity?: 'low' | 'medium' | 'high'
+    tools?: Array<Tool>
+    tool_choice?: string | { type: 'function'; function: { name: string } }
+    parallel_tool_calls?: boolean
+    store?: boolean | null
+    metadata?: Record<string, string>
+    response_format?:
+      | { type: 'text' }
+      | { type: 'json_object' }
+      | {
+          type: 'json_schema'
+          json_schema: {
+            name: string
+            description?: string
+            schema?: Record<string, any>
+            strict?: boolean
+          }
+        }
+    stream_options?: {
+      include_usage?: boolean
+    }
+    modalities?: Array<'text' | 'audio'> | string[]
+    audio?: {
+      format: 'wav' | 'mp3' | 'flac' | 'opus' | 'pcm16'
+      voice: string | { id: string }
+    } | null
+    prediction?: Record<string, any>
+    service_tier?: 'auto' | 'default' | 'flex' | 'priority' | string
+    safety_identifier?: string
+    web_search_options?: Record<string, any>
   }
 
-  /**
-   * 公共返回的Choice参数
-   */
   export interface ResponseChoice {
-    /** 下标 */
     index?: number
-    /** 结束原因 */
     finish_reason?: string | null
-    /** 参数未知 作用未知 */
     content_filter_results?: {
       hate: {
         filtered: boolean
@@ -139,68 +186,50 @@ declare namespace AI {
     }
   }
 
-  /**
-   * 系统、用户、助手（gpt）会话消息
-   * @param {Role} role 角色 system 给系统设置的人设 user 用户 assistant 助手 gpt
-   * @param {string} content {string} 对话内容
-   * @param {string} messageId 当前对话产生的id
-   * @param parentMessageId 上次对话消息id
-   */
   export interface Conversation {
-    /**
-     * ai 是否在思考中
-     */
     thinking?: boolean
-    /**
-     * ai是否回答完毕
-     */
     done?: boolean
-    /**
-     * 会话角色
-     */
     role: Role
-    /**
-     * 会话内容 
-     */
     content: string
-    /**
-     * 当前的id
-     */
     messageId: string
-    /**
-     * 下次的父id 用于查找会话记录
-     */
-    parentMessageId: string
+    parentMessageId?: string
+    name?: string
+    tool_calls?: Array<ToolCall>
+    tool_call_id?: string
+    function_call?: FunctionCall
   }
 
-  /**
-   * 公共发送消息选项
-   */
   export interface CompletionsOptions {
     parentMessageId?: string
     messageId?: string
     stream?: boolean
     systemMessage?: string
+    role?: Role
+    tool_call_id?: string
+    name?: string
   }
 
-  export interface AnswerResponse<T = any>
-    extends globalThis.Response {
+  export interface AnswerResponse<T = any> extends globalThis.Response {
     json(): Promise<T>
   }
 
-  /**
-   * gpt 模型模块
-   */
+  export interface Model {
+    id: string
+    object: string
+    owned_by: string
+  }
+
+  export interface ListModelsResponse {
+    data: Array<Model>
+  }
+
   export namespace Gpt {
     export interface RequestMessage
       extends Omit<
         AI.Conversation,
-        'messageId' | 'parentMessageId'
-      > { }
+        'messageId' | 'parentMessageId' | 'thinking' | 'done'
+      > {}
 
-    /**
-     * 请求参数
-     */
     export interface RequestParams extends AI.RequestParams {
       messages: Array<RequestMessage>
     }
@@ -208,19 +237,19 @@ declare namespace AI {
     export interface ResponseMessage {
       role: Role
       content: string
+      tool_calls?: Array<ToolCall>
+      function_call?: FunctionCall
     }
 
-    export interface ResponseDelta
-      extends ResponseMessage { }
+    export interface ResponseDelta extends ResponseMessage {
+      tool_calls?: Array<ToolCall>
+    }
 
     export interface ResponseChoice extends AI.ResponseChoice {
       message?: ResponseMessage
       delta?: ResponseDelta
     }
 
-    /**
-     * 不走steam流接口的输出结果
-     */
     export interface Response extends AI.Response {
       choices: Array<ResponseChoice>
     }
@@ -233,44 +262,30 @@ declare namespace AI {
       onProgress?: OnProgress<AssistantConversation>
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
+
     export interface GptCoreOptions extends CoreOptions {
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
     }
   }
 
-  /**
-   * 文本模型
-   */
   export namespace Text {
-    /**
-     * 发送的消息选项
-     */
     export interface CompletionsOptions extends AI.CompletionsOptions {
       systemPromptPrefix?: string
       requestParams?: Partial<Omit<RequestParams, 'messages' | 'n' | 'stream'>>
       onProgress?: OnProgress<AssistantConversation>
     }
 
-    /**
-     * 请求参数
-     */
-    export interface RequestParams
-      extends AI.RequestParams {
+    export interface RequestParams extends AI.RequestParams {
       prompt: string
       suffix?: string
       echo?: boolean
       best_of?: number
     }
-    /**
-     * 请求返回
-     */
+
     export interface Response extends AI.Response {
       choices: Array<ResponseChoice>
     }
 
-    /**
-     * 对数概率 ？？？？
-     */
     export interface ResponseLogprobs {
       tokens?: Array<string>
       token_logprobs?: Array<number>
@@ -278,17 +293,12 @@ declare namespace AI {
       text_offset?: Array<number>
     }
 
-    /**
-     * 作用未知
-     */
-    export interface ResponseChoice
-      extends AI.ResponseChoice {
+    export interface ResponseChoice extends AI.ResponseChoice {
       text?: string
       logprobs?: ResponseLogprobs | null
     }
 
-    export interface AssistantConversation
-      extends AI.Conversation {
+    export interface AssistantConversation extends AI.Conversation {
       detail?: Response | null
     }
 

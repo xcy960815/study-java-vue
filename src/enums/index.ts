@@ -7,7 +7,9 @@ export enum loginEnum {
 export enum RoleEnum {
   User = 'user',
   System = 'system',
-  Assistant = 'assistant'
+  Assistant = 'assistant',
+  Tool = 'tool',
+  Function = 'function'
 }
 
 export const enum StoreNames {
