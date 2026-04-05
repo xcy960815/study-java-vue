@@ -32,6 +32,9 @@ export default defineConfig(({ mode }) => {
   const isDaliy = mode === 'daily' || mode === 'development'
   /** 前端搭理接口前缀正则 */
   const VITE_API_DOMAIN_PREFIX_REG = new RegExp(`^${VITE_API_DOMAIN_PREFIX}`)
+  const hasNodeModule = (id: string, packageNames: string[]) => {
+    return packageNames.some((packageName) => id.includes(`/node_modules/${packageName}/`))
+  }
 
   return {
     base: VITE_BASE_URL,
@@ -45,19 +48,19 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('lodash')) {
+              if (hasNodeModule(id, ['lodash'])) {
                 // lodash 单独打包
                 return 'lodash'
               }
-              if (id.includes('@element-plus/icons-vue')) {
+              if (hasNodeModule(id, ['@element-plus/icons-vue'])) {
                 // 单独拆分 element-plus/icons-vue
                 return 'icons-vue'
               }
-              if (id.includes('@icon-park/vue-next')) {
-                // 单独拆分 icon-park
+              if (hasNodeModule(id, ['@icon-park/vue-next'])) {
+                // 当前仅保留项目实际使用的一小部分图标，单独拆分即可避免回流到 vendor
                 return 'icon-park'
               }
-              if (id.includes('axios')) {
+              if (hasNodeModule(id, ['axios'])) {
                 // axios 单独打包
                 return 'axios'
               }
@@ -65,23 +68,25 @@ export default defineConfig(({ mode }) => {
                 // gpt3-tokenizer 单独打包
                 return 'gpt3-tokenizer'
               }
-              if (id.includes('katex')) {
+              if (hasNodeModule(id, ['katex', '@vscode/markdown-it-katex'])) {
                 // katex 单独打包
                 return 'katex'
               }
-              if (id.includes('highlight')) {
+              if (hasNodeModule(id, ['highlight.js', 'markdown-it-highlightjs'])) {
                 // highlight 单独打包
                 return 'highlight'
               }
-              if (id.includes('element-plus')) {
+              if (hasNodeModule(id, ['element-plus'])) {
                 // element-plus 单独打包
                 return 'element-plus'
               }
-              if (id.includes('vue')) {
+              if (
+                hasNodeModule(id, ['vue', '@vue', 'vue-router', 'pinia', '@vueuse/core'])
+              ) {
                 // vue 单独打包
                 return 'vue'
               }
-              if (id.includes('gpt-tokenizer')) {
+              if (hasNodeModule(id, ['gpt-tokenizer'])) {
                 // gpt-tokenizer 单独打包
                 return 'gpt-tokenizer'
               }

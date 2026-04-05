@@ -1,6 +1,5 @@
-import { createParser, type EventSourceParser } from 'eventsource-parser'
-
 import { AiError } from './ai-error'
+import { streamEventSourceMessages } from './fetch-event-source'
 
 export class FetchOpenAITransport implements AI.OpenAITransport {
   private readonly apiKey: string
@@ -55,17 +54,13 @@ export class FetchOpenAITransport implements AI.OpenAITransport {
       return response
     }
 
-    const parser = this.createParser(onMessage)
     const body = response.body
 
     if (!body) {
       return
     }
 
-    for await (const chunk of this.streamAsyncIterable(body)) {
-      const chunkString = new TextDecoder().decode(chunk)
-      parser.feed(chunkString)
-    }
+    await streamEventSourceMessages(body, onMessage)
   }
 
   private buildApiUrl(path: string): string {
@@ -111,41 +106,5 @@ export class FetchOpenAITransport implements AI.OpenAITransport {
     }
 
     return headers
-  }
-
-  private createParser(onMessage: (message: string) => void): EventSourceParser {
-    return createParser({
-      onEvent: (event) => {
-        if (event.data) {
-          onMessage(event.data)
-        }
-      },
-    })
-  }
-
-  private async *streamAsyncIterable(
-    stream: ReadableStream<Uint8Array> | AsyncIterable<Uint8Array>
-  ): AsyncIterable<Uint8Array> {
-    if ('getReader' in stream) {
-      const reader = stream.getReader()
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read()
-
-          if (done) {
-            return
-          }
-
-          yield value!
-        }
-      } finally {
-        reader.releaseLock()
-      }
-    } else {
-      for await (const chunk of stream) {
-        yield chunk
-      }
-    }
   }
 }

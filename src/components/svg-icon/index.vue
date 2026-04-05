@@ -7,13 +7,13 @@
   />
 </template>
 <script lang="ts" setup>
-import { ref, watch, type PropType } from 'vue'
+import { computed, type PropType } from 'vue'
 // 本地icon
-import { svgIcons } from '@assets/svg-icons'
-type SvgIconNames = keyof typeof svgIcons
+import { svgIconContents, type SvgIconName } from '@assets/svg-icons'
+
 const props = defineProps({
   type: {
-    type: String as PropType<SvgIconNames>,
+    type: String as PropType<SvgIconName>,
     default: '',
   },
   size: {
@@ -26,27 +26,13 @@ const props = defineProps({
   },
 })
 
-const svgContent = ref('')
-
-/**
- * 加载本地 SVG
- */
-const loadSvg = async () => {
-  if (!props.type) return
-
-  try {
-    const response = await fetch(`src/assets/svg-icons/${props.type}.svg`) // 确保路径正确
-    svgContent.value = await response.text()
-  } catch (error) {
-    console.error(`加载 SVG 失败: ${props.type}`, error)
-    svgContent.value = '' // 遇到错误时清空
+const svgContent = computed(() => {
+  if (!props.type) {
+    return ''
   }
-}
 
-// 监听 name 变化，动态更新
-watch(() => props.type, loadSvg, { immediate: true })
-
-// onMounted(loadSvg);
+  return svgIconContents[props.type] || ''
+})
 </script>
 
 <style scoped>

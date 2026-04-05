@@ -1,15 +1,16 @@
 /**
  * 该文件作用是修改系统主题颜色
  */
-import { render, createVNode } from 'vue'
+import { render, createVNode, type Component } from 'vue'
 import { svg2bese64 } from '@utils/svg2base64'
 import { type FormInstance } from 'element-plus'
 import { reactive, ref, nextTick } from 'vue'
 import { type RouteLocationNormalizedGeneric } from 'vue-router'
-import * as iconPark from '@icon-park/vue-next'
 import { merge } from 'lodash'
 import { genMixColor } from './generate-color'
 import { useDark } from '@vueuse/core'
+import { svgIconContents } from '@assets/svg-icons'
+import { getIconParkIcon } from './icon-park'
 
 /**
  * CSS 变量键名
@@ -207,9 +208,25 @@ export const setTabIcon = (iconPath: string): void => {
  * 根据路由更新标签页图标
  */
 export const changeTabIcon = (to: RouteLocationNormalizedGeneric): void => {
-  const icon = iconPark[to.meta.icon as keyof typeof iconPark] || iconPark.System
+  const iconName = String(to.meta.icon || '')
+  const localSvgIcon = svgIconContents[iconName as keyof typeof svgIconContents]
+
+  if (localSvgIcon) {
+    setTabIcon(svg2bese64(localSvgIcon))
+    return
+  }
+
+  if (!iconName) {
+    return
+  }
+
+  const icon = getIconParkIcon(iconName)
+  if (!icon) {
+    return
+  }
+
   const size = 16
-  const vnode = createVNode(icon, { theme: 'outline', size, fill: '#333' })
+  const vnode = createVNode(icon as Component, { theme: 'outline', size, fill: '#333' })
   const container = document.createElement('div')
 
   render(vnode, container)

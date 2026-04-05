@@ -278,6 +278,7 @@ import {
   Finished,
   Warning,
 } from '@element-plus/icons-vue'
+import { escapeHtml, sanitizeHtml } from '@/utils/html-sanitizer'
 
 const loading = ref(true)
 const selectedIds = ref<number[]>([])
@@ -438,19 +439,24 @@ const getMethodType = (method: string) => {
 
 const formatJsonWithSyntax = (json: string) => {
   if (!json) return ''
+
+  const highlightJson = (value: string) => {
+    const escapedJson = escapeHtml(value)
+
+    return sanitizeHtml(
+      escapedJson
+        .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+        .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>')
+        .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>')
+        .replace(/: (null)/g, ': <span class="json-null">$1</span>')
+        .replace(/: (-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>')
+    )
+  }
+
   try {
-    const formatted = JSON.stringify(JSON.parse(json), null, 2)
-    return formatted
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:') // 键
-      .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>') // 字符串值
-      .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>') // 布尔值
-      .replace(/: (null)/g, ': <span class="json-null">$1</span>') // null
-      .replace(/: (-?\d+\.?\d*)/g, ': <span class="json-number">$1</span>') // 数字
+    return highlightJson(JSON.stringify(JSON.parse(json), null, 2))
   } catch (e) {
-    return json
+    return highlightJson(json)
   }
 }
 

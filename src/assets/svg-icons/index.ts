@@ -19,7 +19,32 @@ const svgIcons = {
   'server-send-event': 'server-send-event',
   deepseek: 'deepseek',
   ollama: 'ollama',
-  chat: 'chat'
+  chat: 'chat',
 }
 
-export { svgIcons }
+type SvgIconName = keyof typeof svgIcons
+
+const svgIconModules = import.meta.glob('./*.svg', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>
+
+const svgIconContents = Object.keys(svgIcons).reduce(
+  (result, name) => {
+    const modulePath = `./${name}.svg`
+    const content = svgIconModules[modulePath]
+
+    if (content) {
+      result[name as SvgIconName] = content
+    }
+
+    return result
+  },
+  {} as Partial<Record<SvgIconName, string>>
+) as Record<SvgIconName, string>
+
+const svgIconNames = Object.keys(svgIcons) as SvgIconName[]
+
+export type { SvgIconName }
+export { svgIcons, svgIconContents, svgIconNames }

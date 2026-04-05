@@ -3,7 +3,7 @@
     <div class="chat-main-card">
       <ai-chat
         :role-alias="roleAlias"
-        @completions="completions"
+        @completions="sendMessage"
         @cancel-conversation="cancelConversation"
         :conversation-list="conversationList"
         :current-conversation="currentConversation"
@@ -14,30 +14,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+
 import AiChat from '@components/ai-chat/index.vue'
-import { cloneDeep } from 'lodash'
+
+import { useAiChatSession } from '@/composables/useAiChatSession'
 import { useCompletions } from '@/composables/useCompletions'
+
 defineOptions({
   name: 'OllamaChat',
 })
 const route = useRoute()
 
 const model = (route.query.model as string) || 'deepseek-r1:14b'
-/**
- * 角色别名
- */
-const roleAlias = ref<Partial<Record<AI.Role, string>>>({
+const roleAlias: Partial<Record<AI.Role, string>> = {
   user: 'ME',
   assistant: model,
   system: 'System',
-})
-
-/**
- * 会话列表
- */
-const conversationList = ref<AI.Conversation[]>([])
+}
 
 const { Completions } = useCompletions()
 
@@ -50,60 +44,20 @@ const completionsModel = new Completions({
   },
 })
 
-const parentMessageId = ref('')
-
-const currentConversation = ref<AI.Gpt.AssistantConversation | null>(null)
-
-const isAbortError = (error: unknown): boolean => {
-  if (!(error instanceof Error)) {
-    return false
-  }
-  return error.name === 'AbortError' || error.message.toLowerCase().includes('abort')
-}
-
-/**
- * 流式会话
- */
-const completions = async (question: string) => {
-  const responsePromise = completionsModel.completions(question, {
-    parentMessageId: parentMessageId.value,
-    systemMessage: '你是一个聊天机器人',
-    requestParams: {
-      model,
-    },
-    onProgress(partialResponse) {
-      currentConversation.value = cloneDeep(partialResponse)
-    },
-  })
-  conversationList.value = await completionsModel.getAllConversations()
-  currentConversation.value = completionsModel.buildAssistantConversation('', {
-    parentMessageId: parentMessageId.value,
-  })
-
-  try {
-    const response = await responsePromise
-    if (!!response.done) {
-      currentConversation.value = null
-      conversationList.value = await completionsModel.getAllConversations()
-      parentMessageId.value = response.messageId
-    }
-  } catch (error) {
-    if (!isAbortError(error)) {
+const { conversationList, currentConversation, sendMessage, cancelConversation } = useAiChatSession(
+  {
+    model: completionsModel,
+    getCompletionsOptions: () => ({
+      systemMessage: '你是一个聊天机器人',
+      requestParams: {
+        model,
+      },
+    }),
+    onError: (error) => {
       console.error('Ollama conversation failed:', error)
-    }
-    currentConversation.value = null
-    conversationList.value = await completionsModel.getAllConversations()
+    },
   }
-}
-
-/**
- * 取消当前会话
- */
-const cancelConversation = async () => {
-  await completionsModel.cancelConversation('用户手动取消会话')
-  currentConversation.value = null
-  conversationList.value = await completionsModel.getAllConversations()
-}
+)
 </script>
 <style lang="less" scoped>
 .ollama-chat {

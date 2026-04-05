@@ -21,8 +21,8 @@
 </template>
 
 <script setup lang="ts">
-import * as IconParkIcons from '@icon-park/vue-next'
-import { ref, watch } from 'vue'
+import { svgIconNames } from '@assets/svg-icons'
+import { iconParkIconNames } from '@/utils/icon-park'
 
 defineOptions({
   name: 'MenuIconSelector',
@@ -39,9 +39,9 @@ const emit = defineEmits<{
 /**
  * 获取所有图标
  */
-const iconOptions = Object.keys(IconParkIcons).map((key) => ({
-  value: key,
-  label: key,
+const iconOptions = [...new Set([...svgIconNames, ...iconParkIconNames])].map((iconName) => ({
+  value: iconName,
+  label: iconName,
 }))
 
 const handleChange = (value: string) => {

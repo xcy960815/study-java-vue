@@ -14,18 +14,22 @@ import 'katex/dist/katex.min.css'
 
 import 'katex/dist/contrib/mhchem.min.js'
 
+import { sanitizeHtml } from '@/utils/html-sanitizer'
+
+const THINK_PLACEHOLDER_PREFIX = '__STUDY_JAVA_VUE_THINK_BLOCK__'
+
 const markdownIt = new MarkdownIt({
-  html: true,
+  html: false,
   linkify: true,
-  typographer: true
+  typographer: true,
 })
 
 markdownIt
   .use(markdownItHighlight, {
-    vueHighlight
+    vueHighlight,
   })
   .use(preWrapperPlugin, {
-    hasSingleTheme: true
+    hasSingleTheme: true,
   })
   .use(markdownItKatex)
 
@@ -40,7 +44,7 @@ const transformMathMarkdown = (markdownText: string) => {
       left: '\\(',
       right: '\\)',
       display: false
-    }
+    },
   ])
   return data.reduce((result, segment) => {
     if (segment.type === 'text') {
@@ -51,70 +55,35 @@ const transformMathMarkdown = (markdownText: string) => {
   }, '')
 }
 
-/**
- * 转义 <think/> 中的 <script/>
- * @param {string} source 
- * @returns 
- */
-const transformThinkMarkdown = (source: string): string => {
-  let result = ''
-  let buffer = ''
-  let inThinkBlock = false
+const extractThinkBlocks = (source: string): { content: string; thinkBlocks: string[] } => {
+  const thinkBlocks: string[] = []
+  const content = source.replace(/<think>([\s\S]*?)<\/think>/gi, (_, block: string) => {
+    const placeholder = `${THINK_PLACEHOLDER_PREFIX}${thinkBlocks.length}__`
+    thinkBlocks.push(block.trim())
+    return placeholder
+  })
 
-  const classNameWrapper = 'think-wrapper'
+  return { content, thinkBlocks }
+}
 
-  // 转义 <think/> 中的 <script/>
-  const escapeScriptTags = (content: string): string => {
-    // <script> 或 <script ...>
-    let escaped = content.replace(/<script([^>]*)>/gi, '&lt;script$1&gt;')
-    // </script>
-    escaped = escaped.replace(/<\/script>/gi, '&lt;/script&gt;')
-    // <script ... />
-    escaped = escaped.replace(/<script([^>]*)\s*\/>/gi, '&lt;script$1 /&gt;')
+const replaceThinkPlaceholders = (html: string, thinkBlocks: string[]): string => {
+  return thinkBlocks.reduce((result, block, index) => {
+    const placeholder = `${THINK_PLACEHOLDER_PREFIX}${index}__`
+    const thinkHtml = `<div class="think-wrapper">${markdownIt.render(block)}</div>`
 
-    return escaped
-  }
-
-  for (let i = 0; i < source.length; i++) {
-    const char = source[i]
-    const nextChars = source.slice(i, i + 7)
-    const endChars = source.slice(i, i + 8)
-
-    if (!inThinkBlock && nextChars === '<think>') {
-      inThinkBlock = true
-      result += `<div class="${classNameWrapper}">`
-      i += 6
-      continue
-    }
-
-    if (inThinkBlock && endChars === '</think>') {
-      inThinkBlock = false
-      result += '</div>'
-      i += 7
-      continue
-    }
-
-    if (inThinkBlock) {
-      buffer += char
-    } else {
-      result += char
-    }
-  }
-
-  if (buffer) {
-    const escapedBuffer = escapeScriptTags(buffer)
-    const thinkContent = markdownIt.render(escapedBuffer)
-
-    result = result.replace(`<div class="${classNameWrapper}">`, `<div class="${classNameWrapper}">${thinkContent}`)
-  }
-
-  return result
+    return result
+      .split(`<p>${placeholder}</p>`)
+      .join(thinkHtml)
+      .split(placeholder)
+      .join(thinkHtml)
+  }, html)
 }
 
 export const renderMarkdownText = (content: string) => {
-  const thinkTransformed = transformThinkMarkdown(content)
-  const mathTransformed = transformMathMarkdown(thinkTransformed)
-  return markdownIt.render(mathTransformed)
+  const mathTransformed = transformMathMarkdown(content)
+  const { content: transformedContent, thinkBlocks } = extractThinkBlocks(mathTransformed)
+  const markdownHtml = markdownIt.render(transformedContent)
+  const contentWithThink = replaceThinkPlaceholders(markdownHtml, thinkBlocks)
+
+  return sanitizeHtml(contentWithThink)
 }
-
-

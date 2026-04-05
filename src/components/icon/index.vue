@@ -1,41 +1,27 @@
 <template>
   <div class="svg-icon mr-1">
-    <SvgIcon
-      v-if="isSvgIcon"
-      :type="svgIconName"
+    <SvgIcon v-if="svgIconName" :type="svgIconName" :size="size" :fill="fill"></SvgIcon>
+    <component
+      :is="iconParkComponent"
+      v-else-if="iconParkComponent"
       :theme="theme"
       :size="size"
       :fill="fill"
-    ></SvgIcon>
-    <IconPark
-      v-if="isIconParkIcon"
-      :type="iconParkName"
-      :theme="theme"
-      :size="size"
-      :fill="fill"
-    ></IconPark>
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
 import SvgIcon from '@components/svg-icon/index.vue'
 
-import { IconPark } from '@icon-park/vue-next/es/all'
-
 import { computed, type PropType } from 'vue'
 
 // 本地icon
-import { svgIcons } from '@assets/svg-icons'
+import { svgIcons, type SvgIconName } from '@assets/svg-icons'
 
 import { type Theme } from '@icon-park/vue-next/lib/runtime'
 
-import * as IconParkAll from '@icon-park/vue-next'
-
-const { IconProvider, DEFAULT_ICON_CONFIGS, ...IconParkIcons } = IconParkAll
-
-type IconParkNames = Exclude<keyof typeof IconParkIcons, 'IconProvider' | 'DEFAULT_ICON_CONFIGS'>
-
-type SvgIconNames = keyof typeof svgIcons
+import { getIconParkIcon } from '@/utils/icon-park'
 
 defineOptions({
   name: 'icon',
@@ -47,7 +33,7 @@ const props = defineProps({
     default: 'icon',
   },
   name: {
-    type: String as PropType<SvgIconNames | IconParkNames>,
+    type: String as PropType<string>,
     required: true,
   },
 
@@ -70,31 +56,22 @@ const props = defineProps({
  * @returns { boolean }
  */
 const isSvgIcon = computed(() => {
-  const iconNames = Object.keys(svgIcons)
-  return iconNames.includes(props.name)
-})
-
-/**
- * 判断是否为 IconPark 图标
- * @returns { boolean }
- */
-const isIconParkIcon = computed(() => {
-  const iconNames = Object.keys(IconParkIcons)
-  return iconNames.includes(props.name)
+  return props.name in svgIcons
 })
 
 /**
  * 获取SVG图标名称（类型安全）
  */
 const svgIconName = computed(() => {
-  return isSvgIcon.value ? (props.name as SvgIconNames) : undefined
+  return isSvgIcon.value ? (props.name as SvgIconName) : undefined
 })
 
-/**
- * 获取 IconPark 图标名称（类型安全）
- */
-const iconParkName = computed(() => {
-  return isIconParkIcon.value ? (props.name as IconParkNames) : ('' as IconParkNames)
+const iconParkComponent = computed(() => {
+  if (isSvgIcon.value) {
+    return null
+  }
+
+  return getIconParkIcon(props.name)
 })
 </script>
 
