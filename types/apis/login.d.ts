@@ -19,5 +19,11 @@ declare interface LoginRequestDto {
   username: string
   password: string
   rememberMe: boolean
+  captchaId: string
   captcha: string
+}
+
+declare interface CaptchaResponseVo {
+  captchaId: string
+  captchaImage: string
 }

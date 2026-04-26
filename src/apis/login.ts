@@ -8,7 +8,13 @@ export interface RegisterRequestDto {
   username?: string
   password?: string
   confirmPassword?: string
+  captchaId?: string
   captcha?: string
+}
+
+export interface CaptchaResponseVo {
+  captchaId: string
+  captchaImage: string
 }
 
 export function login<
@@ -40,9 +46,9 @@ export function register(requestParams: RegisterRequestDto): Promise<boolean> {
 
 /**
  * 获取验证码
- * @returns {Promise<string>} 返回验证码字符串
+ * @returns {Promise<CaptchaResponseVo>} 返回验证码ID和图片
  */
-export function getCaptcha() {
+export function getCaptcha(): Promise<CaptchaResponseVo> {
   const url = `/captcha`
-  return request.get<string, string>(url)
+  return request.get<CaptchaResponseVo, CaptchaResponseVo>(url)
 }

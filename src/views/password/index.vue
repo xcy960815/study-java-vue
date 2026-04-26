@@ -32,7 +32,6 @@
 </template>
 
 <script lang="ts" setup>
-import Md5 from 'MD5'
 import { eventEmitter } from '@utils/event-emits'
 import { userModule } from '@apis'
 import { type FormInstance, type FormRules, ElMessage } from 'element-plus'
@@ -105,9 +104,9 @@ const handleChangePasswordConfirm = async () => {
   const valid = await changePasswordFormRef.value?.validate().catch(() => false)
   if (!valid) return
   const requestParams = {
-    passwordMd5: Md5(changePasswordFormData.originalPassword),
-    newPasswordMd5: Md5(changePasswordFormData.newPassword),
-    confirmNewPasswordMd5: Md5(changePasswordFormData.confirmNewPasswordMd5),
+    passwordMd5: changePasswordFormData.originalPassword,
+    newPasswordMd5: changePasswordFormData.newPassword,
+    confirmNewPasswordMd5: changePasswordFormData.confirmNewPasswordMd5,
   }
   const result = await userModule.updateUserPassword(requestParams)
   if (result) {

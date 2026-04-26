@@ -107,7 +107,6 @@ import { ElMessage } from 'element-plus'
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Lock, User, View, Hide } from '@element-plus/icons-vue'
-import MD5 from 'MD5'
 import { initBackground } from '../login/background'
 import { loginModule } from '@apis'
 import { useLoginButtonAnimation } from '@/composables/useLoginButtonAnimation'
@@ -122,6 +121,7 @@ const registerFormData = reactive<RegisterRequestDto>({
   username: '',
   password: '',
   confirmPassword: '',
+  captchaId: '',
   captcha: '',
 })
 
@@ -159,11 +159,6 @@ const handleRegister = async () => {
   registering.value = true
   const registerData = { ...registerFormData }
 
-  registerData.password = registerData.password ? MD5(registerData.password) : registerData.password
-  registerData.confirmPassword = registerData.confirmPassword
-    ? MD5(registerData.confirmPassword)
-    : registerData.confirmPassword
-
   try {
     await loginModule.register(registerData)
     ElMessage.success('注册成功，请登录')
@@ -183,7 +178,8 @@ const handleGetCaptcha = async () => {
     captchaLoading.value = false
   })
 
-  captchaUrl.value = captchaRes
+  registerFormData.captchaId = captchaRes.captchaId
+  captchaUrl.value = captchaRes.captchaImage
 }
 
 useLoginButtonAnimation(registerButtonDisabled, registerButtonRef)

@@ -94,7 +94,6 @@ import type { FormInstance, ButtonInstance } from 'element-plus'
 import { onMounted, onUnmounted, reactive, ref, computed } from 'vue'
 import { Lock, User, View, Hide } from '@element-plus/icons-vue'
 // import { useEncryptByRsa } from '@/composables/useEncryption'
-import MD5 from 'MD5'
 import { initBackground } from './background'
 import { loginModule } from '@apis'
 import { useLoginButtonAnimation } from '@/composables/useLoginButtonAnimation'
@@ -108,6 +107,7 @@ const logining = ref(false)
 const loginFormData = reactive<LoginRequestDto>({
   username: '13700002703',
   password: '123456',
+  captchaId: '',
   captcha: '',
   rememberMe: false,
 })
@@ -143,8 +143,6 @@ const handleLogin = async () => {
 
   // loginData.password = encryptByRsa(loginFormData.password) || loginData.password
 
-  loginData.password = loginData.password ? MD5(loginFormData.password) : loginData.password
-
   loginStore.login(loginData).finally(() => {
     logining.value = false
   })
@@ -158,7 +156,8 @@ const handleGetCaptcha = async () => {
     captchaLoading.value = false
   })
 
-  captchaUrl.value = captchaRes
+  loginFormData.captchaId = captchaRes.captchaId
+  captchaUrl.value = captchaRes.captchaImage
 }
 
 useLoginButtonAnimation(loginButtonDisabled, loginButtonRef)
