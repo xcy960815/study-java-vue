@@ -1,11 +1,13 @@
 # 第一阶段：构建阶段
 FROM node:18-alpine AS builder
 
+ARG PNPM_VERSION=10.33.0
+
 # 设置工作目录
 WORKDIR /app
 
-# 启用 corepack 并准备 pnpm (比 npm install -g pnpm 更轻量)
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# 启用 corepack，并使用与 package.json 一致且支持 Node 18 的 pnpm 版本
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 # 先拷贝依赖定义文件，利用 Docker 缓存层
 COPY package.json pnpm-lock.yaml ./
