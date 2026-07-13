@@ -3,6 +3,7 @@ type EventsList = {
   login: () => void
   logout: () => void
   'get-routes': () => Promise<void>
+  'order-paid': (event: OrderPaidEvent) => void
 }
 
 type Listener<T extends (...args: any[]) => any> = {

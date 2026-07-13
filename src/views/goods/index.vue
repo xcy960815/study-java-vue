@@ -30,13 +30,27 @@
       </el-form-item>
     </el-form>
     <Handle-ToolBar v-model:showSearch="showSearch" @queryTableData="getGoodsList">
+      <el-button
+        v-hasPermi="['order:add']"
+        type="success"
+        :disabled="selectedGoods.length === 0"
+        @click="handleBatchBuy"
+      >
+        批量下单（{{ selectedGoods.length }}）
+      </el-button>
       <el-button v-hasPermi="['goods:add']" type="primary" @click="handleClickAddGoods">
         新增商品
       </el-button>
     </Handle-ToolBar>
 
     <!-- 商品表格 -->
-    <el-table border :data="goodsInfo.tableData" style="width: 100%">
+    <el-table
+      border
+      :data="goodsInfo.tableData"
+      style="width: 100%"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column v-if="canPlaceOrder" type="selection" width="48" :selectable="canBuyGoods" />
       <el-table-column align="center" prop="goodsId" label="商品ID" width="100" />
       <el-table-column align="center" prop="goodsName" label="商品名称" width="150" />
       <el-table-column align="center" prop="goodsIntro" label="商品简介" width="200" />
@@ -85,9 +99,18 @@
         align="center"
         fixed="right"
         label="操作"
-        width="150"
+        width="210"
       >
         <template #default="{ row }">
+          <el-button
+            v-if="canBuyGoods(row)"
+            v-hasPermi="['order:add']"
+            link
+            type="success"
+            size="small"
+            @click="handleBuyNow(row)"
+            >立即购买</el-button
+          >
           <el-button
             v-hasPermi="['goods:edit']"
             link
@@ -183,14 +206,41 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { type FormInstance, type FormRules, ElMessage, ElMessageBox } from 'element-plus'
 import HandleToolBar from '@/components/handle-toolbar/index.vue'
 import { goodsModule } from '@apis'
 import { getDataDictList } from '@/apis/system/dataDict'
 import { usePermission } from '@/composables/usePermission'
+import { saveCheckoutDraft } from '@/utils/order-workflow'
 
 const { hasAnyPermi } = usePermission()
-const showActionColumn = computed(() => hasAnyPermi(['goods:edit', 'goods:remove']))
+const router = useRouter()
+const canPlaceOrder = computed(() => hasAnyPermi('order:add'))
+const showActionColumn = computed(() => hasAnyPermi(['order:add', 'goods:edit', 'goods:remove']))
+const selectedGoods = ref<GoodsVo[]>([])
+
+const canBuyGoods = (goods: GoodsVo) => goods.goodsSellStatus === 1 && goods.stockNum > 0
+
+const toCheckoutItem = (goods: GoodsVo): CheckoutDraftItem => ({
+  goodsId: goods.goodsId,
+  goodsName: goods.goodsName,
+  sellingPrice: goods.sellingPrice,
+  stockNum: goods.stockNum,
+  quantity: 1,
+})
+
+const handleSelectionChange = (rows: GoodsVo[]) => {
+  selectedGoods.value = rows.slice(0, 50)
+}
+
+const openCheckout = (goods: GoodsVo[]) => {
+  saveCheckoutDraft(goods.map(toCheckoutItem))
+  router.push({ path: '/order/list', query: { checkout: '1' } })
+}
+
+const handleBuyNow = (goods: GoodsVo) => openCheckout([goods])
+const handleBatchBuy = () => openCheckout(selectedGoods.value)
 
 interface GoodsInfo {
   tableData: GoodsVo[]

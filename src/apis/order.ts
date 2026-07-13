@@ -1,59 +1,32 @@
 import { request } from '@utils/request'
 
-/**
- * 获取订单列表
- * @param requestParams
- * @returns {Promise<T>}
- */
-export const getOrderList = async <T extends ListResponseResult<OrderVo>>(
-  requestParams: OrderDto & BaseListDto
-) => {
-  const url = `/order/getOrderList`
-  return request.get<T, T>(url, {
-    params: requestParams,
+export const getOrderList = (requestParams: OrderDto & BaseListDto) => {
+  return request.get<ListResponseResult<OrderVo>, ListResponseResult<OrderVo>>(
+    '/order/getOrderList',
+    { params: requestParams }
+  )
+}
+
+export const getOrderInfo = (orderId: number) => {
+  return request.get<OrderVo, OrderVo>('/order/getOrderInfo', {
+    params: { id: orderId },
   })
 }
 
-/**
- * 获取订单详情
- * @param orderDto
- * @returns {Promise<T>}
- */
-export const getOrderDetail = async <T extends OrderVo>(orderDto: OrderDto) => {
-  const url = `/order/getOrderDetail`
-  return request.get<T, T>(url, {
-    params: orderDto,
-  })
+export const placeOrder = (placeOrderRequest: PlaceOrderRequest) => {
+  return request.post<OrderVo, OrderVo>('/order/place', placeOrderRequest)
 }
 
-/**
- * 新增订单
- * @param orderDto
- * @returns {Promise<T>}
- */
-export const insertOrder = async <T extends boolean>(orderDto: OrderDto) => {
-  const url = `/order/insertOrder`
-  return request.post<T, T>(url, orderDto)
+export const payOrder = (payOrderRequest: PayOrderRequest) => {
+  return request.post<PaymentResult, PaymentResult>('/order/pay', payOrderRequest)
 }
 
-/**
- * 更新订单
- * @param orderDto
- * @returns {Promise<T>}
- */
-export const updateOrder = async <T extends boolean>(orderDto: OrderDto) => {
-  const url = `/order/updateOrder`
-  return request.post<T, T>(url, orderDto)
+export const transitionOrder = (transitionRequest: OrderTransitionRequest) => {
+  return request.post<OrderVo, OrderVo>('/order/transition', transitionRequest)
 }
 
-/**
- * 删除订单
- * @param orderId
- * @returns {Promise<T>}
- */
-export const deleteOrder = async <T extends boolean>(orderId: number) => {
-  const url = `/order/deleteOrder`
-  return request.delete<T, T>(url, {
-    params: { orderId },
+export const deleteOrder = (orderId: number) => {
+  return request.delete<boolean, boolean>('/order/deleteOrder', {
+    params: { id: orderId },
   })
 }

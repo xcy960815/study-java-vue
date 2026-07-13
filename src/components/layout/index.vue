@@ -23,12 +23,13 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSystemInfoStore } from '@store'
 import LayoutHeader from './header/index.vue'
 import LayoutHistory from './history/index.vue'
 import LayoutMenu from './menu/index.vue'
+import { useOrderNotifications } from '@/composables/useOrderNotifications'
 // import zhCn from 'element-plus/lib/locale/lang/zh-cn'
 // @ts-ignore
 import locale from 'element-plus/dist/locale/zh-cn.mjs'
@@ -36,6 +37,7 @@ import locale from 'element-plus/dist/locale/zh-cn.mjs'
 const route = useRoute()
 const systemInfoStore = useSystemInfoStore()
 const keepLiveList = computed(() => systemInfoStore.getKeepLiveList)
+useOrderNotifications()
 
 const props = defineProps({
   content: {

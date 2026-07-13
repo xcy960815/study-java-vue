@@ -125,7 +125,7 @@ import { ElMessage } from 'element-plus'
 import { Monitor, Connection, VideoPlay, VideoPause, Platform } from '@element-plus/icons-vue'
 import { Cpu, Histogram, PieOne, Folder } from '@icon-park/vue-next'
 import { getServerInfo, startServerMonitor, stopServerMonitor } from '@/apis/server-monitor'
-import { WebSocketClient } from '@/utils/websocket'
+import { getSharedWebSocketClient } from '@/utils/websocket'
 
 const loading = ref(false)
 const isConnected = ref(false)
@@ -142,8 +142,8 @@ let memoryChart: ECharts | null = null
 let jvmChart: ECharts | null = null
 let diskChart: ECharts | null = null
 
-// WebSocket 客户端
-let wsClient: WebSocketClient | null = null
+// 与订单通知共用同一个 STOMP 连接，仅独立管理本页的监控订阅。
+let unsubscribeServerMonitor: (() => void) | null = null
 
 // 初始化图表
 const initCharts = () => {
@@ -436,31 +436,20 @@ const startMonitor = async () => {
     // 调用后端 API 开始推送
     await startServerMonitor()
 
-    // 连接 WebSocket
-    const apiPrefix = import.meta.env.VITE_API_DOMAIN_PREFIX || '/dev-api'
-    const prefix = apiPrefix.startsWith('/') ? apiPrefix : `/${apiPrefix}`
-    const cleanPrefix = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix
-
-    const wsUrl = `${window.location.protocol}//${window.location.host}${cleanPrefix}/ws/server-monitor`
-
-    wsClient = new WebSocketClient(wsUrl)
-    wsClient.connect(
+    unsubscribeServerMonitor?.()
+    unsubscribeServerMonitor = getSharedWebSocketClient().subscribe<ServerInfoVo>(
+      '/topic/server-monitor',
       (data) => {
-        // 收到数据，更新图表
         updateCharts(data)
-      },
-      () => {
-        // 连接成功
         isConnected.value = true
-        ElMessage.success('开始监控')
       },
       (error) => {
-        // 连接错误
         console.error('WebSocket 错误:', error)
         ElMessage.error('连接失败')
         isConnected.value = false
       }
     )
+    ElMessage.success('开始监控')
   } catch (error) {
     console.error('开始监控失败:', error)
     ElMessage.error('开始监控失败')
@@ -472,9 +461,8 @@ const startMonitor = async () => {
 // 停止监控
 const stopMonitor = async () => {
   try {
-    // 断开 WebSocket
-    wsClient?.disconnect()
-    wsClient = null
+    unsubscribeServerMonitor?.()
+    unsubscribeServerMonitor = null
     isConnected.value = false
 
     // 调用后端 API 停止推送
