@@ -1,11 +1,13 @@
 import { onBeforeUnmount, watch } from 'vue'
 import { ElMessage, ElNotification } from 'element-plus'
-import { useUserInfoStore } from '@store'
+import { useUserInfoStore, useNotificationStore } from '@store'
 import { eventEmitter } from '@/utils/event-emits'
 import { getSharedWebSocketClient } from '@/utils/websocket'
+import { buildOrderNotification } from '@/utils/notification'
 
 export const useOrderNotifications = () => {
   const userInfoStore = useUserInfoStore()
+  const notificationStore = useNotificationStore()
   let unsubscribe: (() => void) | null = null
   let lastErrorNoticeAt = 0
 
@@ -23,6 +25,7 @@ export const useOrderNotifications = () => {
             title: '订单支付成功',
             message: `订单 ${event.orderNo}，交易号 ${event.transactionNo}`,
           })
+          notificationStore.addNotification(buildOrderNotification(event))
           eventEmitter.emit('order-paid', event)
         },
         (error) => {

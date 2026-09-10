@@ -15,5 +15,6 @@ export enum RoleEnum {
 export const enum StoreNames {
   USER = 'USER',
   SYSTEM = 'SYSTEM',
-  LOGIN = 'LOGIN'
+  LOGIN = 'LOGIN',
+  NOTIFICATION = 'NOTIFICATION'
 }

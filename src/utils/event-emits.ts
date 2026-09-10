@@ -143,7 +143,7 @@ class TypedEventEmitter<Events extends Record<string, (...args: any[]) => any>> 
   }
 }
 
-export const BASE_REDIRECT_PATH = '/system/user'
+export const BASE_REDIRECT_PATH = '/dashboard'
 export const LOGIN_PATH = '/login'
 export const WHITELIST_PATHS = [LOGIN_PATH, '/register']
 const eventEmitter = new TypedEventEmitter<EventsList>()

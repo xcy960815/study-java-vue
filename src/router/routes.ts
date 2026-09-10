@@ -3,9 +3,21 @@ import type { RouteRecordRaw } from 'vue-router'
 
 export const baseRoutes: RouteRecordRaw[] = [
   {
+    path: '/dashboard',
+    name: 'dashboard',
+    component: () => import(`../components/layout/index.vue`),
+    meta: {
+      title: '首页工作台',
+      icon: 'Home',
+    },
+    props: {
+      content: defineAsyncComponent(() => import(`../views/dashboard/index.vue`)),
+    },
+  },
+  {
     path: '/',
     name: 'home',
-    redirect: '/login',
+    redirect: '/dashboard',
     meta: {
       hidden: true,
     },
@@ -41,6 +53,19 @@ export const baseRoutes: RouteRecordRaw[] = [
     },
     props: {
       content: defineAsyncComponent(() => import(`../views/password/index.vue`)), // 这么做的原因是既想保住layout布局 又想跟 login 页面一样 保持一层路由
+    },
+  },
+  {
+    path: '/user/info',
+    name: 'userInfo',
+    component: () => import(`../components/layout/index.vue`),
+    meta: {
+      title: '个人中心',
+      hidden: true,
+      icon: 'User',
+    },
+    props: {
+      content: defineAsyncComponent(() => import(`../views/user/info/index.vue`)),
     },
   },
   {

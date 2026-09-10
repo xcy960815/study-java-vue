@@ -15,6 +15,8 @@
       </svg>
     </div>
     <div class="right-panel">
+      <!-- 通知中心 -->
+      <layout-notification></layout-notification>
       <!-- 主题配置 -->
       <theme></theme>
       <el-dropdown trigger="contextmenu" @command="handleChooseItem" size="default">
@@ -42,6 +44,7 @@ import { useUserInfoStore, useSystemInfoStore, useLoginStore } from '@store'
 import { useRouter } from 'vue-router'
 import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
 import Theme from './themen.vue'
+import LayoutNotification from './notification.vue'
 
 const router = useRouter()
 const userInfoStore = useUserInfoStore()

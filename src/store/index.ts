@@ -8,6 +8,8 @@ import { systemInfoStore as useSystemInfoStore } from './modules/system'
 
 import { loginStore as useLoginStore } from './modules/login'
 
+import { notificationStore as useNotificationStore } from './modules/notification'
+
 // @link https://github.com/vitejs/vite/issues/9599#issuecomment-1209333753
 // type PiniaStore = {
 //     useUserInfoStore: ReturnType<typeof useUserInfoStore>;
@@ -28,7 +30,7 @@ import { loginStore as useLoginStore } from './modules/login'
 //   }
 // }
 
-export { useUserInfoStore, useSystemInfoStore, useLoginStore }
+export { useUserInfoStore, useSystemInfoStore, useLoginStore, useNotificationStore }
 
 const store = createPinia()
 /* 数据持久化 */
