@@ -9,9 +9,9 @@ export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
 ): Promise<T> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
-  const url = `${baseUrl}/getMenuList?pageSize=${pageSize}&pageNum=${pageNum}`
+  const url = `${baseUrl}/getMenuList`
   return request.get<T, T>(url, {
-    params: otherQueryFormData,
+    params: { pageNum, pageSize, ...otherQueryFormData },
   })
 }
 
@@ -23,9 +23,9 @@ export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
 ): Promise<T> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
-  const url = `${baseUrl}/getMenuTree?pageSize=${pageSize}&pageNum=${pageNum}`
+  const url = `${baseUrl}/getMenuTree`
   return request.get<T, T>(url, {
-    params: otherQueryFormData,
+    params: { pageNum, pageSize, ...otherQueryFormData },
   })
 }
 

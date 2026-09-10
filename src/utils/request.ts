@@ -7,7 +7,13 @@ import { loginEnum } from '@/enums'
 // 直接使用相对路径，依赖 nginx 代理
 const baseUrl = import.meta.env.VITE_API_DOMAIN_PREFIX
 
-const withoutAuthorizationUrls = ['/login']
+const withoutAuthorizationUrls = ['/login', '/register', '/captcha', '/refreshToken']
+
+/**
+ * 提取请求 URL 的路径部分（去掉查询串），用于精确匹配
+ * @param url 请求 URL
+ */
+const getRequestPath = (url?: string) => (url ? url.split('?')[0] : url)
 
 let status = 0
 let isRefreshing = false
@@ -20,15 +26,16 @@ interface RetryRequestConfig extends InternalAxiosRequestConfig {
 axios.defaults.withCredentials = false
 const request = axios.create({
   baseURL: baseUrl,
-  timeout: 60 * 1000 * 10,
+  timeout: 30 * 1000,
 })
 
 request.interceptors.request.use(
   async (config) => {
     const token = await getToken()
-    const isWithoutAuthorizationUrl = !withoutAuthorizationUrls.some((url) =>
-      config.url?.includes(url)
-    )
+    const requestPath = getRequestPath(config.url)
+    const isWithoutAuthorizationUrl = requestPath
+      ? !withoutAuthorizationUrls.includes(requestPath)
+      : true
     if (isWithoutAuthorizationUrl) {
       // 添加请求头
       config.headers['Authorization'] = `Bearer ${token}`
@@ -61,7 +68,7 @@ request.interceptors.response.use(
         const originalRequest = error.config as RetryRequestConfig
 
         // 排除 /refreshToken 接口本身的错误，防止死循环
-        if (originalRequest.url?.includes('/refreshToken')) {
+        if (getRequestPath(originalRequest.url) === '/refreshToken') {
           await removeToken()
           eventEmitter.emit('token-invalid')
           return Promise.reject(error)

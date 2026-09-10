@@ -169,6 +169,9 @@ const queryFormData = reactive<UserInfoDto>({
 })
 const addOrEditUserDialogTitle = ref('')
 
+// 弹窗模式：create 新增 / edit 编辑
+const addOrEditUserDialogMode = ref<'create' | 'edit'>('create')
+
 const addOrEditUserDialogVisible = ref(false)
 
 const userListInfo = reactive<UserListInfo>({
@@ -257,6 +260,7 @@ const addOrEditUserFormRules: FormRules<typeof addOrEditUserFormData> = {
  */
 const handleClickAddUser = async () => {
   await getRoleList()
+  addOrEditUserDialogMode.value = 'create'
   addOrEditUserDialogTitle.value = '新增用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
@@ -271,11 +275,18 @@ const handleClickAddUser = async () => {
  */
 const handleClickEditUser = async (row: UserInfoVo) => {
   await getRoleList()
+  addOrEditUserDialogMode.value = 'edit'
   addOrEditUserDialogTitle.value = '编辑用户'
   addOrEditUserDialogVisible.value = true
   nextTick(() => {
     addOrEditUserFormRef.value?.resetFields()
-    Object.assign(addOrEditUserFormData, row)
+    // 仅回填表单实际编辑的字段，避免把 roleNames/permissions 等展示字段带给后端
+    addOrEditUserFormData.id = row.id
+    addOrEditUserFormData.nickName = row.nickName
+    addOrEditUserFormData.loginName = row.loginName
+    addOrEditUserFormData.roleIds = row.roleIds
+    addOrEditUserFormData.introduceSign = row.introduceSign
+    addOrEditUserFormData.address = row.address
   })
 }
 
@@ -291,7 +302,7 @@ const handleClickAddOrEditConfirm = async () => {
 
   if (!valid) return
   let result
-  if (addOrEditUserDialogTitle.value === '新增用户') {
+  if (addOrEditUserDialogMode.value === 'create') {
     result = await userModule.insertUser(addOrEditUserFormData)
   } else {
     result = await userModule.updateUser<boolean>(addOrEditUserFormData)

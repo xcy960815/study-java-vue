@@ -210,6 +210,9 @@ const menuTreeData = useAsyncComputed(async () => {
 
 const addOrEditRoleDialogTitle = ref('')
 
+// 弹窗模式：create 新增 / edit 编辑
+const addOrEditRoleDialogMode = ref<'create' | 'edit'>('create')
+
 const addOrEditRoleDialogVisible = ref(false)
 
 const roleListInfo = reactive<RoleListInfo>({
@@ -279,6 +282,7 @@ const addOrEditRoleFormRules: FormRules<typeof addOrEditRoleFormData> = {
  * 新增角色
  */
 const handleClickAddRole = () => {
+  addOrEditRoleDialogMode.value = 'create'
   addOrEditRoleDialogTitle.value = '新增角色'
   addOrEditRoleDialogVisible.value = true
   nextTick(() => {
@@ -290,6 +294,7 @@ const handleClickAddRole = () => {
  * 编辑角色
  */
 const handleClickEditRole = (row: RoleInfoVo) => {
+  addOrEditRoleDialogMode.value = 'edit'
   addOrEditRoleDialogTitle.value = '编辑角色'
   addOrEditRoleDialogVisible.value = true
   nextTick(() => {
@@ -309,7 +314,7 @@ const handleClickAddOrEditConfirm = async () => {
 
   if (!valid) return
   let result
-  if (addOrEditRoleDialogTitle.value === '新增角色') {
+  if (addOrEditRoleDialogMode.value === 'create') {
     result = await roleModule.insertRole(addOrEditRoleFormData)
   } else {
     result = await roleModule.updateRole(addOrEditRoleFormData)

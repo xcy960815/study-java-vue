@@ -256,6 +256,8 @@ const queryFormData = reactive<GoodsDto>({
 })
 
 const addOrEditGoodsDialogTitle = ref('')
+// 弹窗模式：create 新增 / edit 编辑
+const addOrEditGoodsDialogMode = ref<'create' | 'edit'>('create')
 const addOrEditGoodsDialogVisible = ref(false)
 
 const goodsInfo = reactive<GoodsInfo>({
@@ -307,6 +309,7 @@ const addOrEditGoodsFormRules: FormRules<GoodsVo> = {
 }
 
 const handleClickAddGoods = () => {
+  addOrEditGoodsDialogMode.value = 'create'
   addOrEditGoodsDialogTitle.value = '新增商品'
   addOrEditGoodsDialogVisible.value = true
   nextTick(() => {
@@ -315,6 +318,7 @@ const handleClickAddGoods = () => {
 }
 
 const handleClickEditGoods = (row: GoodsVo) => {
+  addOrEditGoodsDialogMode.value = 'edit'
   addOrEditGoodsDialogTitle.value = '编辑商品'
   addOrEditGoodsDialogVisible.value = true
   nextTick(() => {
@@ -330,8 +334,7 @@ const handleClickAddOrEditConfirm = async () => {
     .catch(() => false)
 
   if (!valid) return
-  let result
-  if (addOrEditGoodsDialogTitle.value === '新增商品') {
+  if (addOrEditGoodsDialogMode.value === 'create') {
     // result = await insertGoods(addOrEditGoodsFormData)
   } else {
     // result = await updateGoods(addOrEditGoodsFormData)

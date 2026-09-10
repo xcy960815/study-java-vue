@@ -20,8 +20,10 @@ export const getUserList = <T extends ListResponseResult<UserInfoVo>>(
   queryFormData: Partial<UserListRequestParams>
 ): Promise<T> => {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
-  const url = `/user/getUserList?pageSize=${pageSize}&pageNum=${pageNum}`
-  return request.post<T, T>(url, otherQueryFormData)
+  const url = `/user/getUserList`
+  return request.post<T, T>(url, otherQueryFormData, {
+    params: { pageNum, pageSize },
+  })
 }
 
 /**

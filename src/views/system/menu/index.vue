@@ -202,6 +202,9 @@ const showSearch = ref(true)
 
 const addOrEditMenuDialogTitle = ref('')
 
+// 弹窗模式：create 新增/复制/创建子菜单（均走 insertMenu）/ edit 编辑
+const addOrEditMenuDialogMode = ref<'create' | 'edit'>('create')
+
 const addOrEditMenuDialogVisible = ref(false)
 
 /**
@@ -334,6 +337,7 @@ const addOrEditMenuFormRules: FormRules<StudyJavaSysMenuDto> = {
  * @description 新增菜单
  */
 const handleClickAddMenu = () => {
+  addOrEditMenuDialogMode.value = 'create'
   addOrEditMenuDialogTitle.value = '新增菜单'
   addOrEditMenuDialogVisible.value = true
   nextTick(() => {
@@ -346,6 +350,7 @@ const handleClickAddMenu = () => {
  * @param {StudyJavaSysMenuDto} row
  */
 const handleClickEditMenu = (row: StudyJavaSysMenuVo) => {
+  addOrEditMenuDialogMode.value = 'edit'
   addOrEditMenuDialogTitle.value = '编辑菜单'
   addOrEditMenuDialogVisible.value = true
   nextTick(() => {
@@ -359,6 +364,7 @@ const handleClickEditMenu = (row: StudyJavaSysMenuVo) => {
  * @param {StudyJavaSysMenuVo} row
  */
 const handleClickCopyMenu = (row: StudyJavaSysMenuVo) => {
+  addOrEditMenuDialogMode.value = 'create'
   addOrEditMenuDialogTitle.value = '复制菜单'
   addOrEditMenuDialogVisible.value = true
   nextTick(() => {
@@ -381,6 +387,7 @@ const hasCreateSubMenu = computed(() => (row: StudyJavaSysMenuVo) => {
  * @param {StudyJavaSysMenuVo} row
  */
 const handleClickCreateSubMenu = (row: StudyJavaSysMenuVo) => {
+  addOrEditMenuDialogMode.value = 'create'
   addOrEditMenuDialogTitle.value = '创建子菜单'
   addOrEditMenuDialogVisible.value = true
   nextTick(() => {
@@ -402,16 +409,10 @@ const handleClickAddOrEditConfirm = async () => {
 
   if (!valid) return
   let result
-  if (addOrEditMenuDialogTitle.value === '新增菜单') {
-    result = await insertMenu(addOrEditMenuFormData)
-  } else if (addOrEditMenuDialogTitle.value === '编辑菜单') {
-    result = await updateMenu(addOrEditMenuFormData)
-  } else if (addOrEditMenuDialogTitle.value === '复制菜单') {
-    result = await insertMenu(addOrEditMenuFormData)
-  } else if (addOrEditMenuDialogTitle.value === '创建子菜单') {
+  if (addOrEditMenuDialogMode.value === 'create') {
     result = await insertMenu(addOrEditMenuFormData)
   } else {
-    return
+    result = await updateMenu(addOrEditMenuFormData)
   }
 
   if (result) {

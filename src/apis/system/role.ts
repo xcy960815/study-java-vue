@@ -11,9 +11,9 @@ export function getRoleList<T extends ListResponseResult<RoleInfoVo>>(
   queryFormData: BaseListDto & Partial<RoleInfoDto>
 ): Promise<T> {
   const { pageSize, pageNum, ...otherQueryFormData } = queryFormData
-  const url = `${baseUrl}/getRoleList?pageSize=${pageSize}&pageNum=${pageNum}`
+  const url = `${baseUrl}/getRoleList`
   return request.get<T, T>(url, {
-    params: otherQueryFormData,
+    params: { pageNum, pageSize, ...otherQueryFormData },
   })
 }
 
