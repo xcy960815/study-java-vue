@@ -8,6 +8,13 @@
 - Main stack: Vue Router, Pinia, Element Plus, Icon Park, Tailwind/PostCSS, Axios, Vitest.
 - Read the detailed agent docs in `.agents/` before making non-trivial changes.
 
+## Sibling Repositories
+
+This repo is the Vue version of a three-part system; the sibling repos live next to it under `/Users/opera/Documents/my-repositories/`:
+
+- `/Users/opera/Documents/my-repositories/study-java` — the Java backend (Maven, Spring Boot, `docker-compose.yml`) that this frontend and the React frontend both call. When backend contract questions arise (controller params, permission annotations, DTO field names), read the source there instead of guessing.
+- `/Users/opera/Documents/my-repositories/study-java-react` — the React 19 sibling frontend (Ant Design 6, Zustand, Vite 7) for the same backend. It was written to mirror this repo's behavior; check it before assuming a feature exists in only one frontend, and keep API-layer behavior consistent when porting features between the two.
+
 ## Start Here
 
 1. Read `.agents/project-overview.md` for the directory map and generated files.

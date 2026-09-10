@@ -4,6 +4,16 @@
 
 This project is a Vue 3 admin/frontend for a Spring Boot learning/back-office system. It has CRUD-style system pages, monitoring/report pages, upload demos, order/goods pages, and DeepSeek/Ollama chat/model views.
 
+## Repository Layout
+
+This repo is the Vue frontend of a three-part system (all siblings live side by side under `/Users/opera/Documents/my-repositories/`):
+
+- `study-java` — the Spring Boot backend (Maven) that both frontends call. This is the source of truth for API contracts: controller signatures, permission annotations, and DTO/VO field names.
+- `study-java-vue` — this repo, the original frontend (Vue 3 + Element Plus + Pinia).
+- `study-java-react` — a React 19 port (Ant Design 6 + Zustand + Vite 7) of the same frontend, kept behavior-aligned with this repo.
+
+When a task touches API contracts or a feature that may exist in the React port, read the sibling repo's source (each has its own `AGENTS.md`) instead of guessing.
+
 ## Runtime Shape
 
 - Local development runs through Vite.
