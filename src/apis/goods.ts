@@ -45,11 +45,23 @@ export const updateGoods = async <T extends boolean>(goodsDto: GoodsDto) => {
   return request.post<T, T>(url, goodsDto)
 }
 
-/**
- * 删除商品
- * @param number
- * @returns {Promise<T>}
- */
+/** 商品分类树 */
+export const getGoodsCategoryTree = async <T extends GoodsCategoryVo[]>() => {
+  return request.get<T, T>('/goods/category/tree')
+}
+
+export const insertGoodsCategory = async <T extends boolean>(category: GoodsCategoryDto) => {
+  return request.post<T, T>('/goods/category', category)
+}
+
+export const updateGoodsCategory = async <T extends boolean>(category: GoodsCategoryDto) => {
+  return request.put<T, T>('/goods/category', category)
+}
+
+export const deleteGoodsCategory = async <T extends boolean>(categoryId: number) => {
+  return request.delete<T, T>(`/goods/category/${categoryId}`)
+}
+
 export const deleteGoods = async <T extends boolean>(id: number) => {
   const url = `/goods/deleteGoods`
   return request.delete<T, T>(url, {

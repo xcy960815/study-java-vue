@@ -6,6 +6,7 @@ declare interface GoodsVo {
   goodsName: string
   goodsIntro: string
   goodsCategoryId: number
+  categoryName?: string
   goodsCoverImg: string
   goodsCarousel: string
   goodsDetailContent: string
@@ -25,4 +26,22 @@ declare interface GoodsVo {
  */
 declare interface GoodsDto extends Partial<GoodsVo> {
   categoryLevel?: number
+}
+
+declare interface GoodsCategoryVo {
+  categoryId: number
+  parentId: number
+  categoryName: string
+  categoryLevel: number
+  orderNum: number
+  remark?: string
+  children?: GoodsCategoryVo[]
+}
+
+declare interface GoodsCategoryDto {
+  categoryId?: number
+  parentId: number
+  categoryName: string
+  orderNum?: number
+  remark?: string
 }

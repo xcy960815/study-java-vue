@@ -5,10 +5,15 @@
       <el-form-item label="商品名称">
         <el-input v-model="queryFormData.goodsName" placeholder="商品名称" @change="getGoodsList" />
       </el-form-item>
-      <el-form-item label="分类ID">
-        <el-input
+      <el-form-item label="商品分类">
+        <el-tree-select
           v-model="queryFormData.goodsCategoryId"
-          placeholder="分类ID"
+          :data="categoryTree"
+          :props="{ label: 'categoryName', value: 'categoryId', children: 'children' }"
+          check-strictly
+          clearable
+          placeholder="商品分类"
+          class="!w-60"
           @change="getGoodsList"
         />
       </el-form-item>
@@ -54,7 +59,11 @@
       <el-table-column align="center" prop="goodsId" label="商品ID" width="100" />
       <el-table-column align="center" prop="goodsName" label="商品名称" width="150" />
       <el-table-column align="center" prop="goodsIntro" label="商品简介" width="200" />
-      <el-table-column align="center" prop="goodsCategoryId" label="分类ID" width="100" />
+      <el-table-column align="center" prop="categoryName" label="商品分类" width="120">
+        <template #default="{ row }">
+          {{ row.categoryName || '未分类' }}
+        </template>
+      </el-table-column>
       <el-table-column align="center" prop="goodsCoverImg" label="封面图" width="120">
         <template #default="{ row }">
           <el-image
@@ -155,8 +164,16 @@
         <el-form-item label="商品简介" prop="goodsIntro">
           <el-input v-model="addOrEditGoodsFormData.goodsIntro" placeholder="请输入商品简介" />
         </el-form-item>
-        <el-form-item label="分类ID" prop="goodsCategoryId">
-          <el-input v-model="addOrEditGoodsFormData.goodsCategoryId" placeholder="请输入分类ID" />
+        <el-form-item label="商品分类" prop="goodsCategoryId">
+          <el-tree-select
+            v-model="addOrEditGoodsFormData.goodsCategoryId"
+            :data="categoryTree"
+            :props="{ label: 'categoryName', value: 'categoryId', children: 'children' }"
+            check-strictly
+            clearable
+            placeholder="请选择商品分类"
+            class="w-full"
+          />
         </el-form-item>
         <el-form-item label="封面图" prop="goodsCoverImg">
           <el-input v-model="addOrEditGoodsFormData.goodsCoverImg" placeholder="请输入封面图URL" />
@@ -302,7 +319,7 @@ const addOrEditGoodsFormData = reactive<GoodsDto>({
 })
 const addOrEditGoodsFormRules: FormRules<GoodsVo> = {
   goodsName: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
-  goodsCategoryId: [{ required: true, message: '请输入分类ID', trigger: 'blur' }],
+  goodsCategoryId: [{ required: true, message: '请选择商品分类', trigger: 'change' }],
   sellingPrice: [{ required: true, message: '请输入售价', trigger: 'blur' }],
   stockNum: [{ required: true, message: '请输入库存', trigger: 'blur' }],
   goodsSellStatus: [{ required: true, message: '请选择上架状态', trigger: 'change' }],
@@ -372,6 +389,7 @@ const showSearch = ref(true)
 
 // 商品上架状态选项
 const goodsSellStatusOptions = ref<DataDictionaryVo[]>([])
+const categoryTree = ref<GoodsCategoryVo[]>([])
 
 /**
  * 获取商品上架状态字典
@@ -429,8 +447,13 @@ const getCarouselImageList = (carousel: string): string[] => {
     .filter(Boolean)
 }
 
+const loadCategoryTree = async () => {
+  categoryTree.value = await goodsModule.getGoodsCategoryTree()
+}
+
 onMounted(() => {
   getGoodsSellStatusDict()
+  loadCategoryTree()
   getGoodsList()
 })
 </script>
