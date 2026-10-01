@@ -12,7 +12,7 @@
 
 This repo is the Vue version of a three-part system; the sibling repos live next to it under `/Users/opera/Documents/my-repositories/`:
 
-- `/Users/opera/Documents/my-repositories/study-java` — the Java backend (Maven, Spring Boot, `docker-compose.yml`) that this frontend and the React frontend both call. When backend contract questions arise (controller params, permission annotations, DTO field names), read the source there instead of guessing.
+- `/Users/opera/Documents/my-repositories/study-java` — the Java backend (Maven, Spring Boot). Its `docker-compose.yml` creates `study-java-network` plus MySQL, Redis, and the API. This repo's own `docker-compose.yml` only runs the Vue container and joins that network. When backend contract questions arise (controller params, permission annotations, DTO field names), read the source there instead of guessing.
 - `/Users/opera/Documents/my-repositories/study-java-react` — the React 19 sibling frontend (Ant Design 6, Zustand, Vite 7) for the same backend. It was written to mirror this repo's behavior; check it before assuming a feature exists in only one frontend, and keep API-layer behavior consistent when porting features between the two.
 
 ## Start Here

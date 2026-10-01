@@ -6,16 +6,14 @@ type OnUploadProgress = (progressEvent: AxiosProgressEvent) => void
 
 const CHUNK_SIZE = 10 * 1024 * 1024 // 10 MB 每片
 
-/**
- * 普通文件上传
- * @param {FormData} formData
- * @returns {Promise<T>}
- */
-export const uploadFile = <T extends string>(
-  formData: FormData,
-  onUploadProgress: OnUploadProgress
-) => {
-  return request.post<T, T>('/file/upload', formData, {
+export interface UploadResult {
+  filePath?: string
+  status: string
+  message?: string
+}
+
+export const uploadFile = (formData: FormData, onUploadProgress: OnUploadProgress) => {
+  return request.post<UploadResult, UploadResult>('/file/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -24,32 +22,40 @@ export const uploadFile = <T extends string>(
   })
 }
 
-/**
- * 大文件切片上传
- * @param {File} file
- * @param {(chunkIndex: number, percent: number) => void} onChunkProgress
- * @returns {Promise<void>}
- */
-export const uploadLargeFile = async <T extends string>(
+/** 按 10MB 分片上传，进度是各分片完成比例的平均值 */
+export const uploadLargeFile = async (
   file: UploadRawFile,
-  onChunkProgress: (chunkIndex: number, percent: number) => void
+  onProgress: (percent: number) => void
 ) => {
-  const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
-  for (let i = 0; i < totalChunks; i++) {
-    const chunk = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
+  const totalChunks = Math.max(1, Math.ceil(file.size / CHUNK_SIZE))
+  const chunkPercents = Array.from({ length: totalChunks }, () => 0)
+
+  for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex += 1) {
+    const chunk = file.slice(chunkIndex * CHUNK_SIZE, (chunkIndex + 1) * CHUNK_SIZE)
     const formData = new FormData()
-    formData.append('file', chunk)
+    formData.append('file', chunk, file.name)
     formData.append('fileName', file.name)
-    formData.append('chunkIndex', i.toString())
-    formData.append('totalChunks', totalChunks.toString())
-    await request.post(`/uploadLargeFile`, formData, {
+    formData.append('chunkIndex', String(chunkIndex))
+    formData.append('totalChunks', String(totalChunks))
+
+    const result = await request.post<UploadResult, UploadResult>('/file/upload/chunk', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
       onUploadProgress: (progressEvent) => {
-        const percent = Math.floor((progressEvent.loaded * 100) / progressEvent.total!)
-        onChunkProgress(i, percent)
+        if (!progressEvent.total) {
+          return
+        }
+        chunkPercents[chunkIndex] = Math.round(
+          (progressEvent.loaded / progressEvent.total) * 100
+        )
+        const average = chunkPercents.reduce((sum, percent) => sum + percent, 0) / totalChunks
+        onProgress(Math.round(average))
       },
     })
+
+    if (result.status === 'error') {
+      throw new Error(result.message || '分片上传失败')
+    }
   }
 }

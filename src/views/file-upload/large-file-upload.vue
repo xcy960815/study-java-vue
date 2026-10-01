@@ -6,7 +6,6 @@
       :http-request="handleUploadFile"
       action="#"
       :show-file-list="false"
-      :before-upload="beforeUpload"
     >
       <el-icon class="large-file-uploader-icon">
         <Plus />
@@ -25,8 +24,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick } from 'vue'
-import { type UploadProps, type UploadRequestOptions, ElMessage, ElProgress } from 'element-plus'
+import { ref } from 'vue'
+import { type UploadRequestOptions, ElMessage, ElProgress } from 'element-plus'
+import { AxiosError } from 'axios'
 import { Plus } from '@element-plus/icons-vue'
 import { uploadModule } from '@apis'
 
@@ -39,33 +39,20 @@ const progressColors = [
   { color: '#6f7ad3', percentage: 100 },
 ]
 
-const progressDialogVisible = ref(false)
-const chunkProgressArr = ref<number[]>([])
-
-const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  // 可加类型/大小校验
-  return true
-}
-
 const handleUploadFile = async ({ file }: UploadRequestOptions) => {
-  progressDialogVisible.value = true
-  const totalChunks = Math.ceil(file.size / (10 * 1024 * 1024))
-  chunkProgressArr.value = Array(totalChunks).fill(0)
-
-  await uploadModule.uploadLargeFile(file, (chunkIndex: number, percent: number) => {
-    chunkProgressArr.value[chunkIndex] = percent
-  })
-
-  // 检查所有分片都100%后再提示
-  const checkAllDone = () => chunkProgressArr.value.every((p) => p === 100)
-  const waitAllDone = async () => {
-    while (!checkAllDone()) {
-      await new Promise((r) => setTimeout(r, 100))
+  progress.value = 0
+  try {
+    await uploadModule.uploadLargeFile(file, (percent) => {
+      progress.value = percent
+    })
+    progress.value = 100
+    ElMessage.success('全部分片上传完成')
+  } catch (error) {
+    if (error instanceof Error && !(error instanceof AxiosError)) {
+      ElMessage.error(error.message)
     }
+    throw error
   }
-  await waitAllDone()
-  progressDialogVisible.value = false
-  ElMessage.success('全部分片上传完成')
 }
 </script>
 
