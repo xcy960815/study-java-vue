@@ -1,3 +1,4 @@
+# 变量在 env/.env.prod：docker compose --env-file env/.env.prod up -d
 services:
   vue:
     image: ${VUE_WEB_IMAGE_NAME}:${VUE_WEB_IMAGE_VERSION}
