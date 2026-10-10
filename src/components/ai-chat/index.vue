@@ -7,8 +7,6 @@
     >
       <chat-message-list
         :conversation-list="conversationList"
-        :current-conversation="currentConversation"
-        :loading-svg="loadingSvg"
         :render-content="renderContent"
         :role-alias="roleAlias"
       />
@@ -23,7 +21,6 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
 import type { PropType } from 'vue'
 
 import { useCopyCode } from './useCopyCode'
@@ -39,10 +36,6 @@ import 'highlight.js/styles/github-dark.css'
 defineOptions({
   inheritAttrs: false,
 })
-
-// 常量定义
-const LOADING_SVG =
-  "data:image/svg+xml;utf8,%3Csvg viewBox='0 0 24 24' width='1em' height='1em' xmlns='http://www.w3.org/2000/svg' %3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse30' fill='freeze' attributeName='r' begin='0;svgSpinnersPulse32.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='0;svgSpinnersPulse32.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse31' fill='freeze' attributeName='r' begin='svgSpinnersPulse30.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='svgSpinnersPulse30.begin+0.4s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3Ccircle cx='12' cy='12' r='0' fill='currentColor'%3E%3Canimate id='svgSpinnersPulse32' fill='freeze' attributeName='r' begin='svgSpinnersPulse30.begin+0.8s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='0;11'/%3E%3Canimate fill='freeze' attributeName='opacity' begin='svgSpinnersPulse30.begin+0.8s' calcMode='spline' dur='1.2s' keySplines='.52,.6,.25,.99' values='1;0'/%3E%3C/circle%3E%3C/svg%3E"
 
 const props = defineProps({
   conversationList: {
@@ -75,11 +68,6 @@ const emit = defineEmits<{
   (e: 'cancel-conversation'): void
   (e: 'scroll', event: Event): void
 }>()
-
-/**
- * 加载动画
- */
-const loadingSvg = computed(() => LOADING_SVG)
 
 const handleScroll = (event: Event) => {
   emit('scroll', event)

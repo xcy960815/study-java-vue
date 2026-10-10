@@ -145,6 +145,7 @@ const handleEnterKey = (event: KeyboardEvent) => {
  * 发送问题
  */
 const handleSubmit = () => {
+  if (props.conversation) return
   const trimmedQuestion = question.value.trim()
   if (trimmedQuestion.length < 2) {
     ElMessage.warning('问题太短了，请至少输入2个字符')

@@ -85,9 +85,19 @@ class Completions extends CompletionsCore {
         const requestInit = await this.buildFetchRequestInit(currentMessage, options)
 
         if (stream) {
+          let streamSettled = false
+          const finishStream = () => {
+            if (streamSettled) {
+              return
+            }
+
+            streamSettled = true
+            resolve(responseAssembler.finalizeStream())
+          }
+
           requestInit.onMessage = (data: string) => {
             if (isStreamDoneMessage(data)) {
-              resolve(responseAssembler.finalizeStream())
+              finishStream()
               return
             }
 
@@ -99,7 +109,9 @@ class Completions extends CompletionsCore {
             }
           }
 
-          await this.request<AI.Gpt.Response>(this.completionsUrl, requestInit).catch(reject)
+          await this.request<AI.Gpt.Response>(this.completionsUrl, requestInit)
+          // 后端会丢掉 SSE 的 [DONE]，连接结束就算这轮回复完成。
+          finishStream()
           return
         }
 

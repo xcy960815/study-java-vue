@@ -16,6 +16,7 @@
           />
         </div>
         <div class="answer-wrapper flex-1">
+          <chat-thinking v-if="conversation.thinking" />
           <div
             class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
             v-html="renderContent(conversation.content)"
@@ -23,37 +24,6 @@
         </div>
       </div>
     </transition-group>
-
-    <transition name="conversation-fade">
-      <div
-        v-if="currentConversation"
-        :key="currentConversation.messageId"
-        class="current-conversation group flex flex-col px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-lg mb-2 hover:shadow-md transition-shadow duration-200"
-      >
-        <div class="flex justify-between items-center mb-2">
-          <div class="font-bold text-slate-700 dark:text-slate-200">
-            {{ getRoleAlias(currentConversation.role) }}：
-          </div>
-          <chat-copy
-            class="invisible group-hover:visible transition-opacity duration-200"
-            :content="currentConversation.content"
-          />
-        </div>
-        <div class="answer-wrapper flex-1">
-          <chat-thinking v-if="Boolean(currentConversation.thinking)" />
-          <div
-            class="prose-wrapper flex flex-col text-sm text-slate-600 dark:text-slate-300 leading-relaxed"
-            v-html="renderContent(currentConversation.content)"
-          />
-          <img
-            v-if="currentConversation.done === true && currentConversation.thinking === true"
-            :src="loadingSvg"
-            class="w-6 h-6 animate-pulse"
-            alt="loading"
-          />
-        </div>
-      </div>
-    </transition>
   </div>
 </template>
 
@@ -77,10 +47,6 @@ const props = defineProps({
     default: () => [],
     required: true,
   },
-  currentConversation: {
-    type: Object as PropType<AI.Gpt.AssistantConversation | null>,
-    default: null,
-  },
   roleAlias: {
     type: Object as PropType<Partial<Record<AI.Role, string>>>,
     default: () => ({
@@ -91,10 +57,6 @@ const props = defineProps({
   },
   renderContent: {
     type: Function as PropType<AI.ContentTransformer>,
-    required: true,
-  },
-  loadingSvg: {
-    type: String,
     required: true,
   },
 })

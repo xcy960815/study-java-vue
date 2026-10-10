@@ -1,8 +1,14 @@
 import { ref } from 'vue'
 
+import { RoleEnum } from '@enums'
+
 type ChatSessionModel = Pick<
   import('./useCompletions').Completions,
-  'buildAssistantConversation' | 'cancelConversation' | 'completions' | 'getAllConversations'
+  | 'buildAssistantConversation'
+  | 'buildConversation'
+  | 'cancelConversation'
+  | 'completions'
+  | 'getAllConversations'
 >
 
 type UseAiChatSessionOptions = {
@@ -41,33 +47,73 @@ export const useAiChatSession = ({
   const parentMessageId = ref('')
   const conversationList = ref<AI.Conversation[]>([])
   const currentConversation = ref<AI.Gpt.AssistantConversation | null>(null)
+  let requestInFlight = false
 
   const syncConversationList = async () => {
     conversationList.value = await model.getAllConversations()
   }
 
+  const replaceConversation = (messageId: string, next: AI.Conversation) => {
+    const index = conversationList.value.findIndex((item) => item.messageId === messageId)
+    if (index === -1) {
+      return
+    }
+
+    const nextList = conversationList.value.slice()
+    nextList[index] = next
+    conversationList.value = nextList
+  }
+
   const sendMessage = async (question: string): Promise<AI.Gpt.AssistantConversation | null> => {
-    const completionsOptions = {
-      ...(getCompletionsOptions?.({ parentMessageId: parentMessageId.value }) ?? {}),
-      parentMessageId: parentMessageId.value,
-      onProgress(partialResponse: AI.Gpt.AssistantConversation) {
-        currentConversation.value = cloneAssistantConversation(partialResponse)
-      },
-    } satisfies AI.Gpt.CompletionsOptions
+    if (requestInFlight || currentConversation.value) {
+      return null
+    }
 
-    const responsePromise = model.completions(question, completionsOptions)
-
-    await syncConversationList()
-    currentConversation.value = model.buildAssistantConversation('', {
+    requestInFlight = true
+    const userMessage = model.buildConversation(RoleEnum.User, question, {
       parentMessageId: parentMessageId.value,
     })
+    const assistantMessage = model.buildAssistantConversation('', {
+      parentMessageId: userMessage.messageId,
+    })
+    const placeholderId = assistantMessage.messageId
+    conversationList.value = [...conversationList.value, userMessage, assistantMessage]
+    currentConversation.value = assistantMessage
+
+    const writeAssistant = (next: AI.Gpt.AssistantConversation) => {
+      const row = {
+        ...next,
+        messageId: placeholderId,
+        parentMessageId: userMessage.messageId,
+      }
+      replaceConversation(placeholderId, row)
+      currentConversation.value = row
+    }
 
     try {
-      const response = await responsePromise
+      const completionsOptions = {
+        ...(getCompletionsOptions?.({ parentMessageId: parentMessageId.value }) ?? {}),
+        parentMessageId: parentMessageId.value,
+        onProgress(partialResponse: AI.Gpt.AssistantConversation) {
+          writeAssistant({
+            ...cloneAssistantConversation(partialResponse),
+            thinking: partialResponse.thinking,
+            done: false,
+          })
+        },
+      } satisfies AI.Gpt.CompletionsOptions
+
+      const response = await model.completions(question, completionsOptions)
 
       if (response.done) {
         parentMessageId.value = response.messageId
       }
+
+      writeAssistant({
+        ...cloneAssistantConversation(response),
+        thinking: false,
+        done: true,
+      })
 
       return response
     } catch (error) {
@@ -75,17 +121,24 @@ export const useAiChatSession = ({
         onError?.(error)
       }
 
+      const current = conversationList.value.find((item) => item.messageId === placeholderId)
+      if (current) {
+        replaceConversation(placeholderId, {
+          ...current,
+          thinking: false,
+          done: true,
+        })
+      }
+
       return null
     } finally {
       currentConversation.value = null
-      await syncConversationList()
+      requestInFlight = false
     }
   }
 
   const cancelConversation = async (): Promise<void> => {
     await model.cancelConversation(cancelReason)
-    currentConversation.value = null
-    await syncConversationList()
   }
 
   return {

@@ -48,7 +48,10 @@ export function useAutoScroll({ props }: UseAutoScrollParams) {
    * 监听内容变化，自动滚动
    */
   watch(
-    () => props.currentConversation?.content,
+    () => {
+      const last = props.conversationList[props.conversationList.length - 1]
+      return `${props.conversationList.length}:${last?.content ?? ''}:${props.currentConversation?.content ?? ''}`
+    },
     () => {
       if (autoScroll.value && !isUserScrolling.value) {
         scrollToBottom()
