@@ -15,12 +15,40 @@ const withoutAuthorizationUrls = ['/login', '/register', '/captcha', '/refreshTo
  */
 const getRequestPath = (url?: string) => (url ? url.split('?')[0] : url)
 
-let status = 0
-let isRefreshing = false
-let requests: Function[] = []
+/**
+ * 刷新 Token 期间排队中的请求。
+ */
+interface QueuedRequest {
+  resolve: (token: string) => void
+  reject: (error: unknown) => void
+}
 
 interface RetryRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean
+}
+
+let status = 0
+let isRefreshing = false
+let requests: QueuedRequest[] = []
+
+/**
+ * 在刷新成功后重放排队中的请求。
+ *
+ * @param token 新的 access token
+ */
+const resolveQueuedRequests = (token: string) => {
+  requests.forEach(({ resolve }) => resolve(token))
+  requests = []
+}
+
+/**
+ * 在刷新失败后统一拒绝排队中的请求。
+ *
+ * @param error 刷新失败原因
+ */
+const rejectQueuedRequests = (error: unknown) => {
+  requests.forEach(({ reject }) => reject(error))
+  requests = []
 }
 
 axios.defaults.withCredentials = false
@@ -77,10 +105,13 @@ request.interceptors.response.use(
         if (!originalRequest._retry) {
           if (isRefreshing) {
             // 如果正在刷新，将当前请求加入队列，等待刷新完成后执行
-            return new Promise((resolve) => {
-              requests.push((token: string) => {
-                originalRequest.headers['Authorization'] = `Bearer ${token}`
-                resolve(request(originalRequest))
+            return new Promise((resolve, reject) => {
+              requests.push({
+                resolve: (token: string) => {
+                  originalRequest.headers['Authorization'] = `Bearer ${token}`
+                  resolve(request(originalRequest))
+                },
+                reject,
               })
             })
           }
@@ -101,15 +132,21 @@ request.interceptors.response.use(
               await setRefreshToken(data.refreshToken)
 
               // 2. 执行队列中的请求
-              requests.forEach((cb) => cb(data.token))
-              requests = []
+              resolveQueuedRequests(data.token)
 
               // 3. 重试当前请求
               originalRequest.headers['Authorization'] = `Bearer ${data.token}`
               return request(originalRequest)
             }
+
+            // 刷新请求成功但响应缺少新 Token，同样按刷新失败处理
+            rejectQueuedRequests(new Error('刷新 Token 响应无效'))
+            await removeToken()
+            eventEmitter.emit('token-invalid')
+            return Promise.reject(new Error('刷新 Token 响应无效'))
           } catch (refreshError) {
-            // 刷新失败
+            // 刷新失败：拒绝排队中的请求、清理本地登录态并广播 token 失效事件
+            rejectQueuedRequests(refreshError)
             await removeToken()
             eventEmitter.emit('token-invalid')
             return Promise.reject(refreshError)
