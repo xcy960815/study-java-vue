@@ -128,16 +128,6 @@ export const baseRoutes: RouteRecordRaw[] = [
     },
     children: [
       {
-        path: '/monitor/operlog',
-        name: 'monitor-operlog',
-        component: () => import(`../views/monitor/operlog/index.vue`),
-        meta: {
-          title: '操作日志',
-          icon: 'FileText',
-          keepAlive: true,
-        },
-      },
-      {
         path: '/monitor/server',
         name: 'monitor-server',
         component: () => import(`../views/monitor/server/index.vue`),

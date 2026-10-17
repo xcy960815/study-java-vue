@@ -18,7 +18,6 @@ const svgIcons = {
   'user-list': 'user-list',
   'server-send-event': 'server-send-event',
   deepseek: 'deepseek',
-  ollama: 'ollama',
   chat: 'chat',
 }
 

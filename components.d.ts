@@ -46,6 +46,7 @@ declare module 'vue' {
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover']
+    ElProgress: typeof import('element-plus/es')['ElProgress']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']
     ElRow: typeof import('element-plus/es')['ElRow']
@@ -68,10 +69,12 @@ declare module 'vue' {
     Menu: typeof import('./src/components/layout/menu/index.vue')['default']
     MenuItem: typeof import('./src/components/layout/menu/menu-item.vue')['default']
     Notification: typeof import('./src/components/layout/header/notification.vue')['default']
+    PersonalizationDrawer: typeof import('./src/components/layout/header/personalization-drawer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SvgIcon: typeof import('./src/components/svg-icon/index.vue')['default']
     Themen: typeof import('./src/components/layout/header/themen.vue')['default']
+    UpdateDot: typeof import('./src/components/layout/header/update-dot.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
