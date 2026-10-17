@@ -1,8 +1,11 @@
 import { Client, type IMessage, type StompSubscription } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
 
 type MessageHandler<T = unknown> = (message: T) => void
 type ErrorHandler = (error: unknown) => void
+
+/** 将 http(s) 地址转换为同结构的 ws(s) 地址 */
+const toWebSocketUrl = (httpUrl: string) =>
+  httpUrl.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:')
 
 export class WebSocketClient {
   private client: Client
@@ -11,7 +14,9 @@ export class WebSocketClient {
 
   constructor(private readonly url: string) {
     this.client = new Client({
-      webSocketFactory: () => new SockJS(this.url),
+      // 原生 WebSocket 传输：后端已扩展原生端点。不再引入 sockjs-client，
+      // 其模块加载时会注册 unload 监听器，触发 Chrome 115+ 的 Permissions policy violation
+      webSocketFactory: () => new WebSocket(this.url),
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -80,7 +85,9 @@ let sharedClient: WebSocketClient | null = null
 export const getWebSocketUrl = () => {
   const apiPrefix = import.meta.env.VITE_API_DOMAIN_PREFIX || '/dev-api'
   const normalizedPrefix = `/${apiPrefix}`.replace(/\/+/g, '/').replace(/\/$/, '')
-  return `${window.location.protocol}//${window.location.host}${normalizedPrefix}/ws/server-monitor`
+  return toWebSocketUrl(
+    `${window.location.protocol}//${window.location.host}${normalizedPrefix}/ws/server-monitor-native`
+  )
 }
 
 export const getSharedWebSocketClient = () => {

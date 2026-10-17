@@ -14,7 +14,7 @@
           type="primary"
           :icon="VideoPlay"
           :loading="loading"
-          @click="startMonitor"
+          @click="startMonitor()"
         >
           开始监控
         </el-button>
@@ -169,8 +169,13 @@ const applyServerInfo = (info: ServerInfoVo) => {
   animateMetricValues(nextMetrics)
 }
 
-// 开始监控
-const startMonitor = async () => {
+/**
+ * 开始监控。进场时由 onMounted 自动触发（silent=true），不打扰提示；
+ * 自动开始失败时页面回到手动「开始监控」按钮态，可点击重试。
+ *
+ * @param silent - 静默模式，不弹开始成功/失败与连接失败提示
+ */
+const startMonitor = async (silent = false) => {
   loading.value = true
   try {
     // 调用后端 API 开始推送
@@ -185,14 +190,15 @@ const startMonitor = async () => {
       },
       (error) => {
         console.error('WebSocket 错误:', error)
-        ElMessage.error('连接失败')
         isConnected.value = false
+        if (!silent) ElMessage.error('连接失败')
       }
     )
-    ElMessage.success('开始监控')
+    isConnected.value = true
+    if (!silent) ElMessage.success('开始监控')
   } catch (error) {
     console.error('开始监控失败:', error)
-    ElMessage.error('开始监控失败')
+    if (!silent) ElMessage.error('开始监控失败')
   } finally {
     loading.value = false
   }
@@ -252,6 +258,8 @@ onMounted(async () => {
   await nextTick()
   loadInitialData()
   refreshHistory()
+  // 进场自动开始监控（静默模式），无需手动点击
+  startMonitor(true)
   window.addEventListener('resize', handleResize)
 })
 
