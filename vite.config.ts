@@ -60,6 +60,12 @@ export default defineConfig(({ mode }) => {
                 // 当前仅保留项目实际使用的一小部分图标，单独拆分即可避免回流到 vendor
                 return 'icon-park'
               }
+              if (hasNodeModule(id, ['@number-flow'])) {
+                // @number-flow/vue 会在模块顶层调用 Vue 的 defineComponent；若随 vendor 打包，
+                // vendor 与 vue 分块互引会让后续求值的分块踩到未初始化绑定（TDZ 崩溃）。
+                // 单独成块且仅由监控页懒加载，保证其求值时 vue 运行时已就绪。
+                return 'number-flow'
+              }
               if (hasNodeModule(id, ['axios'])) {
                 // axios 单独打包
                 return 'axios'
