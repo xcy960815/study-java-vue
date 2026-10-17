@@ -10,32 +10,17 @@
         @click="toggleFullscreen()"
       />
     </el-tooltip>
-    <!-- 快速切换亮暗 -->
-    <el-tooltip :content="isDark ? '切换到浅色模式' : '切换到深色模式'" placement="bottom">
-      <el-button
-        class="theme-btn"
-        :icon="isDark ? Sunny : Moon"
-        circle
-        @click="toggleDarkQuick()"
-      />
-    </el-tooltip>
-    <!-- 打开个性化设置抽屉 -->
-    <el-tooltip content="个性化设置" placement="bottom">
-      <el-button class="theme-btn" :icon="Brush" circle @click="drawerVisible = true" />
-    </el-tooltip>
   </div>
 </template>
 
 <script lang="ts" setup>
 /**
- * 头部快捷按钮组（与 React 版右上角对齐）：全屏切换、亮暗快切、个性化设置抽屉入口。
- * 主题偏好的完整编辑都在 personalization-drawer 中进行（外观主题 + 主题色彩）。
+ * 头部快捷按钮组：全屏切换。
+ * 亮暗模式与主题色彩的编辑入口在用户下拉菜单的「个性化设置」抽屉中。
  */
-import { useSystemTheme } from '@/utils/system-style'
 import { useFullscreen } from '@/composables/useFullscreen'
-import { Brush, Moon, Sunny, FullScreen } from '@element-plus/icons-vue'
+import { FullScreen } from '@element-plus/icons-vue'
 
-const { isDark, drawerVisible, toggleDarkQuick } = useSystemTheme()
 const { fullscreen, toggleFullscreen } = useFullscreen()
 </script>
 

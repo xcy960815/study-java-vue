@@ -291,11 +291,6 @@ function setSinglePrimaryColor(color: string): void {
   setPrimaryColors({ light: color, dark: color })
 }
 
-/** 顶部圆形按钮的快速切换：当前实际暗色则回亮色，反之切暗色 */
-function toggleDarkQuick(): void {
-  mode.value = isDark.value ? 'light' : 'dark'
-}
-
 /**
  * 系统主题管理（共享单例版本，原为每次调用新建状态的 composable）
  */
@@ -311,7 +306,6 @@ export const useSystemTheme = () => {
     setMode,
     setPrimaryColors,
     setSinglePrimaryColor,
-    toggleDarkQuick,
   }
 }
 
