@@ -1,3 +1,5 @@
+import { randomId } from './random-id'
+
 export type OrderTagType = 'success' | 'primary' | 'warning' | 'info' | 'danger'
 
 export interface OrderStatusMeta {
@@ -111,7 +113,7 @@ export const getOrCreatePaymentRequestId = (
   const key = getPaymentRequestStorageKey(orderId, payType)
   const existingRequestId = storage.getItem(key)
   if (existingRequestId) return existingRequestId
-  const requestId = crypto.randomUUID()
+  const requestId = randomId()
   storage.setItem(key, requestId)
   return requestId
 }

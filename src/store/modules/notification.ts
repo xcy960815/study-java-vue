@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { StoreNames } from '@enums'
+import { randomId } from '@utils/random-id'
 
 const NOTIFICATION_LIMIT = 50
 
@@ -28,7 +29,7 @@ export const notificationStore = defineStore<
     addNotification(notification) {
       this.notifications.unshift({
         ...notification,
-        id: crypto.randomUUID(),
+        id: randomId(),
         createdAt: Date.now(),
         read: false,
       })
