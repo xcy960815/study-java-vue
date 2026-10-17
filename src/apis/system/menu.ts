@@ -1,9 +1,12 @@
 import { request } from '@utils/request'
+
 const baseUrl = '/studyJavaSysMenu'
+
 /**
- * 获取菜单列表
- * @param {BaseListDto} queryFormData
- * @returns {Promise<T>}
+ * 获取菜单分页列表。
+ *
+ * @param queryFormData - 菜单筛选条件与分页参数
+ * @returns 菜单分页结果
  */
 export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
@@ -16,8 +19,10 @@ export function getMenuList<T extends ListResponseResult<StudyJavaSysMenuVo>>(
 }
 
 /**
- * 获取菜单树
- * @returns {Promise<T>}
+ * 获取菜单树（分页）。
+ *
+ * @param queryFormData - 菜单筛选条件与分页参数
+ * @returns 菜单树分页结果
  */
 export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
   queryFormData: BaseListDto & Partial<StudyJavaSysMenuDto>
@@ -30,8 +35,9 @@ export function getMenuTree<T extends ListResponseResult<StudyJavaSysMenuVo>>(
 }
 
 /**
- * 获取所有菜单树
- * @returns {Promise<T>}
+ * 获取所有菜单树。
+ *
+ * @returns 全部菜单树
  */
 export function getAllMenuTree<T extends Array<StudyJavaSysMenuVo>>(): Promise<T> {
   const url = `${baseUrl}/getAllMenuTree`
@@ -39,9 +45,10 @@ export function getAllMenuTree<T extends Array<StudyJavaSysMenuVo>>(): Promise<T
 }
 
 /**
- * 更新菜单信息
- * @param {StudyJavaSysMenuDto} menuInfo
- * @returns {Promise<boolean>}
+ * 更新菜单信息。
+ *
+ * @param menuInfo - 菜单信息
+ * @returns 是否更新成功
  */
 export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/updateMenu`
@@ -49,9 +56,10 @@ export function updateMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
 }
 
 /**
- * 新增菜单
- * @param {StudyJavaSysMenuDto} menuInfo
- * @returns {Promise<boolean>}
+ * 新增菜单。
+ *
+ * @param menuInfo - 菜单信息
+ * @returns 是否新增成功
  */
 export function insertMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/insertMenu`
@@ -59,9 +67,10 @@ export function insertMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
 }
 
 /**
- * 删除菜单
- * @param {StudyJavaSysMenuVo} menuInfo
- * @returns {Promise<boolean>}
+ * 删除菜单。
+ *
+ * @param menuInfo - 待删除的菜单信息
+ * @returns 是否删除成功
  */
 export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
   const url = `${baseUrl}/deleteMenu`
@@ -71,9 +80,10 @@ export function deleteMenu(menuInfo: StudyJavaSysMenuDto): Promise<boolean> {
 }
 
 /**
- * 获取菜单详情
- * @param {number} menuId
- * @returns {Promise<T>}
+ * 获取菜单详情。
+ *
+ * @param id - 菜单ID
+ * @returns 菜单详情
  */
 export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<T> {
   const url = `${baseUrl}/getMenuInfo`
@@ -85,8 +95,9 @@ export function getMenuInfo<T extends StudyJavaSysMenuVo>(id: number): Promise<T
 }
 
 /**
- * 获取当前登录用户所拥有的路由列表
- * @returns {Promise<T>}
+ * 获取当前登录用户所拥有的路由列表。
+ *
+ * @returns 用户可见的路由菜单树
  */
 export const getRoutes = <T extends Array<StudyJavaSysMenuVo>>() => {
   const url = `${baseUrl}/getRoutes`

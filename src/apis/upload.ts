@@ -6,23 +6,36 @@ type OnUploadProgress = (progressEvent: AxiosProgressEvent) => void
 
 const CHUNK_SIZE = 10 * 1024 * 1024 // 10 MB 每片
 
+/** 文件上传结果 */
 export interface UploadResult {
   filePath?: string
   status: string
   message?: string
 }
 
+/**
+ * 普通文件上传。
+ *
+ * @param formData - 包含文件的表单
+ * @param onUploadProgress - 上传进度回调
+ * @returns 上传结果（文件路径或错误信息）
+ */
 export const uploadFile = (formData: FormData, onUploadProgress: OnUploadProgress) => {
   return request.post<UploadResult, UploadResult>('/file/upload', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-    // 显示上传进度
     onUploadProgress,
   })
 }
 
-/** 按 10MB 分片上传，进度是各分片完成比例的平均值 */
+/**
+ * 按 10MB 分片上传大文件，进度是各分片完成比例的平均值。
+ *
+ * @param file - 待上传的大文件
+ * @param onProgress - 上传进度回调（0-100）
+ * @returns 上传全部分片完成
+ */
 export const uploadLargeFile = async (
   file: UploadRawFile,
   onProgress: (percent: number) => void
