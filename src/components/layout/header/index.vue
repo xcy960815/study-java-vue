@@ -15,11 +15,13 @@
       </svg>
     </div>
     <div class="right-panel">
+      <!-- 新版本提示 -->
+      <update-dot></update-dot>
       <!-- 通知中心 -->
       <layout-notification></layout-notification>
-      <!-- 主题配置 -->
+      <!-- 主题 / 全屏快捷入口 -->
       <theme></theme>
-      <el-dropdown trigger="contextmenu" @command="handleChooseItem" size="default">
+      <el-dropdown trigger="click" popper-class="user-dropdown" @command="handleChooseItem" size="default">
         <div class="user-info">
           <el-avatar class="user-avatar" shape="square" :src="userInfo.avatar" />
           <span class="user-name">
@@ -28,12 +30,30 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item command="user-info">个人中心</el-dropdown-item>
+            <el-dropdown-item disabled>
+              <div class="user-profile-card">
+                <el-avatar :size="40" shape="square" :src="userInfo.avatar" />
+                <div class="user-profile-card__identity">
+                  <span class="user-profile-card__name">{{ userInfo.nickName }}</span>
+                  <span class="user-profile-card__account">@{{ userInfo.loginName }}</span>
+                </div>
+                <el-tag
+                  :type="isAdmin ? 'danger' : 'info'"
+                  size="small"
+                  class="user-profile-card__tag"
+                >
+                  {{ isAdmin ? '管理员' : '普通用户' }}
+                </el-tag>
+              </div>
+            </el-dropdown-item>
+            <el-dropdown-item divided command="user-info">个人中心</el-dropdown-item>
             <el-dropdown-item command="change-password">修改密码</el-dropdown-item>
+            <el-dropdown-item command="theme-settings">个性化设置</el-dropdown-item>
             <el-dropdown-item command="login-out">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
+      <PersonalizationDrawer></PersonalizationDrawer>
     </div>
   </el-header>
 </template>
@@ -42,15 +62,21 @@
 import { computed } from 'vue'
 import { useUserInfoStore, useSystemInfoStore, useLoginStore } from '@store'
 import { useRouter } from 'vue-router'
-import { setStyleProperty, CSS_VARIABLES } from '@/utils/system-style'
+import { setStyleProperty, CSS_VARIABLES, useSystemTheme } from '@/utils/system-style'
 import Theme from './themen.vue'
 import LayoutNotification from './notification.vue'
+import UpdateDot from './update-dot.vue'
+import PersonalizationDrawer from './personalization-drawer.vue'
 
 const router = useRouter()
 const userInfoStore = useUserInfoStore()
 const userInfo = computed(() => userInfoStore.$state)
 const systemInfoStore = useSystemInfoStore()
 const openMenuFlag = computed(() => systemInfoStore.getOpenMenuFlag)
+const systemTheme = useSystemTheme()
+
+/** 超级权限视为管理员（与 React 版判定一致） */
+const isAdmin = computed(() => userInfo.value.permissions?.includes('*:*:*') ?? false)
 
 /**
  * 点击展开收起小图标
@@ -74,6 +100,9 @@ const handleChooseItem = (command: string) => {
       break
     case 'change-password':
       router.push('/password')
+      break
+    case 'theme-settings':
+      systemTheme.drawerVisible.value = true
       break
     case 'login-out':
       loginStore.logout()
@@ -143,6 +172,44 @@ const handleChooseItem = (command: string) => {
         color: var(--el-text-color-primary);
         font-size: 14px;
       }
+    }
+  }
+}
+</style>
+
+<style lang="less">
+/* 用户下拉名片：popper 挂在 body 上，样式需全局书写并以 user-dropdown 归位 */
+.user-dropdown.el-popper {
+  .user-profile-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 210px;
+
+    &__identity {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &__account {
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+    }
+
+    &__tag {
+      margin-left: auto;
+      flex-shrink: 0;
     }
   }
 }
