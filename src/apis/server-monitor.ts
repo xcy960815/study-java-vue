@@ -26,3 +26,21 @@ export function startServerMonitor() {
 export function stopServerMonitor() {
   return request.post<string, string>('/monitor/server/stop')
 }
+
+/**
+ * 查询服务器监控指标历史趋势。
+ *
+ * @param metricKey - 指标键（cpu_usage/memory_usage/jvm_usage/disk_usage）
+ * @param start - Unix 秒级起始时间（含）
+ * @param end - Unix 秒级结束时间（含）
+ * @returns 指标趋势数据（label/unit/points）
+ */
+export function getServerMetricsHistory<T extends ServerMetricsHistoryVo>(
+  metricKey: ServerMetricKey,
+  start: number,
+  end: number
+): Promise<T> {
+  return request.get<T, T>('/monitor/server/history', {
+    params: { metricKey, start, end },
+  })
+}

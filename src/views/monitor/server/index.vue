@@ -4,22 +4,17 @@
       <div class="header-title">
         <el-icon class="title-icon"><Monitor /></el-icon>
         <h2>服务器监控</h2>
+        <el-tag :type="isConnected ? 'success' : 'info'" effect="light">
+          {{ isConnected ? '实时监控中' : '未连接' }}
+        </el-tag>
       </div>
       <div class="header-actions">
-        <el-tag v-if="isConnected" type="success" effect="dark">
-          <el-icon><Connection /></el-icon>
-          实时监控中
-        </el-tag>
-        <el-tag v-else type="info" effect="dark">
-          <el-icon><Connection /></el-icon>
-          未连接
-        </el-tag>
         <el-button
           v-if="!isConnected"
           type="primary"
           :icon="VideoPlay"
-          @click="startMonitor"
           :loading="loading"
+          @click="startMonitor"
         >
           开始监控
         </el-button>
@@ -68,365 +63,110 @@
       </el-descriptions>
     </el-card>
 
-    <!-- 监控图表 -->
-    <div class="monitor-charts">
-      <!-- CPU 使用率 -->
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <Cpu theme="outline" size="20" />
-            <span>CPU 使用率</span>
-          </div>
-        </template>
-        <div ref="cpuChartRef" class="chart-container"></div>
-      </el-card>
-
-      <!-- 内存使用率 -->
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <Histogram theme="outline" size="20" />
-            <span>内存使用率</span>
-          </div>
-        </template>
-        <div ref="memoryChartRef" class="chart-container"></div>
-      </el-card>
-
-      <!-- JVM 使用率 -->
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <PieOne theme="outline" size="20" />
-            <span>JVM 内存使用</span>
-          </div>
-        </template>
-        <div ref="jvmChartRef" class="chart-container"></div>
-      </el-card>
-
-      <!-- 磁盘使用率 -->
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <Folder theme="outline" size="20" />
-            <span>磁盘使用率</span>
-          </div>
-        </template>
-        <div ref="diskChartRef" class="chart-container"></div>
-      </el-card>
+    <!-- 指标卡（快捷选择暗色主题时同样联动：数值与描边用 Element 状态色） -->
+    <div class="metric-cards">
+      <MetricCard
+        v-for="metric in metrics"
+        :key="metric.key"
+        :metric="metric"
+        :animated-value="getAnimatedMetricNumber(metric)"
+      />
     </div>
+
+    <!-- 历史趋势 -->
+    <el-card class="history-card">
+      <template #header>
+        <div class="card-header history-header">
+          <span class="history-title">历史趋势</span>
+          <div class="history-controls">
+            <el-select v-model="selectedMetricKey" class="metric-select" @change="refreshHistory">
+              <el-option
+                v-for="option in METRIC_OPTIONS"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
+            </el-select>
+            <el-segmented
+              v-model="selectedRange"
+              :options="RANGE_OPTIONS"
+              @change="refreshHistory"
+            />
+          </div>
+        </div>
+      </template>
+      <div v-loading="loadingHistory" class="history-chart-wrap">
+        <div ref="historyChartRef" class="history-chart"></div>
+        <el-empty
+          v-if="!loadingHistory && historyPoints.length === 0"
+          description="暂无趋势数据"
+          class="history-empty"
+        />
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import * as echarts from 'echarts'
-import type { ECharts } from 'echarts'
+/**
+ * 服务监控页：系统信息 + 实时指标卡（WebSocket 推送驱动数字滚动）+ 历史趋势图。
+ * 历史数据来自后端每分钟的采样任务（ StudyJavaServerMetricsService ）。
+ */
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
-import { Monitor, Connection, VideoPlay, VideoPause, Platform } from '@element-plus/icons-vue'
-import { Cpu, Histogram, PieOne, Folder } from '@icon-park/vue-next'
-import { getServerInfo, startServerMonitor, stopServerMonitor } from '@/apis/server-monitor'
+import { Monitor, VideoPlay, VideoPause, Platform } from '@element-plus/icons-vue'
+import MetricCard from './metric-card.vue'
+import {
+  METRIC_OPTIONS,
+  RANGE_OPTIONS,
+  buildEmptyServerMetrics,
+  serverInfoToMetrics,
+} from './monitor-presentation'
+import { useMetricAnimation } from '@/composables/use-metric-animation'
+import { useServerHistoryChart } from '@/composables/use-server-history-chart'
+import {
+  getServerInfo,
+  startServerMonitor,
+  stopServerMonitor,
+  getServerMetricsHistory,
+} from '@/apis/server-monitor'
 import { getSharedWebSocketClient } from '@/utils/websocket'
+
+const { getAnimatedMetricNumber, animateMetricValues, disposeMetricAnimation } = useMetricAnimation()
+const {
+  chartRef: historyChartRef,
+  renderChart,
+  resizeChart,
+  disposeChart,
+} = useServerHistoryChart()
 
 const loading = ref(false)
 const isConnected = ref(false)
 const serverInfo = ref<ServerInfoVo | null>(null)
+const metrics = ref<ServerMetricValue[]>(buildEmptyServerMetrics())
 
-// 图表实例
-const cpuChartRef = ref<HTMLElement>()
-const memoryChartRef = ref<HTMLElement>()
-const jvmChartRef = ref<HTMLElement>()
-const diskChartRef = ref<HTMLElement>()
-
-let cpuChart: ECharts | null = null
-let memoryChart: ECharts | null = null
-let jvmChart: ECharts | null = null
-let diskChart: ECharts | null = null
+/** 历史趋势当前选中的指标键。 */
+const selectedMetricKey = ref<ServerMetricKey>('cpu_usage')
+/** 历史趋势当前选中的时间范围（秒），默认 1 小时。 */
+const selectedRange = ref(3600)
+/** 历史趋势请求进行中标记。 */
+const loadingHistory = ref(false)
+/** 当前趋势点序列，用于图表空态判断。 */
+const historyPoints = ref<ServerMetricsHistoryPoint[]>([])
 
 // 与订单通知共用同一个 STOMP 连接，仅独立管理本页的监控订阅。
 let unsubscribeServerMonitor: (() => void) | null = null
 
-// 初始化图表
-const initCharts = () => {
-  if (cpuChartRef.value) {
-    cpuChart = echarts.init(cpuChartRef.value)
-    cpuChart.setOption(getCpuChartOption())
-  }
-
-  if (memoryChartRef.value) {
-    memoryChart = echarts.init(memoryChartRef.value)
-    memoryChart.setOption(getMemoryChartOption())
-  }
-
-  if (jvmChartRef.value) {
-    jvmChart = echarts.init(jvmChartRef.value)
-    jvmChart.setOption(getJvmChartOption())
-  }
-
-  if (diskChartRef.value) {
-    diskChart = echarts.init(diskChartRef.value)
-    diskChart.setOption(getDiskChartOption())
-  }
-}
-
-// CPU 图表配置
-const getCpuChartOption = () => ({
-  tooltip: {
-    formatter: '{b}: {c}%',
-  },
-  series: [
-    {
-      name: 'CPU',
-      type: 'gauge',
-      progress: {
-        show: true,
-        width: 18,
-      },
-      axisLine: {
-        lineStyle: {
-          width: 18,
-        },
-      },
-      axisTick: {
-        show: false,
-      },
-      splitLine: {
-        length: 15,
-        lineStyle: {
-          width: 2,
-          color: '#999',
-        },
-      },
-      axisLabel: {
-        distance: 25,
-        color: '#999',
-        fontSize: 12,
-      },
-      anchor: {
-        show: true,
-        showAbove: true,
-        size: 18,
-        itemStyle: {
-          borderWidth: 8,
-        },
-      },
-      title: {
-        show: false,
-      },
-      detail: {
-        valueAnimation: true,
-        fontSize: 32,
-        offsetCenter: [0, '70%'],
-        formatter: '{value}%',
-        color: 'inherit',
-      },
-      data: [
-        {
-          value: 0,
-          name: 'CPU 使用率',
-        },
-      ],
-    },
-  ],
-})
-
-// 内存图表配置
-const getMemoryChartOption = () => ({
-  tooltip: {
-    formatter: '{b}: {c}%',
-  },
-  series: [
-    {
-      name: '内存',
-      type: 'gauge',
-      progress: {
-        show: true,
-        width: 18,
-      },
-      axisLine: {
-        lineStyle: {
-          width: 18,
-          color: [
-            [0.3, '#67E0E3'],
-            [0.7, '#37A2DA'],
-            [1, '#FD666D'],
-          ],
-        },
-      },
-      axisTick: {
-        show: false,
-      },
-      splitLine: {
-        length: 15,
-        lineStyle: {
-          width: 2,
-          color: '#999',
-        },
-      },
-      axisLabel: {
-        distance: 25,
-        color: '#999',
-        fontSize: 12,
-      },
-      anchor: {
-        show: true,
-        showAbove: true,
-        size: 18,
-        itemStyle: {
-          borderWidth: 8,
-          color: '#37A2DA',
-        },
-      },
-      title: {
-        show: false,
-      },
-      detail: {
-        valueAnimation: true,
-        fontSize: 32,
-        offsetCenter: [0, '70%'],
-        formatter: '{value}%',
-        color: 'inherit',
-      },
-      data: [
-        {
-          value: 0,
-          name: '内存使用率',
-        },
-      ],
-    },
-  ],
-})
-
-// JVM 图表配置
-const getJvmChartOption = () => ({
-  tooltip: {
-    trigger: 'item',
-    formatter: '{b}: {c} MB ({d}%)',
-  },
-  legend: {
-    bottom: '5%',
-    left: 'center',
-  },
-  series: [
-    {
-      name: 'JVM 内存',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: {
-        borderRadius: 10,
-        borderColor: '#fff',
-        borderWidth: 2,
-      },
-      label: {
-        show: false,
-        position: 'center',
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 20,
-          fontWeight: 'bold',
-        },
-      },
-      labelLine: {
-        show: false,
-      },
-      data: [
-        { value: 0, name: '已使用' },
-        { value: 0, name: '空闲' },
-      ],
-    },
-  ],
-})
-
-// 磁盘图表配置
-const getDiskChartOption = () => ({
-  tooltip: {
-    trigger: 'item',
-    formatter: '{b}: {c} GB ({d}%)',
-  },
-  legend: {
-    bottom: '5%',
-    left: 'center',
-  },
-  series: [
-    {
-      name: '磁盘',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: {
-        borderRadius: 10,
-        borderColor: '#fff',
-        borderWidth: 2,
-      },
-      label: {
-        show: false,
-        position: 'center',
-      },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 20,
-          fontWeight: 'bold',
-        },
-      },
-      labelLine: {
-        show: false,
-      },
-      data: [
-        { value: 0, name: '已使用', itemStyle: { color: '#91cc75' } },
-        { value: 0, name: '可用空间', itemStyle: { color: '#e0e0e0' } },
-      ],
-    },
-  ],
-})
-
-// 更新图表数据
-const updateCharts = (data: ServerInfoVo) => {
-  serverInfo.value = data
-
-  // 更新 CPU 图表
-  cpuChart?.setOption({
-    series: [
-      {
-        data: [{ value: data.cpu.used }],
-      },
-    ],
-  })
-
-  // 更新内存图表
-  memoryChart?.setOption({
-    series: [
-      {
-        data: [{ value: data.memory.usage }],
-      },
-    ],
-  })
-
-  // 更新 JVM 图表
-  jvmChart?.setOption({
-    series: [
-      {
-        data: [
-          { value: data.jvm.used, name: '已使用' },
-          { value: data.jvm.free, name: '空闲' },
-        ],
-      },
-    ],
-  })
-
-  // 更新磁盘图表
-  diskChart?.setOption({
-    series: [
-      {
-        data: [
-          { value: data.disk.used, name: '已使用' },
-          { value: data.disk.free, name: '可用空间' },
-        ],
-      },
-    ],
-  })
+/**
+ * 用服务器信息快照刷新系统信息与指标卡，并驱动数字滚动。
+ *
+ * @param info - WebSocket 推送或首次拉取的快照
+ */
+const applyServerInfo = (info: ServerInfoVo) => {
+  serverInfo.value = info
+  const nextMetrics = serverInfoToMetrics(info)
+  metrics.value = nextMetrics
+  animateMetricValues(nextMetrics)
 }
 
 // 开始监控
@@ -440,7 +180,7 @@ const startMonitor = async () => {
     unsubscribeServerMonitor = getSharedWebSocketClient().subscribe<ServerInfoVo>(
       '/topic/server-monitor',
       (data) => {
-        updateCharts(data)
+        applyServerInfo(data)
         isConnected.value = true
       },
       (error) => {
@@ -478,25 +218,40 @@ const stopMonitor = async () => {
 const loadInitialData = async () => {
   try {
     const response = await getServerInfo()
-    updateCharts(response)
+    applyServerInfo(response)
   } catch (error) {
     console.error('加载服务器信息失败:', error)
     ElMessage.error('加载服务器信息失败')
   }
 }
 
+// 加载历史趋势
+const refreshHistory = async () => {
+  loadingHistory.value = true
+  const end = Math.floor(Date.now() / 1000)
+  const start = end - selectedRange.value
+  try {
+    const response = await getServerMetricsHistory(selectedMetricKey.value, start, end)
+    historyPoints.value = response.points || []
+    renderChart(response)
+  } catch (error) {
+    console.error('加载历史趋势失败:', error)
+    historyPoints.value = []
+    renderChart()
+  } finally {
+    loadingHistory.value = false
+  }
+}
+
 // 窗口大小改变时重绘图表
 const handleResize = () => {
-  cpuChart?.resize()
-  memoryChart?.resize()
-  jvmChart?.resize()
-  diskChart?.resize()
+  resizeChart()
 }
 
 onMounted(async () => {
   await nextTick()
-  initCharts()
   loadInitialData()
+  refreshHistory()
   window.addEventListener('resize', handleResize)
 })
 
@@ -505,10 +260,10 @@ onBeforeUnmount(() => {
   if (isConnected.value) {
     stopMonitor()
   }
-  cpuChart?.dispose()
-  memoryChart?.dispose()
-  jvmChart?.dispose()
-  diskChart?.dispose()
+  unsubscribeServerMonitor?.()
+  unsubscribeServerMonitor = null
+  disposeMetricAnimation()
+  disposeChart()
   window.removeEventListener('resize', handleResize)
 })
 </script>
@@ -530,7 +285,7 @@ onBeforeUnmount(() => {
 
       .title-icon {
         font-size: 28px;
-        color: var(--el-color-primary);
+        color: var(--sj-primary);
       }
 
       h2 {
@@ -545,26 +300,11 @@ onBeforeUnmount(() => {
       display: flex;
       align-items: center;
       gap: 12px;
-
-      .el-tag {
-        padding: 8px 16px;
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
     }
   }
 
   .system-info-card {
     margin-bottom: 20px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-
-    :deep(.el-card__header) {
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
 
     .card-header {
       display: flex;
@@ -579,49 +319,61 @@ onBeforeUnmount(() => {
     }
   }
 
-  .monitor-charts {
+  .metric-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
 
-    .chart-card {
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
+  .history-card {
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
 
-      &:hover {
-        box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.15);
-        transform: translateY(-2px);
-      }
+    .history-header {
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-      :deep(.el-card__header) {
-        padding: 16px 20px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-      }
+    .history-controls {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-      .card-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 16px;
-        font-weight: 600;
+    .metric-select {
+      width: 220px;
+    }
 
-        .el-icon {
-          font-size: 20px;
-        }
-      }
+    .history-chart-wrap {
+      position: relative;
+      min-height: 320px;
+    }
 
-      .chart-container {
-        width: 100%;
-        height: 350px;
-      }
+    .history-chart {
+      height: 320px;
+    }
+
+    .history-empty {
+      position: absolute;
+      inset: 0;
+      background: color-mix(in srgb, var(--el-bg-color) 80%, transparent);
     }
   }
 }
 
-@media (max-width: 1200px) {
-  .monitor-charts {
-    grid-template-columns: 1fr;
+@media (max-width: 760px) {
+  .server-monitor .monitor-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 </style>
