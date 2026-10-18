@@ -51,7 +51,13 @@ const buildName = (route: StudyJavaSysMenuVo) => {
  * @returns {RouteRecordRaw[]} 路由列表
  */
 export const buildRoute = (voRoutes: StudyJavaSysMenuVo[]): RouteRecordRaw[] => {
-  return voRoutes.map((voRoute) => {
+  // 同层 path 重复的菜单（如误录的重复目录）只保留首行，避免侧栏菜单重复渲染
+  const uniqueRoutes: StudyJavaSysMenuVo[] = []
+  for (const voRoute of voRoutes) {
+    if (uniqueRoutes.some((item) => item.path === voRoute.path)) continue
+    uniqueRoutes.push(voRoute)
+  }
+  return uniqueRoutes.map((voRoute) => {
     const hasChildren = Array.isArray(voRoute.children) && voRoute.children.length > 0
     const route = {
       path: voRoute.path,
